@@ -1,7 +1,7 @@
 import React from "react";
 import { View, Image, Text, StyleSheet } from "react-native";
-import PropTypes from "prop-types"; // @ts-ignore
-
+import PropTypes from "prop-types";
+// @ts-ignore
 import AppIntroSlider from "react-native-app-intro-slider";
 
 const Onboarding = ({
@@ -29,24 +29,48 @@ const Onboarding = ({
   titleStyle = {},
   descriptionStyle = {}
 }) => {
-  const renderItem = ({
-    item,
-    index
-  }) => {
-    return <View style={[styles.slide, styles.ZZbiGaVp]} key={index}>
+  const renderItem = ({ item, index }) => {
+    return (
+      <View style={[styles.slide, { backgroundColor: item.backgroundColor }]} key={index}>
         <Text style={[styles.title, titleStyle]}>{item?.title}</Text>
-        <Image style={[styles.image, imageStyle]} source={{
-        uri: item?.imageURL
-      }} />
+        <Image style={[styles.image, imageStyle]} source={{ uri: item?.imageURL }} />
         <Text style={[styles.text, descriptionStyle]}>{item?.description}</Text>
-      </View>;
+      </View>
+    );
   };
 
-  const handleDone = () => {};
+  const handleDone = () => {
 
-  return <View style={[mainContainerStyle, styles.XicXRJim]}>
-      {slidesData ? <AppIntroSlider renderItem={renderItem} data={slidesData} onDone={onDone || handleDone} onSkip={onSkip || ""} onSlideChange={onSlideChange || ""} showSkipButton={showSkipButton} bottomButton={bottomButton} dotStyle={dotStyle} activeDotStyle={activeDotStyle} skipLabel={skipLabel} doneLabel={doneLabel} nextLabel={nextLabel} prevLabel={prevLabel} showPrevButton={showPrevButton} showNextButton={showNextButton} showDoneButton={showDoneButton} renderNextButton={renderNextButton} renderPrevButton={renderPrevButton} renderDoneButton={renderDoneButton} renderSkipButton={renderSkipButton} /> : <Text style={styles.warText}>No data found!</Text>}
-    </View>;
+  };
+
+  return (
+    <View style={[{ flex: 1 }, mainContainerStyle]}>
+      {slidesData
+        ? <AppIntroSlider
+          renderItem={renderItem}
+          data={slidesData}
+          onDone={onDone || handleDone}
+          onSkip={onSkip || ""}
+          onSlideChange={onSlideChange || ""}
+          showSkipButton={showSkipButton}
+          bottomButton={bottomButton}
+          dotStyle={dotStyle}
+          activeDotStyle={activeDotStyle}
+          skipLabel={skipLabel}
+          doneLabel={doneLabel}
+          nextLabel={nextLabel}
+          prevLabel={prevLabel}
+          showPrevButton={showPrevButton}
+          showNextButton={showNextButton}
+          showDoneButton={showDoneButton}
+          renderNextButton={renderNextButton}
+          renderPrevButton={renderPrevButton}
+          renderDoneButton={renderDoneButton}
+          renderSkipButton={renderSkipButton}
+        />
+        : <Text style={styles.warText}>No data found!</Text>}
+    </View>
+  );
 };
 
 const styles = StyleSheet.create({
@@ -80,14 +104,9 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontFamily: "system-ui",
     fontWeight: "bold"
-  },
-  ZZbiGaVp: {
-    backgroundColor: "item.backgroundColor"
-  },
-  XicXRJim: {
-    flex: 1
   }
 });
+
 Onboarding.propTypes = {
   slidesData: PropTypes.array,
   onDone: PropTypes.func,
@@ -113,6 +132,7 @@ Onboarding.propTypes = {
   titleStyle: PropTypes.object,
   descriptionStyle: PropTypes.object
 };
+
 export default {
   title: "Onboarding",
   navigator: Onboarding
