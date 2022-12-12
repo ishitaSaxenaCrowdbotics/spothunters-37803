@@ -1,12 +1,14 @@
 import { StyleSheet, Dimensions } from "react-native";
-
-const { width, height } = Dimensions.get("window");
-
+const {
+  width,
+  height
+} = Dimensions.get("window");
 const guidelineBaseWidth = 350;
 const guidelineBaseHeight = 680;
 
-const scale = size => (width / guidelineBaseWidth) * size;
-const scaleVertical = size => (height / guidelineBaseHeight) * size;
+const scale = size => width / guidelineBaseWidth * size;
+
+const scaleVertical = size => height / guidelineBaseHeight * size;
 
 export const Color = {
   malibu: "#46E1FD",
@@ -18,7 +20,6 @@ export const Color = {
   google: "#4285F4",
   red: "red"
 };
-
 export const styles = StyleSheet.create({
   screen: {
     flexDirection: "column",
@@ -112,7 +113,11 @@ export const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: Color.whiteOff
   },
-  imageContainer: { marginTop: -20, width: width, height: height / 2 },
+  imageContainer: {
+    marginTop: -20,
+    width: width,
+    height: height / 2
+  },
   cardView: {
     marginTop: -90,
     marginBottom: 20,
@@ -123,7 +128,10 @@ export const styles = StyleSheet.create({
     flex: 1,
     borderRadius: 10,
     elevation: 3,
-    shadowOffset: { height: 10, width: 10 },
+    shadowOffset: {
+      height: 10,
+      width: 10
+    },
     shadowOpacity: 0.3,
     shadowColor: Color.steel
   },
@@ -148,7 +156,6 @@ export const styles = StyleSheet.create({
     fontSize: 18
   }
 });
-
 export const buttonStyles = {
   viewStyle: {
     backgroundColor: Color.malibu,
@@ -167,7 +174,6 @@ export const buttonStyles = {
     marginVertical: 10
   }
 };
-
 export const textInputStyles = {
   textInput: {
     borderColor: Color.steel,
@@ -179,6 +185,13 @@ export const textInputStyles = {
     paddingVertical: 7,
     color: Color.black
   },
-  label: { color: "#6A6A6A", fontSize: 12 },
-  error: { color: Color.red, fontSize: 9, marginLeft: 12 }
+  label: {
+    color: "#6A6A6A",
+    fontSize: 12
+  },
+  error: {
+    color: Color.red,
+    fontSize: 9,
+    marginLeft: 12
+  }
 };

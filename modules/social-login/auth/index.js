@@ -1,80 +1,52 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { mapErrorMessage } from "./utils";
 import { api } from "./api";
-
-export const loginRequest = createAsyncThunk(
-  "login/loginRequest",
-  async (payload) => {
-    const response = await api.apiLoginRequest(payload);
-    return response.data;
-  }
-);
-
-export const signupRequest = createAsyncThunk(
-  "login/signupRequest",
-  async (payload) => {
-    const response = await api.apiSignupRequest(payload);
-    return response.data;
-  }
-);
-
-export const logoutRequest = createAsyncThunk(
-  "login/logoutRequest",
-  async (payload) => {
-    const response = await api.apiLogoutRequest(payload);
-    return response.data;
-  }
-);
-
-export const getAuthUser = createAsyncThunk(
-  "login/getAuthUser",
-  async (payload) => {
-    const response = await api.apiAuthUserRequest(payload);
-    return response.data;
-  }
-);
-export const resetPassword = createAsyncThunk(
-  "login/resetPassword",
-  async (payload) => {
-    const response = await api.apiResetPasswordRequest(payload);
-    return response.data;
-  }
-);
-
-export const facebookLogin = createAsyncThunk(
-  "login/facebookLogin",
-  async (payload) => {
-    const response = await api.apiFacebookLogin(payload);
-    return response.data;
-  }
-);
-
-export const googleLogin = createAsyncThunk(
-  "login/googleLogin",
-  async (payload) => {
-    const response = await api.apiGoogleLogin(payload);
-    return response.data;
-  }
-);
-export const appleLogin = createAsyncThunk(
-  "login/appleLogin",
-  async (payload) => {
-    const response = await api.apiAppleLogin(payload);
-    return response.data;
-  }
-);
-
+export const loginRequest = createAsyncThunk("login/loginRequest", async payload => {
+  const response = await api.apiLoginRequest(payload);
+  return response.data;
+});
+export const signupRequest = createAsyncThunk("login/signupRequest", async payload => {
+  const response = await api.apiSignupRequest(payload);
+  return response.data;
+});
+export const logoutRequest = createAsyncThunk("login/logoutRequest", async payload => {
+  const response = await api.apiLogoutRequest(payload);
+  return response.data;
+});
+export const getAuthUser = createAsyncThunk("login/getAuthUser", async payload => {
+  const response = await api.apiAuthUserRequest(payload);
+  return response.data;
+});
+export const resetPassword = createAsyncThunk("login/resetPassword", async payload => {
+  const response = await api.apiResetPasswordRequest(payload);
+  return response.data;
+});
+export const facebookLogin = createAsyncThunk("login/facebookLogin", async payload => {
+  const response = await api.apiFacebookLogin(payload);
+  return response.data;
+});
+export const googleLogin = createAsyncThunk("login/googleLogin", async payload => {
+  const response = await api.apiGoogleLogin(payload);
+  return response.data;
+});
+export const appleLogin = createAsyncThunk("login/appleLogin", async payload => {
+  const response = await api.apiAppleLogin(payload);
+  return response.data;
+});
 const initialState = {
   token: null,
   user: {},
-  api: { loading: "idle", error: null }
+  api: {
+    loading: "idle",
+    error: null
+  }
 };
 export const slice = createSlice({
   name: "login",
   initialState: initialState,
   reducers: {},
   extraReducers: {
-    [loginRequest.pending]: (state) => {
+    [loginRequest.pending]: state => {
       if (state.api.loading === "idle") {
         state.api.loading = "pending";
         state.api.error = null;
@@ -93,8 +65,7 @@ export const slice = createSlice({
         state.api.loading = "idle";
       }
     },
-
-    [signupRequest.pending]: (state) => {
+    [signupRequest.pending]: state => {
       if (state.api.loading === "idle") {
         state.api.loading = "pending";
         state.api.error = null;
@@ -113,14 +84,13 @@ export const slice = createSlice({
         state.api.loading = "idle";
       }
     },
-
-    [logoutRequest.pending]: (state) => {
+    [logoutRequest.pending]: state => {
       if (state.api.loading === "idle") {
         state.api.loading = "pending";
         state.api.error = null;
       }
     },
-    [logoutRequest.fulfilled]: (state) => {
+    [logoutRequest.fulfilled]: state => {
       if (state.api.loading === "pending") {
         return initialState;
       }
@@ -131,7 +101,7 @@ export const slice = createSlice({
         state.api.loading = "idle";
       }
     },
-    [getAuthUser.pending]: (state) => {
+    [getAuthUser.pending]: state => {
       if (state.api.loading === "idle") {
         state.api.loading = "pending";
         state.api.error = null;
@@ -150,8 +120,7 @@ export const slice = createSlice({
         state.api.loading = "idle";
       }
     },
-
-    [resetPassword.pending]: (state) => {
+    [resetPassword.pending]: state => {
       if (state.api.loading === "idle") {
         state.api.loading = "pending";
         state.api.error = null;
@@ -170,7 +139,7 @@ export const slice = createSlice({
         state.api.loading = "idle";
       }
     },
-    [facebookLogin.pending]: (state) => {
+    [facebookLogin.pending]: state => {
       if (state.api.loading === "idle") {
         state.api.loading = "pending";
         state.api.error = null;
@@ -189,7 +158,7 @@ export const slice = createSlice({
         state.api.loading = "idle";
       }
     },
-    [googleLogin.pending]: (state) => {
+    [googleLogin.pending]: state => {
       if (state.api.loading === "idle") {
         state.api.loading = "pending";
         state.api.error = null;
@@ -208,7 +177,7 @@ export const slice = createSlice({
         state.api.loading = "idle";
       }
     },
-    [appleLogin.pending]: (state) => {
+    [appleLogin.pending]: state => {
       if (state.api.loading === "idle") {
         state.api.loading = "pending";
         state.api.error = null;
