@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "52e38283d353d8f729a2a5c65644701e528ba8be9278f5fb359201fe4cbe1159"
+            "sha256": "ec8c3f05bf0aaabcd0d4263cdb677cffbb9973cc6d096b3505aaa62bfad0d391"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -59,6 +59,10 @@
         "cb-django-social-auth": {
             "editable": true,
             "path": "./modules/django_social_auth"
+        },
+        "cb-payments": {
+            "editable": true,
+            "path": "./modules/payments"
         },
         "certifi": {
             "hashes": [
@@ -988,6 +992,14 @@
             ],
             "markers": "python_version >= '3.5'",
             "version": "==0.4.3"
+        },
+        "stripe": {
+            "hashes": [
+                "sha256:d39a557fe3bbf75db181dce25b5d6d62039a65b024a7854cdd67eedf9169bfcc",
+                "sha256:ffab4b53dda04197d641acec98150327860bf8535e14b522775f0aa3e2379ce1"
+            ],
+            "markers": "python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2, 3.3'",
+            "version": "==2.26.0"
         },
         "tomli": {
             "hashes": [
