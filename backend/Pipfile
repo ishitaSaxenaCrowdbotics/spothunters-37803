@@ -34,3 +34,4 @@ google-cloud-storage = "==2.5.0"
 pipenv = "*"
 cb-django-social-auth = {editable = true, path = "./modules/django_social_auth"}
 cb-payments = {editable = true, path = "./modules/payments"}
+cb-terms-and-conditions = {editable = true, path = "./modules/terms_and_conditions"}

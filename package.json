@@ -19,6 +19,7 @@
     "@modules/qr-code": "file:./modules/qr-code/",
     "@modules/social-login": "file:./modules/social-login/",
     "@modules/splash": "file:./modules/splash/",
+    "@modules/terms-and-conditions": "file:./modules/terms-and-conditions",
     "@react-native-async-storage/async-storage": "1.17.9",
     "@react-native-community/masked-view": "^0.1.10",
     "@react-navigation/native": "^5.9.3",
