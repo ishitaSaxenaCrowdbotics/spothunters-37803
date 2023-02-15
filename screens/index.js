@@ -1,169 +1,104 @@
-import React, { useState } from "react";
+import * as React from "react";
 import {
   Text,
   View,
-  TouchableOpacity,
-  Image,
-  TouchableHighlight,
+  StyleSheet,
   TextInput,
-  StyleSheet
+  TouchableHighlight
 } from "react-native";
 
-const Login2 = () => {
-  const [selected, setSelected] = useState(false);
-  const onPress = () => {
-    setSelected(!selected);
-  };
+const pressed = () => {
+  console.log("pressed");
+};
+
+const ForgotPassword = () => {
   return (
     <View style={styles.container}>
-      <View style={styles.heading}>
-        <Text style={styles.headingText}>Log in</Text>
+      <View style={styles.topHead}>
+        <Text style={styles.mainHeading}>Forgot {"\n"} password</Text>
       </View>
-      <View>
-        <View style={styles.emailContainer}>
-          <Text style={styles.mr10}>Email address</Text>
-          <Input placeholder="Email" />
+
+      <View style={styles.inputSection}>
+        <View style={styles.newPassword}>
+          <Text style={styles.newPassword}>
+            Set new password for your account.
+          </Text>
         </View>
-        <View style={styles.mb20}>
-          <Text style={styles.mr10}>Password</Text>
-          <Input placeholder="Password" />
+        <View style={styles.passwordInput}>
+          <Text style={styles.newPasswordLabel}>Password</Text>
+          <Input placeholder="Enter"></Input>
         </View>
-        <View style={styles.forgotPassword}>
-          <View>
-            <CheckBox
-              onPress={onPress}
-              selected={selected}
-              text="Remember me"
-            />
-          </View>
-          <TouchableOpacity>
-            <Text>Forgot Password?</Text>
-          </TouchableOpacity>
-        </View>
-        <View style={styles.loginContainer}>
-          <Button>Log In</Button>
-        </View>
-        <View style={styles.orContainer}>
-          <View style={styles.line} />
-          <Text style={styles.orText}>Or</Text>
-          <View style={styles.line} />
-        </View>
-        <View style={styles.imageContainer}>
-          <View style={styles.iconContainer}>
-            <Image
-              source={require("./assets/appleIcon.png")}
-              style={styles.icon}
-            />
-          </View>
-          <View style={styles.iconContainer}>
-            <Image
-              source={require("./assets/googleIcon.png")}
-              style={styles.icon}
-            />
-          </View>
-          <View style={styles.iconContainer}>
-            <Image
-              source={require("./assets/fbIcon.png")}
-              style={styles.icon}
-            />
-          </View>
+        <View style={styles.confirmInput}>
+          <Text style={styles.newPasswordLabel}>Confirm Password</Text>
+          <Input placeholder="Enter"></Input>
         </View>
       </View>
-      <View style={styles.footerContainer}>
-        <Text style={styles.footerText}>Do not have an account?</Text>
-        <TouchableOpacity>
-          <Text>Sign Up</Text>
-        </TouchableOpacity>
+      <View style={styles.resetButton}>
+        <Button onPress={pressed} style={styles.resetBtn}>
+          Reset password
+        </Button>
+      </View>
+      <View style={styles.back}>
+        <Text style={styles.backText}>Back</Text>
       </View>
     </View>
   );
 };
 const styles = StyleSheet.create({
+  topHead: {
+    display: "flex",
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    textAlign: "center"
+  },
+  mainHeading: {
+    fontSize: 30,
+    fontWeight: "bold",
+    textAlign: "center"
+  },
   container: {
     padding: 20,
-    display: "flex",
-    flexDirection: "column",
-    justifyContent: "space-between",
-    height: "100%",
-    backgroundColor: "#fff"
+    backgroundColor: "#FFF",
+    height: "100%"
   },
-  heading: {
-    alignSelf: "center"
+  inputSection: {
+    paddingTop: 40
   },
-  headingText: {
-    fontSize: 42,
-    fontWeight: "500"
-  },
-  emailContainer: {
-    marginBottom: 10
-  },
-  mr10: {
-    marginRight: 10,
-    marginBottom: 10
-  },
-  mb20: {
-    marginBottom: 20
-  },
-  forgotPassword: {
-    display: "flex",
-    flexDirection: "row",
-    justifyContent: "space-between",
-    marginBottom: 40
-  },
-  loginContainer: {
-    width: "80%",
-    alignSelf: "center"
-  },
-  orContainer: {
-    display: "flex",
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    width: "70%",
-    alignSelf: "center"
-  },
-  line: {
-    height: 1,
-    width: 100,
-    backgroundColor: "rgba(0, 0, 0, 0.05)"
-  },
-  orText: {
-    marginVertical: 40,
-    alignSelf: "center",
-    fontSize: 16,
-    color: "#231F20",
-    opacity: 0.5
-  },
-  imageContainer: {
+  newPassword: {
     display: "flex",
     flexDirection: "row",
     alignItems: "center",
-    width: "60%",
-    alignSelf: "center",
-    justifyContent: "space-between"
+    justifyContent: "center"
   },
-  iconContainer: {
-    height: 40,
-    width: 40,
-    padding: 10,
-    borderRadius: 10,
-    backgroundColor: "#F7F7F7"
+  passwordInput: {
+    marginTop: 50
   },
-  icon: {
-    height: 18,
-    width: 18
+  newPasswordLabel: {
+    paddingLeft: 15,
+    paddingBottom: 7
   },
-  footerContainer: {
-    alignSelf: "center",
+  confirmInput: {
+    paddingTop: 10
+  },
+  resetButton: {
+    paddingTop: 20,
+    paddingLeft: 30,
+    paddingRight: 30
+  },
+  back: {
     display: "flex",
-    flexDirection: "row"
+    alignItems: "center",
+    justifyContent: "center",
+    paddingTop: 30
   },
-  footerText: {
-    color: "#6B6B6B"
+  backText: {
+    fontWeight: "600",
+    fontSize: 20
   }
 });
 
-export default Login2;
+export default ForgotPassword;
 
 const Button = (props) => {
   return (
@@ -207,43 +142,11 @@ const btnStyles = StyleSheet.create({
   }
 });
 
-const CheckBox = ({ selected, onPress, text }) => (
-  <TouchableOpacity onPress={onPress}>
-    <View style={checkBoxStyles.checkBoxContainer}>
-      <View style={checkBoxStyles.iconContainer}>
-        {selected && (
-          <Image
-            source={require("./assets/checkbox.png")}
-            style={checkBoxStyles.icon}
-          />
-        )}
-      </View>
-      <Text style={checkBoxStyles.iconText}>{text}</Text>
-    </View>
-  </TouchableOpacity>
-);
-
-const checkBoxStyles = StyleSheet.create({
-  checkBoxContainer: { display: "flex", flexDirection: "row" },
-  iconContainer: {
-    height: 18,
-    width: 18,
-    borderColor: "#000000",
-    borderWidth: 2,
-    borderRadius: 5,
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center"
-  },
-  icon: { height: 16, width: 16 },
-  iconText: { marginLeft: 10 }
-});
-
 const Input = (props) => {
   return (
     <View>
       <TextInput
-        style={textStyles.input}
+        style={inputStyles.input}
         placeholder={props.placeholder}
         value={props.value}
         onChangeText={(num) => props.setValue(num)}
@@ -252,14 +155,14 @@ const Input = (props) => {
       />
       {props.errorText
         ? (
-        <Text style={textStyles.error}>{props.errorText}</Text>
+        <Text style={inputStyles.error}>{props.errorText}</Text>
           )
         : null}
     </View>
   );
 };
 
-const textStyles = StyleSheet.create({
+const inputStyles = StyleSheet.create({
   input: {
     backgroundColor: "#fff",
     height: 53,
@@ -268,7 +171,7 @@ const textStyles = StyleSheet.create({
     borderRadius: 10,
     fontSize: 14,
     borderWidth: 1,
-    paddingHorizontal: 10
+    paddingHorizontal: 15
   },
   error: {
     fontSize: 13,
