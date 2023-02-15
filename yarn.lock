@@ -1096,6 +1096,11 @@
 "@modules/payments@file:./modules/payments":
   version "1.0.1"
 
+"@modules/privacy-policy@file:./modules/privacy-policy":
+  version "1.0.1"
+  dependencies:
+    react-native-render-html "^5.1.0"
+
 "@modules/qr-code@file:./modules/qr-code":
   version "1.0.0"
   dependencies:

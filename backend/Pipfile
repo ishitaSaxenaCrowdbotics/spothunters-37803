@@ -35,3 +35,4 @@ pipenv = "*"
 cb-django-social-auth = {editable = true, path = "./modules/django_social_auth"}
 cb-payments = {editable = true, path = "./modules/payments"}
 cb-terms-and-conditions = {editable = true, path = "./modules/terms_and_conditions"}
+cb-privacy-policy = {editable = true, path = "./modules/privacy_policy"}

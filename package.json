@@ -16,6 +16,7 @@
     "@modules/maps": "file:./modules/maps/",
     "@modules/onboarding": "file:./modules/onboarding/",
     "@modules/payments": "file:./modules/payments",
+    "@modules/privacy-policy": "file:./modules/privacy-policy",
     "@modules/qr-code": "file:./modules/qr-code/",
     "@modules/social-login": "file:./modules/social-login/",
     "@modules/splash": "file:./modules/splash/",

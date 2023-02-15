@@ -67,6 +67,7 @@ This section will show any installed modules you add from the Storyboard Modules
 - [payments]()
 - [react-native-qr-code](modules/qr-code)
 - [terms-and-conditions]()
+- [privacy-policy]()
 
 # Getting started: Frontend
 
