@@ -1,238 +1,278 @@
 import React, { useState } from "react";
 import {
   Text,
-  StyleSheet,
   View,
-  ScrollView,
-  SafeAreaView,
+  TouchableOpacity,
   Image,
+  TouchableHighlight,
   TextInput,
-  Pressable
+  StyleSheet
 } from "react-native";
 
-const AddPaymentMethodScreen = (params) => {
-  const [paymentOption, setPaymentOption] = useState("");
-  const [cardNumber, setCardNumber] = useState("");
-  const [cardExpiry, setCardExpiry] = useState("");
-  const [cvv, setCvv] = useState("");
-  const [name, setName] = useState("");
+const Login2 = () => {
+  const [selected, setSelected] = useState(false);
+  const onPress = () => {
+    setSelected(!selected);
+  };
   return (
-    <SafeAreaView style={styles.container}>
-      <ScrollView>
-        <View style={styles.header}>
-          <View style={styles.paletteContainer}>
-            <View style={styles.unSelected}></View>
-            <View style={styles.unSelected}></View>
-            <View style={styles.selected}></View>
-          </View>
-          <Image
-            source={require("./assets/3Dots.png")}
-            style={styles.threeDots}
-          />
+    <View style={styles.container}>
+      <View style={styles.heading}>
+        <Text style={styles.headingText}>Log in</Text>
+      </View>
+      <View>
+        <View style={styles.emailContainer}>
+          <Text style={styles.mr10}>Email address</Text>
+          <Input placeholder="Email" />
         </View>
-        <View style={styles.inputs}>
-          <View style={styles.inputContainer}>
-            <Text style={styles.inputText}>Payment Options</Text>
-            <TextInput
-              style={styles.input}
-              onChangeText={(text) => setPaymentOption(text)}
-              value={paymentOption}
-              placeholder="Master Card"
-              placeholderTextColor="#9B9B9B"
-              autoCapitalize="none"
-              autoCorrect={false}
+        <View style={styles.mb20}>
+          <Text style={styles.mr10}>Password</Text>
+          <Input placeholder="Password" />
+        </View>
+        <View style={styles.forgotPassword}>
+          <View>
+            <CheckBox
+              onPress={onPress}
+              selected={selected}
+              text="Remember me"
             />
           </View>
-          <View style={styles.inputContainer}>
-            <Text style={styles.inputText}>Card Number</Text>
-            <TextInput
-              style={styles.input}
-              onChangeText={(text) => setCardNumber(text)}
-              value={cardNumber}
-              placeholder="Enter your Card Number"
-              placeholderTextColor="#9B9B9B"
-              autoCapitalize="none"
-              autoCorrect={false}
-            />
-          </View>
-          <View style={styles.halfInputs}>
-            <View style={styles.inputContainer}>
-              <Text style={styles.inputText}>Expiration Date</Text>
-              <TextInput
-                style={[styles.input, styles.input1]}
-                onChangeText={(text) => setCardExpiry(text)}
-                value={cardExpiry}
-                placeholder="Enter your last name"
-                placeholderTextColor="#9B9B9B"
-                autoCapitalize="none"
-                autoCorrect={false}
-              />
-            </View>
-            <View style={styles.inputContainer}>
-              <Text style={styles.inputText}>CVV</Text>
-              <TextInput
-                style={[styles.input, styles.input2]}
-                onChangeText={(text) => setCvv(text)}
-                value={cvv}
-                placeholder="CVV"
-                placeholderTextColor="#9B9B9B"
-                autoCapitalize="none"
-                autoCorrect={false}
-              />
-            </View>
-          </View>
-          <View style={styles.inputContainer}>
-            <Text style={styles.inputText}>Card Holder Name</Text>
-            <TextInput
-              style={styles.input}
-              onChangeText={(text) => setName(text)}
-              value={name}
-              placeholder="Username"
-              placeholderTextColor="#9B9B9B"
-              autoCapitalize="none"
-              autoCorrect={false}
-            />
-          </View>
-          <View style={styles.checkBoxContainer}>
-            <Text style={styles.inputText}>Save this card details</Text>
+          <TouchableOpacity>
+            <Text>Forgot Password?</Text>
+          </TouchableOpacity>
+        </View>
+        <View style={styles.loginContainer}>
+          <Button>Log In</Button>
+        </View>
+        <View style={styles.orContainer}>
+          <View style={styles.line} />
+          <Text style={styles.orText}>Or</Text>
+          <View style={styles.line} />
+        </View>
+        <View style={styles.imageContainer}>
+          <View style={styles.iconContainer}>
             <Image
-              source={require("./assets/checkbox.png")}
-              style={styles.checkBox}
+              source={require("./assets/appleIcon.png")}
+              style={styles.icon}
+            />
+          </View>
+          <View style={styles.iconContainer}>
+            <Image
+              source={require("./assets/googleIcon.png")}
+              style={styles.icon}
+            />
+          </View>
+          <View style={styles.iconContainer}>
+            <Image
+              source={require("./assets/fbIcon.png")}
+              style={styles.icon}
             />
           </View>
         </View>
-        <View style={styles.btnContainer}>
-          <Pressable style={styles.btn}>
-            <Text style={styles.btnText}>Continue</Text>
-            <Image
-              source={require("./assets/arrow.png")}
-              style={styles.arrow}
-            />
-          </Pressable>
-        </View>
-      </ScrollView>
-    </SafeAreaView>
+      </View>
+      <View style={styles.footerContainer}>
+        <Text style={styles.footerText}>Do not have an account?</Text>
+        <TouchableOpacity>
+          <Text>Sign Up</Text>
+        </TouchableOpacity>
+      </View>
+    </View>
+  );
+};
+const styles = StyleSheet.create({
+  container: {
+    padding: 20,
+    display: "flex",
+    flexDirection: "column",
+    justifyContent: "space-between",
+    height: "100%",
+    backgroundColor: "#fff"
+  },
+  heading: {
+    alignSelf: "center"
+  },
+  headingText: {
+    fontSize: 42,
+    fontWeight: "500"
+  },
+  emailContainer: {
+    marginBottom: 10
+  },
+  mr10: {
+    marginRight: 10,
+    marginBottom: 10
+  },
+  mb20: {
+    marginBottom: 20
+  },
+  forgotPassword: {
+    display: "flex",
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginBottom: 40
+  },
+  loginContainer: {
+    width: "80%",
+    alignSelf: "center"
+  },
+  orContainer: {
+    display: "flex",
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    width: "70%",
+    alignSelf: "center"
+  },
+  line: {
+    height: 1,
+    width: 100,
+    backgroundColor: "rgba(0, 0, 0, 0.05)"
+  },
+  orText: {
+    marginVertical: 40,
+    alignSelf: "center",
+    fontSize: 16,
+    color: "#231F20",
+    opacity: 0.5
+  },
+  imageContainer: {
+    display: "flex",
+    flexDirection: "row",
+    alignItems: "center",
+    width: "60%",
+    alignSelf: "center",
+    justifyContent: "space-between"
+  },
+  iconContainer: {
+    height: 40,
+    width: 40,
+    padding: 10,
+    borderRadius: 10,
+    backgroundColor: "#F7F7F7"
+  },
+  icon: {
+    height: 18,
+    width: 18
+  },
+  footerContainer: {
+    alignSelf: "center",
+    display: "flex",
+    flexDirection: "row"
+  },
+  footerText: {
+    color: "#6B6B6B"
+  }
+});
+
+export default Login2;
+
+const Button = (props) => {
+  return (
+    <TouchableHighlight onPress={props.onPress} underlayColor="#DDDDDD">
+      <View
+        style={[
+          btnStyles.button,
+          {
+            backgroundColor: props.backgroundColor
+              ? props.backgroundColor
+              : "#000000",
+            height: props.height ? props.height : 49,
+            borderWidth: props.borderWidth ? props.borderWidth : 0,
+            borderColor: props.borderColor ? props.borderColor : "#000000"
+          }
+        ]}
+      >
+        <Text
+          style={[
+            btnStyles.text,
+            { color: props.color ? props.color : "#ffffff" }
+          ]}
+        >
+          {props.children}
+        </Text>
+      </View>
+    </TouchableHighlight>
   );
 };
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#fff"
-  },
-  header: {
-    padding: 20
-  },
-  paletteContainer: {
-    flexDirection: "row",
-    backgroundColor: "#F1F1F1",
-    height: 45,
-    width: "100%",
-    borderRadius: 10,
-    alignItems: "center",
-    justifyContent: "space-around",
-    paddingHorizontal: 5
-  },
-  selected: {
-    backgroundColor: "#fff",
-    height: "80%",
-    flex: 1,
-    padding: 10,
-    paddingHorizontal: 25,
-    borderRadius: 10,
-    borderWidth: 1,
-    borderColor: "#e6e6e6",
-    marginHorizontal: 5
-  },
-  unSelected: {
-    height: "80%",
-    flex: 1,
-    marginHorizontal: 5,
-    backgroundColor: "#12D790",
-    padding: 10,
-    paddingHorizontal: 25,
-    borderRadius: 10
-  },
-  threeDots: {
-    alignSelf: "center",
-    marginTop: 20
-  },
-  inputs: {
-    paddingHorizontal: 20,
-    justifyContent: "center"
-  },
-  inputContainer: {
-    flexDirection: "column",
-    flex: 1,
-    justifyContent: "center"
-  },
-  inputText: {
-    fontSize: 14,
-    marginLeft: 20
-  },
-  input: {
-    borderWidth: 1,
-    borderColor: "#e6e6e6",
-    borderRadius: 10,
-    padding: 10,
-    paddingLeft: 20,
-    marginVertical: 10,
-    width: "100%"
-  },
-  halfInputs: {
-    justifyContent: "space-between",
-    flexDirection: "row",
-    flex: 1
-  },
-  input1: {
-    borderRightWidth: 0,
-    borderRightColor: "#fff",
-    borderTopRightRadius: 0,
-    borderBottomRightRadius: 0,
-    flex: 0.8
-  },
-  input2: {
-    borderLeftWidth: 0,
-    borderLeftColor: "#fff",
-    borderTopLeftRadius: 0,
-    borderBottomLeftRadius: 0,
-    flex: 0.2
-  },
-  checkBoxContainer: {
-    borderWidth: 1,
-    borderColor: "#e6e6e6",
-    padding: 10,
-    marginVertical: 10,
-    flexDirection: "row",
-    justifyContent: "space-between",
-    borderRadius: 10
-  },
-  btnContainer: {
-    padding: 30,
-    paddingTop: 10,
-    paddingHorizontal: 40,
-    justifyContent: "center",
-    marginTop: 20
-  },
-  btn: {
-    backgroundColor: "black",
-    height: 50,
-    width: "100%",
-    padding: 10,
-    paddingHorizontal: 25,
-    borderRadius: 10,
+const btnStyles = StyleSheet.create({
+  button: {
+    display: "flex",
     justifyContent: "center",
     alignItems: "center",
-    flexDirection: "row"
+    borderRadius: 10
   },
-  arrow: {
-    marginLeft: 10,
-    marginTop: 2
-  },
-  btnText: {
-    color: "#fff",
-    fontSize: 16,
-    fontWeight: "bold"
+  text: {
+    fontWeight: "bold",
+    fontSize: 15
   }
 });
-export default AddPaymentMethodScreen;
+
+const CheckBox = ({ selected, onPress, text }) => (
+  <TouchableOpacity onPress={onPress}>
+    <View style={checkBoxStyles.checkBoxContainer}>
+      <View style={checkBoxStyles.iconContainer}>
+        {selected && (
+          <Image
+            source={require("./assets/checkbox.png")}
+            style={checkBoxStyles.icon}
+          />
+        )}
+      </View>
+      <Text style={checkBoxStyles.iconText}>{text}</Text>
+    </View>
+  </TouchableOpacity>
+);
+
+const checkBoxStyles = StyleSheet.create({
+  checkBoxContainer: { display: "flex", flexDirection: "row" },
+  iconContainer: {
+    height: 18,
+    width: 18,
+    borderColor: "#000000",
+    borderWidth: 2,
+    borderRadius: 5,
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center"
+  },
+  icon: { height: 16, width: 16 },
+  iconText: { marginLeft: 10 }
+});
+
+const Input = (props) => {
+  return (
+    <View>
+      <TextInput
+        style={textStyles.input}
+        placeholder={props.placeholder}
+        value={props.value}
+        onChangeText={(num) => props.setValue(num)}
+        placeholderTextColor="#ddd"
+        editable={props.editable !== false}
+      />
+      {props.errorText
+        ? (
+        <Text style={textStyles.error}>{props.errorText}</Text>
+          )
+        : null}
+    </View>
+  );
+};
+
+const textStyles = StyleSheet.create({
+  input: {
+    backgroundColor: "#fff",
+    height: 53,
+    borderColor: "#C4C4C4",
+    color: "#000",
+    borderRadius: 10,
+    fontSize: 14,
+    borderWidth: 1,
+    paddingHorizontal: 10
+  },
+  error: {
+    fontSize: 13,
+    color: "#FA060D",
+    paddingTop: 8
+  }
+});

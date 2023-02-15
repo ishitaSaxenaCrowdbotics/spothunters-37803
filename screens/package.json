@@ -1,10 +1,11 @@
 {
-    "name": "@screens/add-payment-method",
+    "name": "@screens/login-2",
     "version": "1.0.0",
     "description": "",
     "private": true,
     "main": "index.js",
-    "files": ["*"],
     "author": "Crowdbotics",
-    "license": "ISC"
+    "license": "ISC",
+    "dependencies": {},
+    "x-dependencies": {}
 }
