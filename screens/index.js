@@ -1,181 +1,141 @@
-import * as React from "react";
+import React, { useState } from "react";
 import {
   Text,
-  View,
   StyleSheet,
+  View,
+  Image,
   TextInput,
-  TouchableHighlight
+  Pressable
 } from "react-native";
 
-const pressed = () => {
-  console.log("pressed");
-};
-
-const ForgotPassword = () => {
+const RateTheAppScreen = (params) => {
+  const [review, setReview] = useState("");
   return (
     <View style={styles.container}>
-      <View style={styles.topHead}>
-        <Text style={styles.mainHeading}>Forgot {"\n"} password</Text>
-      </View>
-
-      <View style={styles.inputSection}>
-        <View style={styles.newPassword}>
-          <Text style={styles.newPassword}>
-            Set new password for your account.
-          </Text>
-        </View>
-        <View style={styles.passwordInput}>
-          <Text style={styles.newPasswordLabel}>Password</Text>
-          <Input placeholder="Enter"></Input>
-        </View>
-        <View style={styles.confirmInput}>
-          <Text style={styles.newPasswordLabel}>Confirm Password</Text>
-          <Input placeholder="Enter"></Input>
-        </View>
-      </View>
-      <View style={styles.resetButton}>
-        <Button onPress={pressed} style={styles.resetBtn}>
-          Reset password
-        </Button>
-      </View>
-      <View style={styles.back}>
-        <Text style={styles.backText}>Back</Text>
-      </View>
-    </View>
-  );
-};
-const styles = StyleSheet.create({
-  topHead: {
-    display: "flex",
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    textAlign: "center"
-  },
-  mainHeading: {
-    fontSize: 30,
-    fontWeight: "bold",
-    textAlign: "center"
-  },
-  container: {
-    padding: 20,
-    backgroundColor: "#FFF",
-    height: "100%"
-  },
-  inputSection: {
-    paddingTop: 40
-  },
-  newPassword: {
-    display: "flex",
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center"
-  },
-  passwordInput: {
-    marginTop: 50
-  },
-  newPasswordLabel: {
-    paddingLeft: 15,
-    paddingBottom: 7
-  },
-  confirmInput: {
-    paddingTop: 10
-  },
-  resetButton: {
-    paddingTop: 20,
-    paddingLeft: 30,
-    paddingRight: 30
-  },
-  back: {
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    paddingTop: 30
-  },
-  backText: {
-    fontWeight: "600",
-    fontSize: 20
-  }
-});
-
-export default ForgotPassword;
-
-const Button = (props) => {
-  return (
-    <TouchableHighlight onPress={props.onPress} underlayColor="#DDDDDD">
-      <View
-        style={[
-          btnStyles.button,
-          {
-            backgroundColor: props.backgroundColor
-              ? props.backgroundColor
-              : "#000000",
-            height: props.height ? props.height : 49,
-            borderWidth: props.borderWidth ? props.borderWidth : 0,
-            borderColor: props.borderColor ? props.borderColor : "#000000"
-          }
-        ]}
-      >
-        <Text
-          style={[
-            btnStyles.text,
-            { color: props.color ? props.color : "#ffffff" }
-          ]}
-        >
-          {props.children}
+      <View style={styles.header}>
+        <Text style={styles.heading}>How was your experience?</Text>
+        <Text style={styles.subhHeading}>
+          Use 5 star rating to rate an app or leave a text review.
         </Text>
       </View>
-    </TouchableHighlight>
-  );
-};
-
-const btnStyles = StyleSheet.create({
-  button: {
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
-    borderRadius: 10
-  },
-  text: {
-    fontWeight: "bold",
-    fontSize: 15
-  }
-});
-
-const Input = (props) => {
-  return (
-    <View>
-      <TextInput
-        style={inputStyles.input}
-        placeholder={props.placeholder}
-        value={props.value}
-        onChangeText={(num) => props.setValue(num)}
-        placeholderTextColor="#ddd"
-        editable={props.editable !== false}
+      <Image
+        source={require("./assets/5starsImage.png")}
+        style={styles.image}
       />
-      {props.errorText
-        ? (
-        <Text style={inputStyles.error}>{props.errorText}</Text>
-          )
-        : null}
+      <Image
+        source={require("./assets/separator.png")}
+        style={styles.separator}
+      />
+      <View style={styles.inputContainer}>
+        <Text style={styles.inputText}>Text review</Text>
+        <TextInput
+          style={styles.input}
+          onChangeText={(text) => setReview(text)}
+          value={review}
+          placeholder="Enter"
+          placeholderTextColor="#9B9B9B"
+          autoCapitalize="none"
+          autoCorrect={false}
+        />
+      </View>
+      <Button buttonText={"Submit"} />
+      <Button buttonText={"Cancel"} outline={true} />
     </View>
   );
 };
 
-const inputStyles = StyleSheet.create({
-  input: {
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
     backgroundColor: "#fff",
-    height: 53,
-    borderColor: "#C4C4C4",
-    color: "#000",
-    borderRadius: 10,
-    fontSize: 14,
-    borderWidth: 1,
-    paddingHorizontal: 15
+    justifyContent: "center"
   },
-  error: {
-    fontSize: 13,
-    color: "#FA060D",
-    paddingTop: 8
+  header: {
+    justifyContent: "center",
+    alignItems: "center",
+    paddingHorizontal: 50
+  },
+  heading: {
+    fontSize: 24,
+    fontWeight: "bold"
+  },
+  subhHeading: {
+    fontSize: 15,
+    lineHeight: 20,
+    marginTop: 10,
+    fontWeight: "bold",
+    textAlign: "center"
+  },
+  image: {
+    alignSelf: "center"
+  },
+  separator: {
+    alignSelf: "center",
+    marginVertical: 30
+  },
+  inputContainer: {
+    flexDirection: "column",
+    justifyContent: "center",
+    marginHorizontal: 20
+  },
+  inputText: {
+    fontSize: 16,
+    marginLeft: 20,
+    color: "#111112"
+  },
+  input: {
+    borderWidth: 1,
+    borderColor: "#e6e6e6",
+    borderRadius: 10,
+    padding: 10,
+    paddingLeft: 20,
+    marginVertical: 10,
+    width: "100%",
+    height: 150
+  }
+});
+export default RateTheAppScreen;
+
+const Button = ({ onPress, buttonText, outline }) => {
+  const btnStyle = {
+    backgroundColor: outline ? "#fff" : "#000",
+    borderColor: outline ? "#000" : "#fff",
+    borderWidth: 1
+  };
+  const btnText = {
+    color: outline ? "#000" : "#fff"
+  };
+  return (
+    <View style={buttonStyles.btnContainer}>
+      <Pressable style={[buttonStyles.btn, btnStyle]} onPress={onPress}>
+        <Text style={[buttonStyles.btnText, btnText]}>{buttonText}</Text>
+      </Pressable>
+    </View>
+  );
+};
+
+const buttonStyles = StyleSheet.create({
+  btnContainer: {
+    paddingTop: 10,
+    paddingHorizontal: 40,
+    justifyContent: "center",
+    marginTop: 20
+  },
+  btn: {
+    backgroundColor: "black",
+    height: 50,
+    width: "100%",
+    padding: 10,
+    paddingHorizontal: 25,
+    borderRadius: 10,
+    justifyContent: "center",
+    alignItems: "center",
+    shadowColor: "rgba(0, 0, 0, 0.2)",
+    elevation: 10
+  },
+  btnText: {
+    color: "#fff",
+    fontSize: 16,
+    fontWeight: "bold"
   }
 });
