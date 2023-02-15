@@ -1096,7 +1096,7 @@
 "@modules/payments@file:./modules/payments":
   version "1.0.1"
 
-"@modules/qr-code@file:./modules/qr-code/":
+"@modules/qr-code@file:./modules/qr-code":
   version "1.0.0"
   dependencies:
     react-native-camera "4.2.1"
