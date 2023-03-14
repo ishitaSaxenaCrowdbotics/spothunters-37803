@@ -1,36 +1,35 @@
+import "react-native-gesture-handler";
 import React, { useContext } from "react";
 import { Provider } from "react-redux";
-import "react-native-gesture-handler";
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
 import { configureStore, createReducer, combineReducers } from "@reduxjs/toolkit";
 import { screens } from "@screens";
-import { modules, reducers, hooks, initialRoute } from "@modules";
+import { modules, reducers, hooks, initialRoute } from "./modules";
 import { connectors } from "@store";
+import { GlobalOptionsContext } from "@options";
+import SplashScreen from "./src/screens/splashScreen";
+import OnBoarding from "./src/screens/onBoarding";
+import Login from "./src/screens/login";
+import termsAndConditions from "./modules/terms-and-conditions";
+import privacyPolicy from "./modules/privacy-policy";
+
 const Stack = createStackNavigator();
-import { GlobalOptionsContext, OptionsContext, getOptions } from "@options";
 
 const getNavigation = (modules, screens, initialRoute) => {
   const Navigation = () => {
-    const routes = modules.concat(screens).map(mod => {
-      const pakage = mod.package;
-      const name = mod.value.title;
-      const Navigator = mod.value.navigator;
-
-      const Component = props => {
-        return <OptionsContext.Provider value={getOptions(pakage)}>
-            <Navigator {...props} />
-          </OptionsContext.Provider>;
-      };
-
-      return <Stack.Screen key={name} name={name} component={Component} />;
-    });
     const screenOptions = {
       headerShown: true
     };
     return <NavigationContainer>
-        <Stack.Navigator initialRouteName={initialRoute} screenOptions={screenOptions}>
-          {routes}
+        <Stack.Navigator initialRouteName={SplashScreen} screenOptions={screenOptions}>
+          {/* {routes} */}
+          <Stack.Screen name='SplashScreen' component={SplashScreen} options={{ headerShown: false }} />
+          <Stack.Screen name='OnBoarding' component={OnBoarding} options={{ headerShown: false }} />
+          <Stack.Screen name='Login' component={Login} options={{ headerShown: false }} />
+          <Stack.Screen name='TermsAndConditions' component={termsAndConditions.navigator} options={{ headerShown: false }} />
+          <Stack.Screen name='PrivacyPolicy' component={privacyPolicy.navigator} options={{ headerShown: false }} />
+          {/* <Stack.Screen name='socialLogin' component={login.} options={{ headerShown: false }} /> */}
         </Stack.Navigator>
       </NavigationContainer>;
   };
