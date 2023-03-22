@@ -1,32 +1,90 @@
 import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, TextInput, ScrollView, Image } from 'react-native';
+import { View, Text, TouchableOpacity, TextInput, ScrollView, Image, Alert } from 'react-native';
 import CheckBox from '@react-native-community/checkbox';
+import { SocialButtonsView } from '../../../modules/social-login/screens/loginsignup';
+import { useDispatch, useSelector } from 'react-redux';
+import { loginRequest, signUpRequest } from '../../utils/service';
 
 const Login = (props) => {
-  const [isAccoutnCreate, setIsAccountCreate] = useState(false)
+  const [isAccountCreate, setIsAccountCreate] = useState(false)
   const [toggleCheckBox, setToggleCheckBox] = useState(false)
+  const [email, setEmail] = useState('ishita_saxena.nga@crowdbotics.com')
+  const [password, setPassword] = useState('reNxsgmgx5')
+  const [mobileNumber, setMobileNumber] = useState('+91-9972537712')
+  const [confirmPassword, setConfirmPassword] = useState('reNxsgmgx5')
+
+  const dispatch = useDispatch()
+  let token = useSelector(state => state?.app?.token)
+
+  const onLoginPress = async () => {
+    if (isAccountCreate) {
+      const signUpData = {
+        name:"ishita",
+        email,
+        password,
+        phone:"+91-9972537712"
+      }
+      const resp1 = await dispatch(signUpRequest(signUpData))
+      if (resp1?.status){
+        props.navigation.navigate('EmailVerification')
+      } else {
+        Alert.alert('Internet connection issue')
+      }
+    } else {
+      const loginData = { email, password }
+      const resp = await dispatch(loginRequest(loginData))
+      if (resp?.status){
+        props.navigation.navigate('Home')
+      } else {
+        Alert.alert('Please enter correct credentials')
+      }
+    }
+  }
+
+  const onLoginSignup = () => {
+    setIsAccountCreate((preState) => !preState)
+    setPassword('')
+  }
+
   return (
     <ScrollView contentContainerStyle={{justifyContent: 'center', backgroundColor: 'white'}}>
       <View style={{ paddingHorizontal: 17, flex: 1, paddingVertical: 30}}>
-        <TouchableOpacity style={{backgroundColor:'#1E8FFF', width: 30, height: 30, alignItems: 'center', justifyContent: 'center', borderRadius: 30}} onPress={() => setIsAccountCreate(false)}>
-          <Image source={require('../../../screens/assets/arrow.png')}
-                      resizeMode={'cover'}
-                      style={{ width: 20, height: 10 }}></Image>
-        </TouchableOpacity>
         <Image source={require('../../assets/logo.png')} style={{height: 111, width: 111, alignSelf: 'center'}}></Image>
         {/* <View style={{height: 111, width: 111, backgroundColor: 'grey', borderRadius: 24, alignSelf: 'center'}} /> */}
-        <Text style={{marginTop: 10, textAlign: 'center', fontSize: 24, color: '#1E8FFF', fontWeight: '600'}}>SpotHunter </Text>
+        <Text style={{marginTop: 10, textAlign: 'center', fontSize: 24, color: '#1E8FFF', fontWeight: '600'}}>SpotHunter</Text>
         <Text style={{marginTop: 12, textAlign: 'center', fontSize: 16, fontWeight: '600'}}>Sign In</Text>
-        <TextInput style={{borderWidth: 1,borderRadius: 10, borderColor: 'grey',marginTop: 20}} placeholder={isAccoutnCreate ? 'Email ID' : 'Email ID/username'}/>
-        <TextInput style={{borderWidth: 1,borderRadius: 10, borderColor: 'grey',marginTop: 20}} placeholder={isAccoutnCreate ? 'mobile number' : 'password'}/>
-        {isAccoutnCreate && 
+        <TextInput 
+          style={{borderWidth: 1,borderRadius: 10, borderColor: 'grey',marginTop: 20}} 
+          placeholder={isAccountCreate ? 'Email ID' : 'Email ID/username'}
+          value={email}
+          onChangeText={(value) => setEmail(value)}/>
+        <TextInput 
+          style={{borderWidth: 1,borderRadius: 10, borderColor: 'grey',marginTop: 20}} 
+          placeholder={isAccountCreate ? 'mobile number' : 'password'}
+          value={isAccountCreate ? mobileNumber : password}
+          onChangeText={(value) => isAccountCreate ? setMobileNumber : setPassword(value)}/>
+        {isAccountCreate && 
           <>
-            <TextInput style={{borderWidth: 1,borderRadius: 10, borderColor: 'grey',marginTop: 20}} placeholder='password'/>
-            <TextInput style={{borderWidth: 1,borderRadius: 10, borderColor: 'grey',marginTop: 20}} placeholder='confirm password'/>
+            <TextInput 
+            style={{borderWidth: 1,borderRadius: 10, borderColor: 'grey',marginTop: 20}} 
+            placeholder='password'
+            value={password}
+            onChangeText={(value) => setPassword(value)}
+            />
+            <TextInput 
+            style={{borderWidth: 1,borderRadius: 10, borderColor: 'grey',marginTop: 20}} 
+            placeholder='confirm password'
+            value={confirmPassword}
+            onChangeText={(value) => setConfirmPassword(value)}/>
           </>
         }
-        {!isAccoutnCreate && <Text style={{marginTop: 12, textAlign: 'center', fontSize: 10, color: '#1E8FFF', alignSelf: 'flex-end'}}>forgot password?</Text>}
-        {isAccoutnCreate && 
+        {!isAccountCreate && 
+          <TouchableOpacity onPress={() => props.navigation.navigate('ChangePassword', {isChangePassword: true})}>
+            <Text style={{marginTop: 12, textAlign: 'center', fontSize: 10, color: '#1E8FFF', alignSelf: 'flex-end'}}>
+              forgot password?
+              </Text>
+          </TouchableOpacity>}
+        {isAccountCreate && 
           <View style={{flexDirection: 'row',marginTop: 16}}>
             <CheckBox value={toggleCheckBox}
               onValueChange={setToggleCheckBox} />
@@ -42,12 +100,20 @@ const Login = (props) => {
             </View>
           </View>
         }
-        <TouchableOpacity style={{borderRadius: 24, backgroundColor: '#1E8FFF', padding: 10, alignItems: 'center', marginTop: 30}} onPress={() => props.navigation.navigate('Login')}>
+        <TouchableOpacity style={{borderRadius: 24, backgroundColor: '#1E8FFF', padding: 10, alignItems: 'center', marginTop: 30}} onPress={onLoginPress}>
           <Text style={{color: 'white', fontWeight: '700'}}>
-          {isAccoutnCreate ? 'CREATE ACCOUNT' : 'LOGIN'}
+          {isAccountCreate ? 'CREATE ACCOUNT' : 'LOGIN'}
           </Text>
         </TouchableOpacity>
-        <TouchableOpacity style={{borderRadius: 24, backgroundColor: '#1E8FFF', padding: 10, alignItems: 'center', marginTop: 30}} onPress={() => props.navigation.navigate('Login')}>
+        <View style={{marginTop: 30}}>
+        <SocialButtonsView
+          loading={false}
+          onFacebookConnect={() => onFacebookConnect(dispatch, navigation)}
+          onGoogleConnect={() => onGoogleConnect(dispatch, navigation)}
+          onAppleConnect={() => onAppleConnect(dispatch, navigation)}
+        />
+      </View>
+        {/* <TouchableOpacity style={{borderRadius: 24, backgroundColor: '#1E8FFF', padding: 10, alignItems: 'center', marginTop: 30}} onPress={() => props.navigation.navigate('Login')}>
           <Text style={{color: 'white', fontWeight: '700'}}>
           Login with google
           </Text>
@@ -61,17 +127,15 @@ const Login = (props) => {
           <Text style={{color: 'white', fontWeight: '700'}}>
           Login with apple
           </Text>
+        </TouchableOpacity> */}
+        
+        <Text style={{marginTop: 32, textAlign: 'center', fontSize: 13}}>{isAccountCreate ? "Already have an account?" : "Don't have account?"}</Text>
+        <TouchableOpacity style={{borderRadius: 24, backgroundColor: '#1E8FFF', padding: 10, alignItems: 'center', marginTop: 12}} onPress={onLoginSignup}>
+          <Text style={{color: 'white', fontWeight: '700'}}>
+          {isAccountCreate ?   'Login' : 'create a account'}
+          </Text>
         </TouchableOpacity>
-        {!isAccoutnCreate && 
-          <>
-            <Text style={{marginTop: 32, textAlign: 'center', fontSize: 13}}>Don't have account?</Text>
-            <TouchableOpacity style={{borderRadius: 24, backgroundColor: '#1E8FFF', padding: 10, alignItems: 'center', marginTop: 12}} onPress={() => setIsAccountCreate(true)}>
-              <Text style={{color: 'white', fontWeight: '700'}}>
-              create a account
-              </Text>
-            </TouchableOpacity>
-          </>
-        }
+          
         <Text style={{marginTop: 16, textAlign: 'center', fontSize: 10, color: '#1E8FFF'}}>Proceed as a guest</Text>
       </View>
     </ScrollView>

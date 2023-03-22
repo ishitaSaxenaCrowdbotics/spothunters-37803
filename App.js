@@ -13,6 +13,14 @@ import OnBoarding from "./src/screens/onBoarding";
 import Login from "./src/screens/login";
 import termsAndConditions from "./modules/terms-and-conditions";
 import privacyPolicy from "./modules/privacy-policy";
+import ChangePassword from "./src/screens/changPassword";
+import Home from "./src/screens/home";
+import PreviousBooking from "./src/components/previousBooking";
+import UpcomingBooking from "./src/components/upcomingBooking";
+import qrCode from "./modules/qr-code";
+import SpotHunterReducer from "./src/state/reducers";
+import TutorialScreen from "./src/screens/tutorialScreen";
+import EmailVerification from "./src/screens/emailVerification";
 
 const Stack = createStackNavigator();
 
@@ -29,6 +37,13 @@ const getNavigation = (modules, screens, initialRoute) => {
           <Stack.Screen name='Login' component={Login} options={{ headerShown: false }} />
           <Stack.Screen name='TermsAndConditions' component={termsAndConditions.navigator} options={{ headerShown: false }} />
           <Stack.Screen name='PrivacyPolicy' component={privacyPolicy.navigator} options={{ headerShown: false }} />
+          <Stack.Screen name='ChangePassword' component={ChangePassword} options={{ headerShown: false }} />
+          <Stack.Screen name='Home' component={Home} options={{ headerShown: false }} />
+          <Stack.Screen name='TutorialScreen' component={TutorialScreen} options={{ headerShown: false }} />
+          <Stack.Screen name='PreviousBooking' component={PreviousBooking} options={{ headerShown: false }} />
+          <Stack.Screen name='qrCode' component={qrCode.navigator} options={{ headerShown: false }} />
+          <Stack.Screen name='EmailVerification' component={EmailVerification} options={{ headerShown: false }} />
+          {/* <Stack.Screen name='UpcomingBooking' component={UpcomingBooking} options={{ headerShown: false }} /> */}
           {/* <Stack.Screen name='socialLogin' component={login.} options={{ headerShown: false }} /> */}
         </Stack.Navigator>
       </NavigationContainer>;
@@ -38,11 +53,13 @@ const getNavigation = (modules, screens, initialRoute) => {
 };
 
 const getStore = globalState => {
-  const appReducer = createReducer(globalState, _ => {
-    return globalState;
-  });
+  // const appReducer = createReducer(globalState, _ => {
+  //   return globalState;
+  // });
   const reducer = combineReducers({
-    app: appReducer,
+    // app: appReducer,
+    // auth_requests: auth_requests,
+    app: SpotHunterReducer,
     ...reducers,
     ...connectors
   });

@@ -7,7 +7,8 @@ import {
   TextInput,
   ActivityIndicator,
   Alert,
-  Platform
+  Platform,
+  Image
 } from "react-native";
 import {
   AppleButton,
@@ -60,49 +61,53 @@ export const Button = (props) => (
         />
           )
         : (
+          <View style={{flexDirection: 'row', justifyContent: 'center', alignItems: 'center'}}>
+          {props.isImage && <Image source={require('../../../src/assets/facebookLogo.png')}></Image>}
         <Text style={[buttonStyles.textStyle, props.textStyle]}>
           {props.title}
         </Text>
+        </View>
           )}
     </View>
   </TouchableOpacity>
 );
 
 // Grouped Social Buttons View
-const SocialButtonsView = (props) => (
+export const SocialButtonsView = (props) => (
   <View>
-    <Text style={{ textAlign: "center", width: "100%", marginVertical: 5 }}>
-      - or -
-    </Text>
     <Button
-      title="Signin with Facebook"
+      isImage
+      title="Log In with Facebook"
       viewStyle={{
         backgroundColor: Color.facebook,
         borderColor: Color.facebook,
         marginHorizontal: 5,
-        marginBottom: 2
+        marginBottom: 2,
+        borderRadius: 25
       }}
-      textStyle={{ color: Color.white }}
+      textStyle={{ color: Color.white, fontWeight: '700' }}
       loading={props.loading}
       onPress={props.onFacebookConnect}
     />
     <GoogleSigninButton
       onPress={props.onGoogleConnect}
       size={GoogleSigninButton.Size.Wide}
-      color={GoogleSigninButton.Color.Dark}
+      color={GoogleSigninButton.Color.Light}
       disabled={props.loading}
-      style={{ width: "99%", height: 48, marginHorizontal: 2 }}
+      style={{ width: "99%", height: 48, marginHorizontal: 2, borderRadius: 25, marginTop: 20 }}
     />
     {(Platform.OS === "ios" || appleAuthAndroid.isSupported) && (
       <AppleButton
         onPress={props.onAppleConnect}
-        buttonStyle={AppleButton.Style.WHITE_OUTLINE}
+        buttonStyle={AppleButton.Style.BLACK}
         buttonType={AppleButton.Type.SIGN_IN}
         style={{
           width: "97%", // You must specify a width
           height: 44, // You must specify a height
           marginHorizontal: 5,
-          marginTop: 2
+          marginTop: 2,
+          borderRadius: 25,
+          marginTop: 20
         }}
       />
     )}

@@ -14,7 +14,7 @@ export const Color = {
   whiteOff: "#F4F5F9",
   steel: "#CCCCCC",
   black: "#000",
-  facebook: "#3b5998",
+  facebook: "#1877F2",
   google: "#4285F4",
   red: "red"
 };

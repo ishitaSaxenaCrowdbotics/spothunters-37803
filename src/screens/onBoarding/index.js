@@ -71,7 +71,7 @@ const OnBoarding = (props) => {
         activeDotStyle={{backgroundColor: '#1E8FFF'}}
         dotStyle={{backgroundColor:'#1E8FFF80'}}
         prevLabel={'Prev'}/>
-      <TouchableOpacity style={{borderRadius: 24, backgroundColor: '#1E8FFF', padding: 10, alignItems: 'center', marginVertical: 30}} onPress={() => props.navigation.navigate('Login')}>
+      <TouchableOpacity style={{borderRadius: 24, backgroundColor: '#1E8FFF', padding: 10, alignItems: 'center', marginVertical: 30}} onPress={() => props.navigation.navigate('TutorialScreen')}>
           <Text style={{color: 'white'}}>
           GET STARTED
           </Text>
