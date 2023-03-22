@@ -17,7 +17,7 @@ const PrivacyPolicy = ({ navigation }) => {
 
   useEffect(() => {
     // change the root url below to your project's url.
-    fetch("https://privacy-mod-test-1-26188.botics.co/modules/privacy-policy/")
+    fetch(`https://parkauthority-37803.botics.co/modules/privacy-policy/`)
       .then((response) => response.json())
       .then((data) => setHtmlContent(data[0].body))
       .catch((err) => {
@@ -32,18 +32,10 @@ const PrivacyPolicy = ({ navigation }) => {
   return (
     <View
       style={{
-        flex: 1
+        flex: 1,
+        backgroundColor: '#FBFBFB'
       }}
     >
-      <View style={styles.heading}>
-        <TouchableOpacity
-          style={styles.touchableopacity}
-          onPress={() => {
-            navigation.goBack();
-          }}
-        ></TouchableOpacity>
-        <Text style={styles.header}>Privacy Policy</Text>
-      </View>
       <ScrollView style={{ flex: 1 }}>
         <HTML
           source={{ html: htmlContent }}

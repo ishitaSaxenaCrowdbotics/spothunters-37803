@@ -79,7 +79,7 @@ const Login = (props) => {
           </>
         }
         {!isAccountCreate && 
-          <TouchableOpacity onPress={() => props.navigation.navigate('ChangePassword', {isChangePassword: true})}>
+          <TouchableOpacity onPress={() => props.navigation.navigate('ChangePassword', {name: 'Forgot Password', isChangePassword: false})}>
             <Text style={{marginTop: 12, textAlign: 'center', fontSize: 10, color: '#1E8FFF', alignSelf: 'flex-end'}}>
               forgot password?
               </Text>

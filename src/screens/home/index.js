@@ -15,9 +15,6 @@ const Home = (props) => {
 
   return (
       <SafeAreaView style={{backgroundColor: '#FBFBFB', flex: 1}}>
-          <View style={{marginTop: 40, paddingHorizontal: 16}}>
-              <Image source={require('../../assets/backButton.png')} />
-          </View>
         <ScrollView contentContainerStyle={{justifyContent: 'center'}}>
             <View style={{flexDirection: 'row', justifyContent: 'space-between', width: '100%', alignItems: 'center', paddingHorizontal: 16}}>
                 <TextInput 

@@ -21,6 +21,8 @@ import qrCode from "./modules/qr-code";
 import SpotHunterReducer from "./src/state/reducers";
 import TutorialScreen from "./src/screens/tutorialScreen";
 import EmailVerification from "./src/screens/emailVerification";
+import { Image } from "react-native";
+import { Header } from "./src/components/header";
 
 const Stack = createStackNavigator();
 
@@ -35,10 +37,42 @@ const getNavigation = (modules, screens, initialRoute) => {
           <Stack.Screen name='SplashScreen' component={SplashScreen} options={{ headerShown: false }} />
           <Stack.Screen name='OnBoarding' component={OnBoarding} options={{ headerShown: false }} />
           <Stack.Screen name='Login' component={Login} options={{ headerShown: false }} />
-          <Stack.Screen name='TermsAndConditions' component={termsAndConditions.navigator} options={{ headerShown: false }} />
-          <Stack.Screen name='PrivacyPolicy' component={privacyPolicy.navigator} options={{ headerShown: false }} />
-          <Stack.Screen name='ChangePassword' component={ChangePassword} options={{ headerShown: false }} />
-          <Stack.Screen name='Home' component={Home} options={{ headerShown: false }} />
+          <Stack.Screen name='TermsAndConditions' component={termsAndConditions.navigator} 
+            options={({ navigation, route }) => {
+              return {
+                headerStyle: { backgroundColor: '#FBFBFB' },
+                headerTitle: route.name,
+                headerTitleAlign: 'center',
+                headerLeft: () => <Header navigation={navigation} /> //<FIcons name='menu' onPress={props.navigation.openDrawer} size={24} color={route.name == 'exclusive'?'white':'black'} style={{width:24,height:24, marginLeft:13}} />
+              };
+            }} />
+          <Stack.Screen name='PrivacyPolicy' component={privacyPolicy.navigator} 
+            options={({ navigation, route }) => {
+              return {
+                headerStyle: { backgroundColor: '#FBFBFB' },
+                headerTitle: route.name,
+                headerTitleAlign: 'center',
+                headerLeft: () => <Header navigation={navigation} /> //<FIcons name='menu' onPress={props.navigation.openDrawer} size={24} color={route.name == 'exclusive'?'white':'black'} style={{width:24,height:24, marginLeft:13}} />
+              };
+            }} />
+          <Stack.Screen name='ChangePassword' component={ChangePassword} 
+            options={({ navigation, route }) => {
+              return {
+                headerStyle: { backgroundColor: '#FBFBFB' },
+                headerTitle: route.params.name,
+                headerTitleAlign: 'center',
+                headerLeft: () => <Header navigation={navigation} /> //<FIcons name='menu' onPress={props.navigation.openDrawer} size={24} color={route.name == 'exclusive'?'white':'black'} style={{width:24,height:24, marginLeft:13}} />
+              };
+            }} />
+          <Stack.Screen name='Home' component={Home} 
+            options={({ navigation, route }) => {
+              return {
+                headerStyle: { backgroundColor: '#FBFBFB' },
+                headerTitle: route.name,
+                headerTitleAlign: 'center',
+                headerLeft: () => <Header navigation={navigation} /> //<FIcons name='menu' onPress={props.navigation.openDrawer} size={24} color={route.name == 'exclusive'?'white':'black'} style={{width:24,height:24, marginLeft:13}} />
+              };
+            }} />
           <Stack.Screen name='TutorialScreen' component={TutorialScreen} options={{ headerShown: false }} />
           <Stack.Screen name='PreviousBooking' component={PreviousBooking} options={{ headerShown: false }} />
           <Stack.Screen name='qrCode' component={qrCode.navigator} options={{ headerShown: false }} />
