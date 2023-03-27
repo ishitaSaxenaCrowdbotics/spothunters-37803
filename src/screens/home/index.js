@@ -1,7 +1,10 @@
-import React from 'react';
-import { View, Text, TouchableOpacity, TextInput, ScrollView, Image, SafeAreaView, FlatList } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, TouchableOpacity, ScrollView, Image, SafeAreaView, FlatList } from 'react-native';
+import { LogoutPopup } from '../../components/logOutPopup';
 import PreviousBooking from '../../components/previousBooking';
 import UpcomingBooking from '../../components/upcomingBooking';
+import FloatingTextInput from '../../components/floatingTextInput';
+import { CustomButton } from '../../components/customButton';
 
 const Home = (props) => {
 
@@ -13,13 +16,16 @@ const Home = (props) => {
         return(<PreviousBooking />)
     }
 
+    const [modalVisible, setModalVisible] = useState(false)
+
   return (
       <SafeAreaView style={{backgroundColor: '#FBFBFB', flex: 1}}>
         <ScrollView contentContainerStyle={{justifyContent: 'center'}}>
-            <View style={{flexDirection: 'row', justifyContent: 'space-between', width: '100%', alignItems: 'center', paddingHorizontal: 16}}>
-                <TextInput 
-                    style={{backgroundColor: 'white', borderRadius: 15, padding: 15, width: '78%'}}
-                    placeholder='Search Here...' />
+            <View style={{flexDirection: 'row', justifyContent: 'space-between', width: '100%', alignItems: 'center', paddingHorizontal: 16, marginTop: 10}}>
+                <FloatingTextInput
+                    style={{width: '78%'}}
+                    label='Search Here...'
+                    placeholder='dfghjk' />
                 <TouchableOpacity style={{width: 55, height: 54, backgroundColor: '#1E8FFF', alignItems: 'center', justifyContent: 'center', borderRadius: 15}}>
                     <Image source={require('../../assets/settingIcon.png')} />
                 </TouchableOpacity>
@@ -58,14 +64,46 @@ const Home = (props) => {
                 showsVerticalScrollIndicator={true}
                 renderItem={renderItemPrev}
                 keyExtractor={(item, index) => `${item.id}-${index}`}/>
+                <View style={{flexDirection: 'row', marginTop: 20, marginHorizontal: 20}}>
+                    <TouchableOpacity style={{marginRight: 10}} onPress={() => props.navigation.navigate('InviteFriends')}>
+                        <Text>
+                            Invite Friends
+                        </Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity style={{marginRight: 10}}
+                        onPress={() => {
+                            setModalVisible(true)  
+                        }}>
+                        <Text>
+                            LogOut Popup
+                        </Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity style={{marginRight: 10}}
+                        onPress={() => props.navigation.navigate('DeleteAccount')}>
+                        <Text>
+                            DeleteAccount
+                        </Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity style={{marginRight: 10}}
+                        onPress={() => props.navigation.navigate('SendFeedback')}>
+                        <Text>
+                            FeedBack
+                        </Text>
+                    </TouchableOpacity>
+                </View>
+                <View style={{flexDirection: 'row', marginTop: 20, marginHorizontal: 20}}>
+                    <TouchableOpacity style={{marginRight: 10}}
+                        onPress={() => props.navigation.navigate('ChangePassword', {name: 'Change Password', isChangePassword: true})}>
+                        <Text>
+                            changepassword
+                        </Text>
+                    </TouchableOpacity>
+                </View>
         </ScrollView>
         <View style={{paddingHorizontal: 8, paddingVertical: 16, backgroundColor: 'white'}}>
-            <TouchableOpacity style={{backgroundColor: '#1E8FFF', paddingVertical: 12, paddingHorizontal: 32, marginHorizontal: 16, borderRadius: 24, alignItems: 'center'}}>
-                <Text style={{fontSize: 16, fontWeight: '700', color: 'white'}}>
-                    BOOK NEW PARKING
-                </Text>
-            </TouchableOpacity>
+                <CustomButton label={'BOOK NEW PARKING'} isPrimaryButton />
         </View>
+        <LogoutPopup visible={modalVisible} onClose={() => setModalVisible(false)} navigation={props.navigation} />
     </SafeAreaView>
   );
 }

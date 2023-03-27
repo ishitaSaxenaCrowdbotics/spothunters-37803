@@ -25,3 +25,9 @@ export function emailVerify(response) {
         payload: response
     }
 }
+
+export function reset() {
+    return { 
+        type: 'RESET', 
+    }
+}

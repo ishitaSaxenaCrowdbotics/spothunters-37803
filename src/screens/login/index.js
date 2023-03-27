@@ -1,15 +1,17 @@
 import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, TextInput, ScrollView, Image, Alert } from 'react-native';
+import { View, Text, TouchableOpacity, ScrollView, Image, Alert } from 'react-native';
 import CheckBox from '@react-native-community/checkbox';
 import { SocialButtonsView } from '../../../modules/social-login/screens/loginsignup';
 import { useDispatch, useSelector } from 'react-redux';
 import { loginRequest, signUpRequest } from '../../utils/service';
+import FloatingTextInput from '../../components/floatingTextInput';
+import { CustomButton } from '../../components/customButton';
 
 const Login = (props) => {
   const [isAccountCreate, setIsAccountCreate] = useState(false)
   const [toggleCheckBox, setToggleCheckBox] = useState(false)
-  const [email, setEmail] = useState('ishita_saxena.nga@crowdbotics.com')
-  const [password, setPassword] = useState('reNxsgmgx5')
+  const [email, setEmail] = useState('test1@gmail.com')
+  const [password, setPassword] = useState('spothunter')
   const [mobileNumber, setMobileNumber] = useState('+91-9972537712')
   const [confirmPassword, setConfirmPassword] = useState('reNxsgmgx5')
 
@@ -33,6 +35,7 @@ const Login = (props) => {
     } else {
       const loginData = { email, password }
       const resp = await dispatch(loginRequest(loginData))
+      console.log('resp: ', resp)
       if (resp?.status){
         props.navigation.navigate('Home')
       } else {
@@ -50,36 +53,35 @@ const Login = (props) => {
     <ScrollView contentContainerStyle={{justifyContent: 'center', backgroundColor: 'white'}}>
       <View style={{ paddingHorizontal: 17, flex: 1, paddingVertical: 30}}>
         <Image source={require('../../assets/logo.png')} style={{height: 111, width: 111, alignSelf: 'center'}}></Image>
-        {/* <View style={{height: 111, width: 111, backgroundColor: 'grey', borderRadius: 24, alignSelf: 'center'}} /> */}
         <Text style={{marginTop: 10, textAlign: 'center', fontSize: 24, color: '#1E8FFF', fontWeight: '600'}}>SpotHunter</Text>
         <Text style={{marginTop: 12, textAlign: 'center', fontSize: 16, fontWeight: '600'}}>Sign In</Text>
-        <TextInput 
-          style={{borderWidth: 1,borderRadius: 10, borderColor: 'grey',marginTop: 20}} 
-          placeholder={isAccountCreate ? 'Email ID' : 'Email ID/username'}
+        <FloatingTextInput
+          style={{marginTop: 20}} 
+          label={isAccountCreate ? 'Email ID' : 'Email ID/username'}
           value={email}
           onChangeText={(value) => setEmail(value)}/>
-        <TextInput 
-          style={{borderWidth: 1,borderRadius: 10, borderColor: 'grey',marginTop: 20}} 
-          placeholder={isAccountCreate ? 'mobile number' : 'password'}
+        <FloatingTextInput 
+          style={{marginTop: 20}} 
+          label={isAccountCreate ? 'mobile number' : 'password'}
           value={isAccountCreate ? mobileNumber : password}
           onChangeText={(value) => isAccountCreate ? setMobileNumber : setPassword(value)}/>
         {isAccountCreate && 
           <>
-            <TextInput 
-            style={{borderWidth: 1,borderRadius: 10, borderColor: 'grey',marginTop: 20}} 
-            placeholder='password'
+            <FloatingTextInput 
+            style={{marginTop: 20}} 
+            label='password'
             value={password}
             onChangeText={(value) => setPassword(value)}
             />
-            <TextInput 
-            style={{borderWidth: 1,borderRadius: 10, borderColor: 'grey',marginTop: 20}} 
-            placeholder='confirm password'
+            <FloatingTextInput 
+            style={{marginTop: 20}} 
+            label='confirm password'
             value={confirmPassword}
             onChangeText={(value) => setConfirmPassword(value)}/>
           </>
         }
         {!isAccountCreate && 
-          <TouchableOpacity onPress={() => props.navigation.navigate('ChangePassword', {name: 'Forgot Password', isChangePassword: false})}>
+          <TouchableOpacity onPress={() => props.navigation.navigate('ChangePassword', {name: 'Forgot Password'})}>
             <Text style={{marginTop: 12, textAlign: 'center', fontSize: 10, color: '#1E8FFF', alignSelf: 'flex-end'}}>
               forgot password?
               </Text>
@@ -100,11 +102,11 @@ const Login = (props) => {
             </View>
           </View>
         }
-        <TouchableOpacity style={{borderRadius: 24, backgroundColor: '#1E8FFF', padding: 10, alignItems: 'center', marginTop: 30}} onPress={onLoginPress}>
-          <Text style={{color: 'white', fontWeight: '700'}}>
-          {isAccountCreate ? 'CREATE ACCOUNT' : 'LOGIN'}
-          </Text>
-        </TouchableOpacity>
+        <CustomButton
+          onPress={onLoginPress}
+          isPrimaryButton
+          style={{marginTop: 30}} 
+          label={isAccountCreate ? 'CREATE ACCOUNT' : 'LOGIN'} />
         <View style={{marginTop: 30}}>
         <SocialButtonsView
           loading={false}
@@ -130,13 +132,14 @@ const Login = (props) => {
         </TouchableOpacity> */}
         
         <Text style={{marginTop: 32, textAlign: 'center', fontSize: 13}}>{isAccountCreate ? "Already have an account?" : "Don't have account?"}</Text>
-        <TouchableOpacity style={{borderRadius: 24, backgroundColor: '#1E8FFF', padding: 10, alignItems: 'center', marginTop: 12}} onPress={onLoginSignup}>
-          <Text style={{color: 'white', fontWeight: '700'}}>
-          {isAccountCreate ?   'Login' : 'create a account'}
-          </Text>
+        <CustomButton
+          onPress={onLoginSignup}
+          isPrimaryButton
+          style={{marginTop: 12}} 
+          label={isAccountCreate ?   'Login' : 'create a account'} />
+        <TouchableOpacity onPress={() => props.navigation.navigate('ProceedAsGuest')}>
+          <Text style={{marginTop: 16, textAlign: 'center', fontSize: 12, color: '#1E8FFF', fontWeight: '400'}}>Proceed as a guest</Text>
         </TouchableOpacity>
-          
-        <Text style={{marginTop: 16, textAlign: 'center', fontSize: 10, color: '#1E8FFF'}}>Proceed as a guest</Text>
       </View>
     </ScrollView>
   );

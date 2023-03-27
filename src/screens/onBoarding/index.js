@@ -1,6 +1,7 @@
 import React, { useEffect } from "react";
 import { View, Text, Button, TouchableOpacity, Image } from "react-native";
 import AppIntroSlider from "react-native-app-intro-slider";
+import { CustomButton } from "../../components/customButton";
 
 const OnBoarding = (props) => {
 
@@ -71,11 +72,11 @@ const OnBoarding = (props) => {
         activeDotStyle={{backgroundColor: '#1E8FFF'}}
         dotStyle={{backgroundColor:'#1E8FFF80'}}
         prevLabel={'Prev'}/>
-      <TouchableOpacity style={{borderRadius: 24, backgroundColor: '#1E8FFF', padding: 10, alignItems: 'center', marginVertical: 30}} onPress={() => props.navigation.navigate('TutorialScreen')}>
-          <Text style={{color: 'white'}}>
-          GET STARTED
-          </Text>
-      </TouchableOpacity>
+        <CustomButton
+          onPress={() => props.navigation.navigate('TutorialScreen')}
+          isPrimaryButton
+          style={{marginVertical: 30}} 
+          label={'GET STARTED'} />
       {/* <View style={{height: 280, width: 280, backgroundColor: 'grey', borderRadius: 24}} />
       <Text style={{marginTop: 42, textAlign: 'center'}}>Lorem Ipsum is simply </Text>
       <Text style={{marginTop: 12, textAlign: 'center'}}>At magnum periculum adiit in quo aut perferendis doloribus asperiores repellat hanc ego assentior. </Text>

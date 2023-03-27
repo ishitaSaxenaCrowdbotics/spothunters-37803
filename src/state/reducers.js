@@ -28,6 +28,14 @@ const SpotHunterReducer = (state = initialState, action) =>{
                 ...state,
                 emailVerify: action.payload
             }
+        case 'RESET':
+            return {
+                userData: {},
+                token: '',
+                data: {},
+                tutorial: [],
+                emailVerify: {}
+            }
         default:
         return state
     }
