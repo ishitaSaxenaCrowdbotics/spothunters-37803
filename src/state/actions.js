@@ -31,3 +31,23 @@ export function reset() {
         type: 'RESET', 
     }
 }
+
+export function setRememberMeAction() {
+    return { 
+        type: 'REMEMBER_ME', 
+    }
+}
+
+export function setParkingSearch(response) {
+    return { 
+        type: 'SET_PARKING_SEARCH', 
+        payload: response
+    }
+}
+
+export function setParkingSearchByID(response) {
+    return { 
+        type: 'SET_PARKING_SEARCH_ID', 
+        payload: response
+    }
+}

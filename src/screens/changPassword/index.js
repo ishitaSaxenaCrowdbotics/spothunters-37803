@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
-import { View, Text, Alert } from 'react-native';
-import { TouchableOpacity } from 'react-native-gesture-handler';
+import { View, Text, Alert, ActivityIndicator } from 'react-native';
 import { useDispatch } from 'react-redux';
 import { CustomButton } from '../../components/customButton';
 import FloatingTextInput from '../../components/floatingTextInput';
+import { colors, commonStyles } from '../../styles';
 import { changePasswordRequest, forgotPasswordRequest } from '../../utils/service';
 
 const ChangePassword = (props) => {
@@ -12,11 +12,13 @@ const ChangePassword = (props) => {
   const [status, setStatus] = useState(false)
   const [currentPassword, setCurrentPassword] = useState('')
   const [newPassword, setNewPassword] = useState('')
-  const [confirmPassword, setConfirmPasswordStatus] = useState('')
-  const [emailId, setEmailId] = useState('')
+  const [confirmPassword, setConfirmPassword] = useState('')
+  const [emailId, setEmailId] = useState('') 
+  const [isloading, setIsloading] = useState(false)
 
   const onButtonPress = async () => {
-    if(props.route.params.isChangePassword) {
+    if(props.route.params?.isChangePassword) {
+      setIsloading(true)
       const reqBody = {
         current_password: currentPassword,
         password1: newPassword,
@@ -24,12 +26,30 @@ const ChangePassword = (props) => {
       }
       const resp = await dispatch(changePasswordRequest(reqBody))
       console.log('resp: ', resp)
-      Alert.alert('password changed successfully')
+      if(resp?.status){
+        setIsloading(false)
+        Alert.alert('password changed successfully')
+      } else {
+        setIsloading(false)
+        Alert.alert(resp?.message)
+      }
     } else {
-      const resp = await dispatch(forgotPasswordRequest({email: 'ishita_saxena.nga@crowdbotics.com'}))
+      const resp = await dispatch(forgotPasswordRequest({email: emailId}))
       console.log('resp: ', resp)
-      setStatus(true)
+      if(resp?.status){
+        setStatus(true)
+      } else {
+        Alert.alert('Enter a registered email address.')
+      }
     }
+  }
+
+  const onValidate = () => {
+    let reg = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w\w+)+$/;
+    if(reg.test(emailId)){
+      return false
+    }
+    return true
   }
 
   return (
@@ -40,34 +60,40 @@ const ChangePassword = (props) => {
         paddingHorizontal: 16
       }}>
         <FloatingTextInput 
-          style={{marginTop: 24}} 
-          value={props.route.params.isChangePassword ? currentPassword : emailId}
-          onChangeText={(value) => props.route.params.isChangePassword ? setCurrentPassword(value) : setEmailId(value)}
-          label={props.route.params.isChangePassword ? 'Current Password' : 'Email ID *'}/>
-        {props.route.params.isChangePassword && 
+          secureTextEntry={props.route.params?.isChangePassword}
+          style={commonStyles.marginTop16} 
+          value={props.route.params?.isChangePassword ? currentPassword : emailId}
+          onChangeText={(value) => props.route.params?.isChangePassword ? setCurrentPassword(value) : setEmailId(value)}
+          label={props.route.params?.isChangePassword ? 'Current Password' : 'Email ID *'}/>
+        {props.route.params?.isChangePassword && 
           <>
             <FloatingTextInput 
-              style={{marginTop: 16}} 
+              secureTextEntry
+              style={commonStyles.marginTop16} 
               label='New Password'
               value={newPassword}
               onChangeText={(value) => setNewPassword(value)}/>
             <FloatingTextInput 
-              style={{marginTop: 16}} 
+              secureTextEntry
+              style={commonStyles.marginTop16} 
               value={confirmPassword}
-              onChangeText={(value) => setConfirmPasswordStatus(value)}
+              onChangeText={(value) => setConfirmPassword(value)}
               label='Confirm New Password'/>
            </>
         }
         <CustomButton 
-          style={{marginTop: 16}}
+          style={commonStyles.marginTop16}
           onPress={onButtonPress}
           isPrimaryButton
-          label={props.route.params.isChangePassword ? 'UPDATE PASSWORD' : 'RESET PASSWORD'} />
+          disabled={props.route.params?.isChangePassword ? !(newPassword && confirmPassword && currentPassword) : onValidate()}
+          label={props.route.params?.isChangePassword ? 'UPDATE PASSWORD' : 'RESET PASSWORD'} />
         {status && 
-          <Text style={{fontSize: 14, fontWeight: '400', color: 'red', marginTop: 24}}>
+          <Text style={[commonStyles.text_small, commonStyles.marginTop24, commonStyles.redTextColor]}>
             Verification Link has been sent to your inbox. please click on verification link to reset password
           </Text>
         }
+        {isloading && <ActivityIndicator  size="large" style={commonStyles.marginTop10}
+                color={colors.base} />}
     </View>
   );
 }

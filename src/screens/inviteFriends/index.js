@@ -4,51 +4,73 @@ import { useDispatch } from 'react-redux';
 import { CustomButton } from '../../components/customButton';
 import FloatingTextInput from '../../components/floatingTextInput';
 import { inviteFriendRequest } from '../../utils/service';
+import Clipboard from '@react-native-clipboard/clipboard';
+import Toast from 'react-native-toast-message';
+import { commonStyles } from '../../styles';
+import styles from './styles';
 
 const InviteFriends = (props) => {
 
   const [emailID, setEmailId] = useState('')
+  const [appID, setappID] = useState('https://apps.apple.com/in/app')
   const dispatch = useDispatch()
 
   const onSubmit = async () => {
-    const resp = await dispatch(inviteFriendRequest({email: 'ishita_saxena.nga@crowdbotics.com', link: 'msg'}))
+    const resp = await dispatch(inviteFriendRequest({email: emailID, link: appID}))
     console.log('resp: ', resp)
     if(resp.status){
       Alert.alert('link sent')
     }
   }
 
+  const onCopy = () => {
+    Clipboard.setString(appID);
+    Toast.show({
+      type: 'info',
+      text1: 'Copied',
+      text2: 'The link has been copied',
+      visibilityTime: 3000
+    });
+  }
+
+  const onLoginValidate = () => {
+    let reg = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w\w+)+$/;
+    if(reg.test(emailID)){
+      return false
+    }
+    return true
+  }
+
   return (
-    <View style={{ flex: 1, backgroundColor: '#FBFBFB', paddingHorizontal: 16, paddingTop: 5 }}>
-      <Text style={{fontSize: 14, fontWeight: '400'}}>
+    <View style={styles.container}>
+      <Text style={commonStyles.text_small}>
         Share this link with your friends
       </Text>
       <FloatingTextInput
-        editable={false}
-        label='App Id'
-        style={{marginTop: 20}} 
-        value={'https://apps.apple.com/in/app'}/>
-      <TouchableOpacity style={{borderRadius: 24, borderColor: '#1E8FFF', padding: 10, alignItems: 'center', marginTop: 16, borderWidth: 1}}>
-        <Text style={{color: '#1E8FFF', fontWeight: '700'}}>
-          Copy link to share
-        </Text>
-      </TouchableOpacity>
-      <Text style={{fontSize: 14, fontWeight: '400', textAlign: 'center', marginTop: 24}}>
+        disabled
+        label='App Id' 
+        style={commonStyles.marginTop20}
+        value={appID}
+        onChangeText={() => setappID(appID)}/>
+      <CustomButton label={'Copy link to share'} style={commonStyles.marginTop16} onPress={onCopy} />
+      <Text style={[commonStyles.text_small, commonStyles.centerTextAlign, commonStyles.marginTop24]}>
         Or
       </Text>
-      <Text style={{fontSize: 14, fontWeight: '400', marginTop: 24}}>
-        Invite friends to join SpotHunters Via Emails
+      <Text style={[commonStyles.text_small, commonStyles.marginTop24]}>
+        Invite friends to join Spot Hunters Via Email
       </Text>
       <FloatingTextInput
         label='Email ID *'
-        style={{marginTop: 20}} 
+        style={commonStyles.marginTop20} 
         value={emailID}
         onChangeText={(value) => setEmailId(value)}/>
       <CustomButton
           onPress={onSubmit}
           isPrimaryButton
-          style={{marginTop: 16}} 
+          disabled={onLoginValidate()}
+          style={commonStyles.marginTop16} 
           label={'Send Link'} />
+      <Toast />
     </View>
   );
 }

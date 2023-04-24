@@ -1,47 +1,59 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Text, TouchableOpacity, Alert } from 'react-native';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { CustomButton } from '../../components/customButton';
 import FloatingTextInput from '../../components/floatingTextInput';
-import { feedBackRequest } from '../../utils/service';
+import { commonStyles } from '../../styles';
+import { feedBackRequest, get_auth } from '../../utils/service';
+import styles from './styles';
 
 const SendFeedback = (props) => {
 
   const dispatch = useDispatch()
   const [msg, setMsg] = useState('')
+  const [emailID, setEmailID] = useState(userData?.email)
+
+  let userData = useSelector(state => state?.app?.userData)
 
   const onSubmit = async () => {
-    const resp = await dispatch(feedBackRequest({email: 'ishita_saxena.nga@crowdbotics.com', message: msg}))
+    const resp = await dispatch(feedBackRequest({email: emailID, message: msg}))
     console.log('resp: ', resp)
     if(resp.id){
       Alert.alert('feedback sent')
     }
   }
 
+  useEffect(() => {
+    setEmailID(userData?.email)
+    console.log('userData: ', userData)
+  },[userData])
+
   return (
-    <View style={{ flex: 1, backgroundColor: '#FBFBFB', paddingHorizontal: 16, paddingTop: 5 }}>
-      <Text style={{fontSize: 16, fontWeight: '500'}}>
+    <View style={styles.container}>
+      <Text style={commonStyles.text_large_thick}>
         Help us to improve
       </Text>
-      <Text style={{fontSize: 14, fontWeight: '400', marginTop: 24}}>
+      <Text style={[commonStyles.text_small, commonStyles.marginTop24]}>
         Would you help us improve your experience by your feedback?
       </Text>
       <FloatingTextInput
-        editable={false}
         label='Email ID *'
-        style={{marginTop: 20}} 
-        value={'ishita@gmail.com'}/>
+        style={commonStyles.marginTop20} 
+        value={emailID}
+        disabled
+        onChangeText={() => setEmailID(emailID)}/>
       <FloatingTextInput
         label='Message*'
         multiline 
         numberOfLines={10}
-        style={{marginTop: 20}} 
+        style={commonStyles.marginTop20} 
         value={msg}
         onChangeText={(value) => setMsg(value)}/>
         <CustomButton
           onPress={onSubmit}
           isPrimaryButton
-          style={{marginTop: 24}} 
+          disabled={!msg}
+          style={commonStyles.marginTop24} 
           label={'Submit'} />
     </View>
   );

@@ -1,10 +1,13 @@
 import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, Image } from 'react-native';
+import { View, Text, TouchableOpacity, Image, Alert } from 'react-native';
 import { useDispatch } from 'react-redux';
 import { CustomButton } from '../../components/customButton';
 import { reset } from '../../state/actions';
+import { colors, commonStyles } from '../../styles';
 import { removeAuthData } from '../../utils';
 import { deleteAccountRequest } from '../../utils/service';
+import styles from './styles';
+import { Icon } from 'react-native-elements';
 
 const DeleteAccount = (props) => {
 
@@ -23,40 +26,41 @@ const DeleteAccount = (props) => {
     }
 
   return (
-    <View style={{ flex: 1, backgroundColor: '#FBFBFB', paddingTop: 32 }}>
-        {isDeleted ? 
-            <View style={{justifyContent: 'center', alignItems: 'center', paddingHorizontal: 16}}> 
-                <Image source={require('../../assets/checkSquare.png')} />
-                <Text style={{fontSize: 20, fontWeight: '600', marginTop: 16}}>
+    <View style={styles.container}>
+        {true ? 
+            <View style={[commonStyles.justifyContentCenter, commonStyles.alignItemsCenter, commonStyles.paddingHorizontal16]}> 
+                {/* <Image source={require('../../assets/checkSquare.png')} /> */}
+                <Icon name="checkmark-circle-outline" type='ionicon' size={100} color={'#00AF54'} />
+                <Text style={[commonStyles.text_xl_bold, commonStyles.marginTop16]}>
                     Delete successfully! 
                 </Text>
-                <Text style={{fontSize: 14, fontWeight: '400', marginTop: 24}}>
+                <Text style={[commonStyles.text_small, commonStyles.marginTop24]}>
                     Your account has been delete successfully 
                 </Text>
                 <CustomButton 
                         isPrimaryButton
-                        style={{marginTop: 24, width: '100%'}} 
+                        style={[commonStyles.fullWidth, commonStyles.marginTop24]} 
                         label={'Create account'} />
             </View>
             : <>
-                <View style={{paddingHorizontal: 34}}>
-                    <Text style={{fontSize: 16, fontWeight: '500'}}>
+                <View style={styles.paddingHorizontal34}>
+                    <Text style={commonStyles.text_large_thick}>
                         Are you sure you want to delete account?
                     </Text>
-                    <Text style={{fontSize: 12, fontWeight: '400', marginTop: 8}}>
+                    <Text style={[commonStyles.text_xs, commonStyles.marginTop8]}>
                         Clients on Demand, LLC, (“Clients on Demand,” “we,” “us,” “our”) is committed to protecting both the personal as well as business information you share and/or store with us. This Privacy Policy applies to transactions and activities and data gathered through the Clients on Demand Website and interaction you may have with its related Social Media accounts. Please review this Privacy Policy periodically as we may revise it without notice.
                         Generally, we may collect and use personal information for many purposes, including, but not limited to: billing, product and service fulfillment, understanding customer needs, providing a better website, improving products and services, and communicating with c
                     </Text>
                 </View>
-                <View style={{flexDirection: 'row', position: 'absolute', bottom: 8, justifyContent: 'center', marginHorizontal: 16, marginTop: 16}}>
+                <View style={styles.buttonContainer}>
                     <CustomButton
-                        style={{flex: 1, marginRight: 20}} 
+                        style={[commonStyles.flex1, commonStyles.marginRight20]} 
                         onPress={onDelete}
                         label={'Yes delete'}/>
                     <CustomButton 
                         isPrimaryButton
-                        style={{flex: 1, marginRight: 20}} 
-                        onPress={onDelete}
+                        style={[commonStyles.flex1, commonStyles.marginRight20]} 
+                        onPress={() => {}}
                         label={'Cancel'} />
                 </View>
             </>

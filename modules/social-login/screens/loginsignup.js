@@ -114,7 +114,7 @@ export const SocialButtonsView = (props) => (
   </View>
 );
 
-const onFacebookConnect = async (dispatch, navigation) => {
+export const onFacebookConnect = async (dispatch, navigation) => {
   try {
     const fbResult = await LoginManager.logInWithPermissions([
       "public_profile",
@@ -133,7 +133,7 @@ const onFacebookConnect = async (dispatch, navigation) => {
   }
 };
 
-const onGoogleConnect = async (dispatch, navigation) => {
+export const onGoogleConnect = async (dispatch, navigation) => {
   GoogleSignin.configure({
     webClientId: GOOGLE_WEB_CLIENT_ID, // client ID of type WEB for your server
     offlineAccess: true, // if you want to access Google API on behalf of the user FROM YOUR SERVER
@@ -156,7 +156,7 @@ const onGoogleConnect = async (dispatch, navigation) => {
   }
 };
 
-const onAppleConnect = async (dispatch, navigation) => {
+export const onAppleConnect = async (dispatch, navigation) => {
   try {
     const signinFunction = Platform.select({
       ios: appleForiOS,

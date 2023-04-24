@@ -1,19 +1,24 @@
 import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, ScrollView, Image, Alert } from 'react-native';
+import { View, Text, TouchableOpacity, ScrollView, Image, Alert, ActivityIndicator } from 'react-native';
 import CheckBox from '@react-native-community/checkbox';
-import { SocialButtonsView } from '../../../modules/social-login/screens/loginsignup';
+import { onAppleConnect, onFacebookConnect, onGoogleConnect, SocialButtonsView } from '../../../modules/social-login/screens/loginsignup';
 import { useDispatch, useSelector } from 'react-redux';
-import { loginRequest, signUpRequest } from '../../utils/service';
+import { loginRequest, resendCodeRequest, signUpRequest } from '../../utils/service';
 import FloatingTextInput from '../../components/floatingTextInput';
 import { CustomButton } from '../../components/customButton';
+import { setRememberMeAction } from '../../state/actions';
+import { commonStyles } from '../../styles';
+import styles from './styles';
 
 const Login = (props) => {
-  const [isAccountCreate, setIsAccountCreate] = useState(false)
+  const [isAccountCreate, setIsAccountCreate] = useState(props?.route?.params?.isSignup)
   const [toggleCheckBox, setToggleCheckBox] = useState(false)
-  const [email, setEmail] = useState('test1@gmail.com')
-  const [password, setPassword] = useState('spothunter')
-  const [mobileNumber, setMobileNumber] = useState('+91-9972537712')
-  const [confirmPassword, setConfirmPassword] = useState('reNxsgmgx5')
+  const [rememberMe, setRememberMe] = useState(false)
+  const [email, setEmail] = useState('')//test1@gmail.com
+  const [password, setPassword] = useState('') //test
+  const [mobileNumber, setMobileNumber] = useState('')
+  const [confirmPassword, setConfirmPassword] = useState('')// reNxsgmgx5
+  const [isloading, setIsloading] = useState(false)
 
   const dispatch = useDispatch()
   let token = useSelector(state => state?.app?.token)
@@ -21,27 +26,86 @@ const Login = (props) => {
   const onLoginPress = async () => {
     if (isAccountCreate) {
       const signUpData = {
-        name:"ishita",
+        name:"",
         email,
         password,
-        phone:"+91-9972537712"
+        phone: mobileNumber
       }
       const resp1 = await dispatch(signUpRequest(signUpData))
       if (resp1?.status){
-        props.navigation.navigate('EmailVerification')
+        props.navigation.navigate('EmailVerification', {email, isCreateAccount: props.route.params?.isCreateAccount})
       } else {
-        Alert.alert('Internet connection issue')
+        if(resp1?.data?.statusCode === 401){
+          Alert.alert(
+            'Email ID not verified',
+            'Please verify your email ID',
+            [
+              {text: 'Cancel', onPress: () => console.log('Cancel Pressed!')},
+              {text: 'Verify', onPress: async() => {
+                const resp1 = await dispatch(resendCodeRequest({email}))
+                if(resp1?.status){
+                  props.navigation.navigate('EmailVerification', {email})
+                }
+            }},
+        
+            ],
+            { cancelable: false }
+          )
+        } else if (resp1?.data?.statusCode === 403){
+          Alert.alert('Email-ID already registered. Please try to login')
+        } else {
+          Alert.alert(resp?.message)
+        }
       }
     } else {
+      setIsloading(true)
+      if(rememberMe){
+        await dispatch(setRememberMeAction())
+      }
       const loginData = { email, password }
       const resp = await dispatch(loginRequest(loginData))
       console.log('resp: ', resp)
       if (resp?.status){
-        props.navigation.navigate('Home')
+        setIsloading(false)
+        props.navigation.replace('MainNav');
       } else {
-        Alert.alert('Please enter correct credentials')
+        setIsloading(false)
+        if(resp?.data?.statusCode === 401){
+          Alert.alert(
+            'Email ID not verified',
+            'Please verify your email ID',
+            [
+              {text: 'Cancel', onPress: () => console.log('Cancel Pressed!')},
+              {text: 'Verify', onPress: async() => {
+                const resp1 = await dispatch(resendCodeRequest({email}))
+                if(resp1?.status){
+                  props.navigation.navigate('EmailVerification', {email})
+                }
+              }},
+        
+            ],
+            { cancelable: false }
+          )
+        }else {
+          Alert.alert(resp?.message)
+        }
       }
     }
+  }
+
+  const onLoginValidate = () => {
+    let reg = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w\w+)+$/;
+    if(password){
+      return false
+    }
+    return true
+  }
+  const onSignValidate = () => {
+    let reg = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w\w+)+$/;
+    if(reg.test(email) && password && toggleCheckBox && mobileNumber && confirmPassword && (confirmPassword === password)){
+      return false
+    }
+    return true
   }
 
   const onLoginSignup = () => {
@@ -50,95 +114,95 @@ const Login = (props) => {
   }
 
   return (
-    <ScrollView contentContainerStyle={{justifyContent: 'center', backgroundColor: 'white'}}>
-      <View style={{ paddingHorizontal: 17, flex: 1, paddingVertical: 30}}>
-        <Image source={require('../../assets/logo.png')} style={{height: 111, width: 111, alignSelf: 'center'}}></Image>
-        <Text style={{marginTop: 10, textAlign: 'center', fontSize: 24, color: '#1E8FFF', fontWeight: '600'}}>SpotHunter</Text>
-        <Text style={{marginTop: 12, textAlign: 'center', fontSize: 16, fontWeight: '600'}}>Sign In</Text>
+    <ScrollView contentContainerStyle={[commonStyles.justifyContentCenter, commonStyles.whiteBackground]}>
+      <View style={styles.container}>
+        <Image source={require('../../assets/logo.png')} style={[commonStyles.size111, commonStyles.alignSelfCenter, commonStyles.size111]} />
+        <Text style={styles.headingText}>Spot Hunters</Text>
+        <Text style={[commonStyles.text_large_bold, commonStyles.marginTop12, commonStyles.centerTextAlign]}>Sign In</Text>
         <FloatingTextInput
-          style={{marginTop: 20}} 
-          label={isAccountCreate ? 'Email ID' : 'Email ID/username'}
+          style={commonStyles.marginTop20} 
+          label={isAccountCreate ? 'Email ID *' : 'Email ID *'}
           value={email}
           onChangeText={(value) => setEmail(value)}/>
         <FloatingTextInput 
-          style={{marginTop: 20}} 
-          label={isAccountCreate ? 'mobile number' : 'password'}
+          secureTextEntry={isAccountCreate ? false : true }
+          style={commonStyles.marginTop20} 
+          label={isAccountCreate ? 'mobile number *' : 'Password *'}
           value={isAccountCreate ? mobileNumber : password}
-          onChangeText={(value) => isAccountCreate ? setMobileNumber : setPassword(value)}/>
+          onChangeText={(value) => {isAccountCreate ? setMobileNumber(value) : setPassword(value)}}/>
         {isAccountCreate && 
           <>
             <FloatingTextInput 
-            style={{marginTop: 20}} 
-            label='password'
+            secureTextEntry
+            style={commonStyles.marginTop20} 
+            label='Password *'
             value={password}
             onChangeText={(value) => setPassword(value)}
             />
             <FloatingTextInput 
-            style={{marginTop: 20}} 
-            label='confirm password'
+            secureTextEntry
+            style={commonStyles.marginTop20} 
+            label='Confirm Password *'
             value={confirmPassword}
             onChangeText={(value) => setConfirmPassword(value)}/>
           </>
         }
         {!isAccountCreate && 
+        // <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
+        //   <View style={{flexDirection:'row'}}>
+        //   <CheckBox 
+        //       value={rememberMe}
+        //       onValueChange={(newValue) => setRememberMe(newValue)}/>
+        //   <Text style={{fontSize: 10, textAlignVertical: 'center'}}>Remember me</Text>
+        //   </View>
           <TouchableOpacity onPress={() => props.navigation.navigate('ChangePassword', {name: 'Forgot Password'})}>
-            <Text style={{marginTop: 12, textAlign: 'center', fontSize: 10, color: '#1E8FFF', alignSelf: 'flex-end'}}>
-              forgot password?
+            <Text style={[commonStyles.text_xxs_thick, commonStyles.marginTop12, commonStyles. centerTextAlign, commonStyles.blueTextColor, commonStyles.alignSelfEnd]}>
+              Forgot Password?
               </Text>
-          </TouchableOpacity>}
+          </TouchableOpacity>
+        // </View>
+          }
         {isAccountCreate && 
-          <View style={{flexDirection: 'row',marginTop: 16}}>
-            <CheckBox value={toggleCheckBox}
-              onValueChange={setToggleCheckBox} />
+          <View style={[commonStyles.flexRow, commonStyles.marginTop16]}>
+            <CheckBox 
+              value={toggleCheckBox}
+              onValueChange={(newValue) => setToggleCheckBox(newValue)}/>
             <View style={{flexDirection: 'row', alignItems: 'center'}}>
-              <Text style={{fontSize: 10}}>I agree to the </Text>
+              <Text style={commonStyles.text_xxs_thick }>I agree to the </Text>
               <TouchableOpacity onPress={() => props.navigation.navigate('TermsAndConditions')}>
-              <Text style={{color: '#1E8FFF', fontSize: 10}}>Terms and conditions </Text>
+              <Text style={[commonStyles.text_xxs_thick, commonStyles.blueTextColor]}>Terms and conditions </Text>
               </TouchableOpacity>
-              <Text style={{fontSize: 10}}>and </Text>
+              <Text style={commonStyles.text_xxs_thick }>and </Text>
               <TouchableOpacity onPress={() => props.navigation.navigate('PrivacyPolicy')}>
-              <Text style={{color: '#1E8FFF', fontSize: 10}}>Privacy Policy</Text>
+              <Text style={[commonStyles.text_xxs_thick, commonStyles.blueTextColor]}>Privacy Policy</Text>
               </TouchableOpacity>
             </View>
           </View>
         }
         <CustomButton
+          disabled={isAccountCreate ? onSignValidate() : onLoginValidate()}
           onPress={onLoginPress}
           isPrimaryButton
-          style={{marginTop: 30}} 
+          style={commonStyles.marginTop30} 
           label={isAccountCreate ? 'CREATE ACCOUNT' : 'LOGIN'} />
-        <View style={{marginTop: 30}}>
+          {isloading && <ActivityIndicator  size="large" style={commonStyles.marginTop10}
+                color='#1E8FFF' />}
+        <View style={commonStyles.marginTop30}>
         <SocialButtonsView
           loading={false}
-          onFacebookConnect={() => onFacebookConnect(dispatch, navigation)}
-          onGoogleConnect={() => onGoogleConnect(dispatch, navigation)}
-          onAppleConnect={() => onAppleConnect(dispatch, navigation)}
+          onFacebookConnect={() => onFacebookConnect(dispatch, props.navigation)}
+          onGoogleConnect={() => onGoogleConnect(dispatch, props.navigation)}
+          onAppleConnect={() => onAppleConnect(dispatch, props.navigation)}
         />
       </View>
-        {/* <TouchableOpacity style={{borderRadius: 24, backgroundColor: '#1E8FFF', padding: 10, alignItems: 'center', marginTop: 30}} onPress={() => props.navigation.navigate('Login')}>
-          <Text style={{color: 'white', fontWeight: '700'}}>
-          Login with google
-          </Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={{borderRadius: 24, backgroundColor: '#1E8FFF', padding: 10, alignItems: 'center', marginTop: 30}} onPress={() => props.navigation.navigate('Login')}>
-          <Text style={{color: 'white', fontWeight: '700'}}>
-          Login with facebook
-          </Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={{borderRadius: 24, backgroundColor: '#1E8FFF', padding: 10, alignItems: 'center', marginTop: 30}} onPress={() => props.navigation.navigate('Login')}>
-          <Text style={{color: 'white', fontWeight: '700'}}>
-          Login with apple
-          </Text>
-        </TouchableOpacity> */}
-        
-        <Text style={{marginTop: 32, textAlign: 'center', fontSize: 13}}>{isAccountCreate ? "Already have an account?" : "Don't have account?"}</Text>
+        <Text style={styles.textStyle}>{isAccountCreate ? "Already have an account?" : "Don't have account?"}</Text>
         <CustomButton
           onPress={onLoginSignup}
           isPrimaryButton
-          style={{marginTop: 12}} 
-          label={isAccountCreate ?   'Login' : 'create a account'} />
+          style={commonStyles.marginTop12} 
+          label={isAccountCreate ?   'Login' : 'Create an account'} />
         <TouchableOpacity onPress={() => props.navigation.navigate('ProceedAsGuest')}>
-          <Text style={{marginTop: 16, textAlign: 'center', fontSize: 12, color: '#1E8FFF', fontWeight: '400'}}>Proceed as a guest</Text>
+          <Text style={[commonStyles.text_xs, commonStyles.marginTop16, commonStyles.centerTextAlign, commonStyles.blueTextColor]}>Proceed as a guest</Text>
         </TouchableOpacity>
       </View>
     </ScrollView>

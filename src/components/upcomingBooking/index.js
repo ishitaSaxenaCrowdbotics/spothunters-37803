@@ -1,85 +1,93 @@
-import React, { forwardRef } from 'react';
+import React, { forwardRef, useState } from 'react';
 import { View, Text, Image } from 'react-native';
 import { TouchableOpacity } from 'react-native-gesture-handler';
+import { colors, commonStyles } from '../../styles';
+import { styles } from './styles';
+// import Icon from 'react-native-vector-icons/Ionicons';
+import { Icon } from 'react-native-elements'
+import QrCode from '../qrCode';
 
 const UpcomingBooking = forwardRef((props, ref) => {
 
+    const [isModal, setModal] = useState(false)
+
+    const openQrCode = () => {
+        setModal(true)
+    }
+
   return (
     <>
-        <View style={{
-            backgroundColor: 'white',
-            borderRadius: 8,
-            paddingVertical: 15,
-            paddingHorizontal: 15,
-            marginVertical: 10,
-            marginHorizontal: 16,
-            width: 305,
-            elevation: 5}}>
+        <View style={[styles.container, {width: props?.fullView ? null : 305}]}>
         <View style={{flexDirection: 'row'}}>
-            <View style={{flex: 0.8}}>
-                <Text style={{fontSize: 16, fontWeight: '500', color: '#151313'}}>
+            <View style={commonStyles.flex8}>
+                <Text style={[commonStyles.text_large_thick, commonStyles.lightBlackTextColor]}>
                     NCP Car Park Manchester
                 </Text>
-                <Text style={{fontSize: 12, fontWeight: '400', color: '#6A6A6A', marginTop: 8}}>
+                <Text style={[commonStyles.text_xs, commonStyles.darkGreyTextColor, commonStyles.marginTop8]}>
                     Rental ID: 1234567789
                 </Text>
-                <View style={{flexDirection: 'row', marginTop: 8}}>
-                    <Image source={require('../../assets/marker.png')} style={{marginRight: 8, width: 24, height: 24}} />
-                    <Text style={{fontSize: 12, fontWeight: '400', color: '#6A6A6A'}}>
+                <View style={[commonStyles.flexRow, commonStyles.marginTop8, commonStyles.alignItemsCenter]}>
+                    {/* <Image source={require('../../assets/marker.png')} style={[commonStyles.marginRight8, commonStyles.size24]} /> */}
+                    <Icon name="location-sharp" type='ionicon' size={25} color={'black'} />
+                    <Text style={[commonStyles.text_xs, commonStyles.darkGreyTextColor]}>
                         Toronto, Canada
                     </Text>
                 </View>
             </View>
-            <View style={{flex: 0.2, alignItems: 'center'}}>
-                <Image source={require('../../assets/markerButton.png')} />
-                <Text style={{fontSize: 12, fontWeight: '400', color: '#6A6A6A'}}>
+            <View style={[commonStyles.flex2, commonStyles.alignItemsCenter]}>
+                <Icon name="directions" type='font-awesome-5' size={40} color={colors.base} />
+                {/* <Image source={require('../../assets/markerButton.png')} /> */}
+                <Text style={[commonStyles.text_xs, commonStyles.darkGreyTextColor]}>
                     2 km
                 </Text>
             </View>
         </View>
-        <View style={{flexDirection: 'row', justifyContent: 'space-between', marginTop: 16}}>
+        <View style={[commonStyles.flexRow, commonStyles. justifyContentBetween, commonStyles.marginTop16]}>
             <View>
-                <Text style={{fontSize: 12, fontWeight: '400', color: '#6A6A6A', textAlign: 'center', marginBottom: 5}}>
+                <Text style={[commonStyles.text_xs, commonStyles.darkGreyTextColor, commonStyles.centerTextAlign, commonStyles.marginBottom5]}>
                     In time
                 </Text>
-                <Text style={{fontSize: 12, fontWeight: '600', color: '#000000', textAlign: 'center'}}>
+                <Text style={[commonStyles.text_xs_bold, commonStyles.blackTextColor, commonStyles.centerTextAlign]}>
                     10:00AM
                 </Text>
             </View>
             <View>
-                <Text style={{fontSize: 12, fontWeight: '400', color: '#6A6A6A', textAlign: 'center', marginBottom: 5}}>
+                <Text style={[commonStyles.text_xs,commonStyles.darkGreyTextColor, commonStyles.centerTextAlign, commonStyles.marginBottom5]}>
                     out time 
                 </Text>
-                <Text style={{fontSize: 12, fontWeight: '600', color: '#000000', textAlign: 'center'}}>
+                <Text style={[commonStyles.text_xs_bold,commonStyles.blackTextColor, commonStyles.centerTextAlign]}>
                     5:00 PM
                 </Text>
             </View>
             <View>
-                <Text style={{fontSize: 12, fontWeight: '400', color: '#6A6A6A', textAlign: 'center', marginBottom: 5}}>
+                <Text style={[commonStyles.text_xs,commonStyles.darkGreyTextColor, commonStyles.centerTextAlign, commonStyles.marginBottom5]}>
+
                     Paid
                 </Text>
-                <Text style={{fontSize: 12, fontWeight: '600', color: '#000000', textAlign: 'center'}}>
+                <Text style={[commonStyles.text_xs_bold, commonStyles.blackTextColor, commonStyles.centerTextAlign]}>
                     $8.00
                 </Text>
             </View>
         </View>
-        <View style={{backgroundColor: '#6A6A6A', height: 1, width: '100%', marginVertical: 8}} />
-        <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
-            <TouchableOpacity>
-                <Text style={{fontSize: 12, fontWeight: '500', color: '#1E8FFF'}}>
+        <View style={commonStyles.divider} />
+        <View style={[commonStyles.flexRow, commonStyles.justifyContentBetween, commonStyles.alignItemsCenter]}>
+            <TouchableOpacity >
+                <Text style={[commonStyles.text_xs_thick, commonStyles.blueTextColor]}>
                     Modify
                 </Text>
             </TouchableOpacity>
-            <TouchableOpacity style={{backgroundColor: '#1E8FFF', borderRadius: 37, paddingVertical: 6,  width: 113}} onPress={() => props.navigation.navigate('qrCode')}>
-                <View style={{flexDirection: 'row', justifyContent: 'center', alignItems: 'center'}}>
-                <Image source={require('../../assets/qrCodeIcon.png')} />
-                <Text style={{fontSize: 12, fontWeight: '500', color: 'white', marginLeft: 5}}>
+            <TouchableOpacity style={styles.qrCodeContainer} onPress={openQrCode}>
+                <View style={[commonStyles.flexRow, commonStyles.justifyContentCenter, commonStyles.alignItemsCenter]}>
+                {/* <Image source={require('../../assets/qrCodeIcon.png')} /> */}
+                <Icon name="qr-code-2" type='material' size={25} color={colors.white} />
+                <Text style={[commonStyles.text_xs_thick, commonStyles.whiteTextColor, commonStyles.marginLeft5]}>
                     View QR
                 </Text>
                 </View>
             </TouchableOpacity>
         </View>
         </View>
+        <QrCode isModal={isModal} setModal={setModal} data={'data'} />
     </>
   );
 })

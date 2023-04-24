@@ -17,7 +17,7 @@ const TermsAndConditions = ({ navigation }) => {
     // Set your API's URL via Module Options - in options.js
     fetch(path)
       .then((response) => response.json())
-      .then((data) => setHtmlContent(data[0].body))
+      .then((data) => setHtmlContent(data.results[0].body))
       .catch((err) => {
         console.log(err);
         return setHtmlContent("<h1>Error Loading Terms and Conditions</h1>");
@@ -25,7 +25,7 @@ const TermsAndConditions = ({ navigation }) => {
   });
 
   return (
-    <View style={{ flex: 1, backgroundColor: '#FBFBFB' }}>
+    <View style={{ flex: 1, backgroundColor: '#FBFBFB', padding: 16 }}>
       <ScrollView style={{ flex: 1 }}>
         <HTML source={{ html: htmlContent }} contentWidth={contentWidth} />
       </ScrollView>

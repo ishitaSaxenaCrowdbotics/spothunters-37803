@@ -4,6 +4,8 @@ import { useDispatch } from 'react-redux';
 import { logoutRequest } from '../../utils/service';
 import { removeAuthData } from '../../utils';
 import { reset } from '../../state/actions';
+import { commonStyles } from '../../styles';
+import { styles } from './styles';
 
 export const LogoutPopup = (props) => {
 
@@ -27,26 +29,23 @@ export const LogoutPopup = (props) => {
         <Modal 
             transparent
             visible={props.visible}>
-            <View style={{
-                flex:1, 
-                backgroundColor: '#000000CC'
-                }}>
-                <TouchableOpacity activeOpacity={1} style={{flex:1, justifyContent: 'center', alignItems: 'center'}} onPress={props.onClose}>
-                    <View style={{backgroundColor: 'white', borderRadius: 8, padding: 24}}>
-                        <Text style={{fontWeight: '600', fontSize: 20, textAlign: 'center'}}>
+            <View style={styles.container}>
+                <TouchableOpacity activeOpacity={1} style={styles.centerContainer} onPress={props.onClose}>
+                    <View style={styles.subContainer}>
+                        <Text style={[commonStyles.text_xl_bold, commonStyles.centerTextAlign]}>
                             Log out
                         </Text>
-                        <Text style={{fontWeight: '400', fontSize: 14, textAlign: 'center', marginTop: 24}}>
-                            Your password has been reset successfully 
+                        <Text style={[commonStyles.text_small, styles.headerText]}>
+                            Do you want to log out?
                         </Text>
-                        <View style={{flexDirection: 'row', marginTop: 24, justifyContent: 'space-between'}}>
-                        <TouchableOpacity style={{backgroundColor: '#1E8FFF', borderRadius: 24, alignItems: 'center', flex: 1,  padding: 10, marginRight: 20}} onPress={props.onClose}>
-                            <Text style={{fontSize: 14, fontWeight: '600', color: 'white'}}>
+                        <View style={styles.buttonContainer}>
+                        <TouchableOpacity style={styles.cancelButton} onPress={props.onClose}>
+                            <Text style={[commonStyles.text_small_bold, commonStyles.whiteTextColor]}>
                                 Cancel
                             </Text>
                         </TouchableOpacity>
-                        <TouchableOpacity style={{borderRadius: 24, borderColor: '#1E8FFF', padding: 10, alignItems: 'center', borderWidth: 1, flex: 1}} onPress={onLogout}>
-                            <Text style={{color: '#1E8FFF', fontSize: 14, fontWeight: '600'}}>
+                        <TouchableOpacity style={styles.logOutButton} onPress={onLogout}>
+                            <Text style={[commonStyles.text_small_bold, commonStyles.blueTextColor]}>
                                 Log out
                             </Text>
                         </TouchableOpacity>

@@ -19,7 +19,7 @@ const PrivacyPolicy = ({ navigation }) => {
     // change the root url below to your project's url.
     fetch(`https://parkauthority-37803.botics.co/modules/privacy-policy/`)
       .then((response) => response.json())
-      .then((data) => setHtmlContent(data[0].body))
+      .then((data) => { setHtmlContent(data.results[0].body) })
       .catch((err) => {
         console.log(err);
         setHtmlContent(
@@ -33,7 +33,8 @@ const PrivacyPolicy = ({ navigation }) => {
     <View
       style={{
         flex: 1,
-        backgroundColor: '#FBFBFB'
+        backgroundColor: '#FBFBFB',
+        padding: 16
       }}
     >
       <ScrollView style={{ flex: 1 }}>

@@ -1,41 +1,107 @@
 import React, { useState, useEffect } from "react";
-import { View, Dimensions, TouchableOpacity, Image } from "react-native";
+import { View, Dimensions, TouchableOpacity, Image, Platform, Text, FlatList } from "react-native";
 import { styles, autoCompleteStyles } from "./styles";
-import Icon from "react-native-vector-icons/FontAwesome5";
 // @ts-ignore
 import { GooglePlacesAutocomplete } from "react-native-google-places-autocomplete";
 import MapViewDirections from "react-native-maps-directions";
-import MapView, { Marker } from "react-native-maps";
+import MapView, { Callout, Marker } from "react-native-maps";
 import PropTypes from "prop-types";
+import { PERMISSIONS, request } from "react-native-permissions";
+import Geolocation from 'react-native-geolocation-service'
+import { MapParkingSpotItem,  } from '../../src/components/parkingSpots'
+import { colors, commonStyles } from "../../src/styles";
+import SvgUri from "react-native-svg-uri";
+import { color } from "react-native-elements/dist/helpers";
+import { getDistance } from 'geolib';
+import { convertToMeterToMiles } from "../../src/utils";
+import { Icon } from "react-native-elements";
+import { useDispatch, useSelector } from "react-redux";
+import { parkingSearchRequest } from "../../src/utils/service";
+import { MapMarker } from '../../src/components/mapMarker'
 
-const Maps = ({ origin, enableDirections = true, showSearchInput = true, markerImage, originTitle, originDescription, apiKey, onNavigationStart, onNavigationError, getDistance, getDuration, markerColor, getDestinationAddress, strokeColor, strokeWidth, onLatLngChange, markerImageStyle = {}, mainContainerStyle = {}, markedLocations, onDragEnd, onDrag, onDragStart }) => {
-  const [mapRef, setMapRef] = useState(null);
+// {latitude: 28.363201, longitude: 77.361887, price: 100, dist: 100}, {latitude: 28.361427, longitude: 77.359869, price: 300, dist: 200}, {latitude: 28.357537, longitude: 77.358495, price: 400, dist: 150}
+const Maps = ({navigation, handleListView, origin, enableDirections = true, showSearchInput = true, markerImage, originTitle, originDescription, apiKey='AIzaSyAzo9Xzk5QwuAixqF8Kxdxp1zgMfL2DtKA', onNavigationStart, onNavigationError, getDuration, markerColor, getDestinationAddress, strokeColor, strokeWidth, onLatLngChange, markerImageStyle = {}, mainContainerStyle = {}, markedLocations=[], onDragEnd, onDrag, onDragStart }) => {
+  // const [mapRef, setMapRef] = useState(null);
   const [defaultOrigin, setDefaultOrigin] = useState({
-    latitude: 37.78825,
-    longitude: -122.4324,
+    latitude: 28.6107092000000000,
+    longitude: 77.1943697000000000,
     title: "",
     description: ""
   });
   const [inputValue, setInputValue] = useState("");
-  const [destination, setDestination] = useState(null);
+  const [destination, setDestination] = useState();
   const [isDirection, setIsDirection] = useState(false);
   const { width, height } = Dimensions.get("window");
   const ASPECT_RATIO = width / height;
   const LATITUDE = defaultOrigin.latitude;
   const LONGITUDE = defaultOrigin.longitude;
-  const LATITUDE_DELTA = 0.0922;
+  const LATITUDE_DELTA = 0.04;
   const LONGITUDE_DELTA = LATITUDE_DELTA * ASPECT_RATIO;
+  const data = [{id: 1},{id: 2},{id: 3},{id: 4},{id: 5}]
+
+  const mapRef = React.createRef();
+
+  const dispatch = useDispatch()
+  let parkingSearchList = useSelector(state => state?.app?.parkingSearchList)
+  console.log('parkingSearchList: ', parkingSearchList)
+
+  const getParkingPlaces = async () => {
+      const resp = await dispatch(parkingSearchRequest())
+      console.log('resp: ', resp)
+      if(resp.id){
+          Alert.alert('feedback sent')
+      }
+  }
+
+  const getCurrentLocation = () => {
+    try {
+        request(
+            Platform.select({
+              android: PERMISSIONS.ANDROID.ACCESS_FINE_LOCATION,
+              ios: PERMISSIONS.IOS.LOCATION_WHEN_IN_USE
+            })
+          ).then(res => {
+            if (res == "granted") {
+              Geolocation.getCurrentPosition(
+                (position) => {
+                  console.log(position);
+                  setDefaultOrigin({
+                        latitude: position?.coords?.latitude,
+                        longitude: position?.coords?.longitude
+                      });
+                },
+                (error) => {
+                  // See error code charts below.
+                  console.log(error.code, error.message);
+                },
+                { enableHighAccuracy: true, timeout: 15000, maximumAge: 10000 }
+            );
+            } else {
+              // console.log("Location is not enabled");
+            }
+          });
+        } catch (error) {
+          console.log("location set error:", error);
+        }
+}
 
   useEffect(() => {
-    if (origin) {
-      setDefaultOrigin({
-        ...defaultOrigin,
-        latitude: origin?.latitude,
-        longitude: origin?.longitude,
-        title: originTitle || "",
-        description: originDescription || ""
-      });
-    }
+    console.log(mapRef)
+    handleAnimate({ latitude: defaultOrigin?.latitude, longitude: defaultOrigin?.longitude });
+  },[mapRef])
+
+  useEffect(() => {
+    getParkingPlaces()
+    getCurrentLocation()
+    // if (origin) {
+    //   setDefaultOrigin({
+    //     ...defaultOrigin,
+    //     latitude: origin?.latitude,
+    //     longitude: origin?.longitude,
+    //     title: originTitle || "",
+    //     description: originDescription || ""
+    //   });
+    // }
   }, []);
 
   const onMapPress = async (e) => {
@@ -105,7 +171,7 @@ const Maps = ({ origin, enableDirections = true, showSearchInput = true, markerI
   };
 
   const handleAnimate = (coords) => {
-    mapRef.animateCamera({
+    mapRef?.current?.animateCamera({
       center: coords,
       pitch: 90
     });
@@ -169,15 +235,19 @@ const Maps = ({ origin, enableDirections = true, showSearchInput = true, markerI
     }
   };
 
-  const handleOnDragStart = () => {
+  const handleOnDragStart = () => { 
     if (onDragStart) {
       onDragStart();
     }
   };
 
+  const renderItem = ({item}) => {
+    return(<MapParkingSpotItem navigation={navigation}  item={item} defaultOrigin={defaultOrigin} />)
+}
+
   return (
     <View style={[styles.view, mainContainerStyle]}>
-      <View style={{ zIndex: 1000, height: inputValue ? "100%" : 50 }}>
+      {/* <View style={{ zIndex: 1000, height: inputValue ? "100%" : 50 }}>
         {
           showSearchInput && <GooglePlacesAutocomplete
             placeholder='Search location'
@@ -196,35 +266,39 @@ const Maps = ({ origin, enableDirections = true, showSearchInput = true, markerI
             }}
           />
         }
-      </View>
+      </View> */}
 
       <MapView
         initialRegion={{
-          latitude: LATITUDE,
-          longitude: LONGITUDE,
+          latitude: defaultOrigin.latitude,
+          longitude: defaultOrigin.longitude,
           latitudeDelta: LATITUDE_DELTA,
           longitudeDelta: LONGITUDE_DELTA
         }}
-        ref={setMapRef}
+        ref={mapRef}
         onPress={onMapPress}
         style={styles.map}
       >
         {markedLocations && markedLocations.map((item, index) =>
+          {
+            const dist = getDistance(
+              {longitude: defaultOrigin.longitude, latitude: defaultOrigin.latitude}, 
+              {longitude: item.long, latitude: item.lat})
+          return(
           <Marker
+          // onMarkerPress={() => console.log('pressed')}
+            onMar
             key={index}
-            coordinate={{ latitude: item.latitude, longitude: item.longitude }}
+            coordinate={{ latitude: parseFloat(item.lat), longitude: parseFloat(item.long) }}
             title={item?.title}
             description={item?.description}
             pinColor={markerColor}
           >
-            {markerImage && (
-              <Image
-                source={{ uri: markerImage }}
-                style={[styles.marker, markerImageStyle]}
-              />
-            )}
-          </Marker>
-        )}
+            {/* <Callout> */}
+              <MapMarker dist={dist} item={item} navigation={navigation}  origin={defaultOrigin}/>
+            {/* </Callout> */}
+          </Marker>)
+          })}
 
         <Marker
           key={1}
@@ -238,12 +312,6 @@ const Maps = ({ origin, enableDirections = true, showSearchInput = true, markerI
           onDragStart={() => handleOnDragStart()}
           onDragEnd={(e) => handleDragOrigin(e)}
         >
-          {markerImage && (
-            <Image
-              source={{ uri: markerImage }}
-              style={[styles.marker, markerImageStyle]}
-            />
-          )}
         </Marker>
         {destination && (
           <Marker
@@ -284,11 +352,22 @@ const Maps = ({ origin, enableDirections = true, showSearchInput = true, markerI
           resetOnChange={false}
         />}
       </MapView>
-      {enableDirections && (
-        <TouchableOpacity style={styles.directionsContainer} onPress={handleDirections}>
-          <Icon name="directions" size={45} color={isDirection ? "#00f" : "#6495ED"} />
-        </TouchableOpacity>
-      )}
+      <TouchableOpacity style={{position: "absolute", bottom: 190,zIndex: 990, backgroundColor: '#333232', alignItems: 'center', alignSelf: 'center', paddingVertical: 6, paddingHorizontal: 12, borderRadius: 8, flexDirection: 'row'}} onPress={handleListView}>
+          {/* <SvgUri
+           width={21}
+           height={24}
+           source={require('../../src/assets/listView.svg')} /> */}
+           <Icon name='view-agenda-outline' type='material-community' color={colors.white} size={24} />
+          <Text style={{fontSize: 12, fontWeight: '600', color:'white', marginLeft: 10}}>List View</Text>
+      </TouchableOpacity>
+      <FlatList
+        nestedScrollEnabled
+        horizontal
+        style={{ position: "absolute",bottom:40,zIndex: 990,borderRadius: 30}}
+        data={parkingSearchList?.results}
+        showsVerticalScrollIndicator={true}
+        renderItem={renderItem}
+        keyExtractor={(item, index) => `${item.id}-${index}`}/>
     </View>
   );
 };
@@ -316,7 +395,4 @@ Maps.propTypes = {
   onDrag: PropTypes.func,
   onDragEnd: PropTypes.func
 };
-export default {
-  title: "Maps",
-  navigator: Maps
-};
+export default Maps

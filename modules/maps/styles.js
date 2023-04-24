@@ -52,8 +52,6 @@ export const styles = StyleSheet.create({
 export const autoCompleteStyles = StyleSheet.create({
   textInputContainer: {
     marginHorizontal: 15,
-    top: 10,
-    zIndex: 1000
   },
   textInput: {
     height: 44,

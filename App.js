@@ -3,7 +3,7 @@ import React, { useContext } from "react";
 import { Provider } from "react-redux";
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
-import { configureStore, createReducer, combineReducers } from "@reduxjs/toolkit";
+import { configureStore, combineReducers } from "@reduxjs/toolkit";
 import { screens } from "@screens";
 import { modules, reducers, hooks, initialRoute } from "./modules";
 import { connectors } from "@store";
@@ -13,41 +13,45 @@ import OnBoarding from "./src/screens/onBoarding";
 import Login from "./src/screens/login";
 import termsAndConditions from "./modules/terms-and-conditions";
 import privacyPolicy from "./modules/privacy-policy";
-import ChangePassword from "./src/screens/changPassword";
-import Home from "./src/screens/home";
-import PreviousBooking from "./src/components/previousBooking";
-import UpcomingBooking from "./src/components/upcomingBooking";
-import qrCode from "./modules/qr-code";
 import SpotHunterReducer from "./src/state/reducers";
 import TutorialScreen from "./src/screens/tutorialScreen";
-import EmailVerification from "./src/screens/emailVerification";
-import { Image } from "react-native";
 import { Header } from "./src/components/header";
-import InviteFriends from "./src/screens/inviteFriends";
-import DeleteAccount from "./src/screens/deleteAccount";
-import SendFeedback from "./src/screens/sendFeedback";
 import ProceedAsGuest from "./src/screens/proceedAsGuest";
+import MainNav from "./src/navigation";
+import Home from "./src/screens/home";
+import ChangePassword from "./src/screens/changPassword";
+import EmailVerification from "./src/screens/emailVerification";
+import { DrawerHeader } from "./src/components/drawerHeader";
 
-const Stack = createStackNavigator();
+const Stack = createStackNavigator(); 
 
 const getNavigation = (modules, screens, initialRoute) => {
+  
   const Navigation = () => {
     const screenOptions = {
       headerShown: true
     };
     return <NavigationContainer>
-        <Stack.Navigator initialRouteName={SplashScreen} screenOptions={screenOptions}>
-          {/* {routes} */}
+        <Stack.Navigator initialRouteName={'SplashScreen'} screenOptions={screenOptions}>
           <Stack.Screen name='SplashScreen' component={SplashScreen} options={{ headerShown: false }} />
           <Stack.Screen name='OnBoarding' component={OnBoarding} options={{ headerShown: false }} />
           <Stack.Screen name='Login' component={Login} options={{ headerShown: false }} />
+          <Stack.Screen name='MainNav' component={MainNav} options={{ headerShown: false }} />
+          <Stack.Screen name='Home' component={Home} 
+            options={({ navigation, route }) => {
+              return {
+                headerStyle: { backgroundColor: '#FBFBFB' },
+                headerTitle: route.name,
+                headerLeft: () => <DrawerHeader navigation={navigation} />
+              };
+            }} />
           <Stack.Screen name='TermsAndConditions' component={termsAndConditions.navigator} 
             options={({ navigation, route }) => {
               return {
                 headerStyle: { backgroundColor: '#FBFBFB' },
                 headerTitle: 'Terms And Conditions',
                 headerTitleAlign: 'center',
-                headerLeft: () => <Header navigation={navigation} /> //<FIcons name='menu' onPress={props.navigation.openDrawer} size={24} color={route.name == 'exclusive'?'white':'black'} style={{width:24,height:24, marginLeft:13}} />
+                headerLeft: () => <Header navigation={navigation} />
               };
             }} />
           <Stack.Screen name='PrivacyPolicy' component={privacyPolicy.navigator} 
@@ -56,73 +60,32 @@ const getNavigation = (modules, screens, initialRoute) => {
                 headerStyle: { backgroundColor: '#FBFBFB' },
                 headerTitle: 'Privacy Policy',
                 headerTitleAlign: 'center',
-                headerLeft: () => <Header navigation={navigation} /> //<FIcons name='menu' onPress={props.navigation.openDrawer} size={24} color={route.name == 'exclusive'?'white':'black'} style={{width:24,height:24, marginLeft:13}} />
+                headerLeft: () => <Header navigation={navigation} />
               };
             }} />
-          <Stack.Screen name='ChangePassword' component={ChangePassword} 
-            options={({ navigation, route }) => {
-              return {
-                headerStyle: { backgroundColor: '#FBFBFB' },
-                headerTitle: route.params.name,
-                headerTitleAlign: 'center',
-                headerLeft: () => <Header navigation={navigation} /> //<FIcons name='menu' onPress={props.navigation.openDrawer} size={24} color={route.name == 'exclusive'?'white':'black'} style={{width:24,height:24, marginLeft:13}} />
-              };
-            }} />
-          <Stack.Screen name='Home' component={Home} 
-            options={({ navigation, route }) => {
-              return {
-                headerStyle: { backgroundColor: '#FBFBFB' },
-                headerTitle: route.name,
-                headerTitleAlign: 'center',
-                headerLeft: () => <Header navigation={navigation} /> //<FIcons name='menu' onPress={props.navigation.openDrawer} size={24} color={route.name == 'exclusive'?'white':'black'} style={{width:24,height:24, marginLeft:13}} />
-              };
-            }} />
+          
           <Stack.Screen name='TutorialScreen' component={TutorialScreen} options={{ headerShown: false }} />
-          <Stack.Screen name='PreviousBooking' component={PreviousBooking} options={{ headerShown: false }} />
-          <Stack.Screen name='qrCode' component={qrCode.navigator} options={{ headerShown: false }} />
-          <Stack.Screen name='EmailVerification' component={EmailVerification} options={{ headerShown: false }} />
-          <Stack.Screen name='InviteFriends' component={InviteFriends} 
-            options={({ navigation, route }) => {
-              return {
-                headerStyle: { backgroundColor: '#FBFBFB' },
-                headerTitle: 'Invite Friends',
-                headerTitleAlign: 'center',
-                headerLeft: () => <Header navigation={navigation} /> //<FIcons name='menu' onPress={props.navigation.openDrawer} size={24} color={route.name == 'exclusive'?'white':'black'} style={{width:24,height:24, marginLeft:13}} />
-              };
-            }}
-          />
-          <Stack.Screen name='DeleteAccount' component={DeleteAccount} 
-            options={({ navigation, route }) => {
-              return {
-                headerStyle: { backgroundColor: '#FBFBFB' },
-                headerTitle: 'Delete Account',
-                headerTitleAlign: 'center',
-                headerLeft: () => <Header navigation={navigation} /> //<FIcons name='menu' onPress={props.navigation.openDrawer} size={24} color={route.name == 'exclusive'?'white':'black'} style={{width:24,height:24, marginLeft:13}} />
-              };
-            }}
-          />
-          <Stack.Screen name='SendFeedback' component={SendFeedback} 
-            options={({ navigation, route }) => {
-              return {
-                headerStyle: { backgroundColor: '#FBFBFB' },
-                headerTitle: 'Feedback',
-                headerTitleAlign: 'center',
-                headerLeft: () => <Header navigation={navigation} /> //<FIcons name='menu' onPress={props.navigation.openDrawer} size={24} color={route.name == 'exclusive'?'white':'black'} style={{width:24,height:24, marginLeft:13}} />
-              };
-            }}
-          />
           <Stack.Screen name='ProceedAsGuest' component={ProceedAsGuest} 
             options={({ navigation, route }) => {
               return {
                 headerStyle: { backgroundColor: '#FBFBFB' },
                 headerTitle: 'Proceed As Guest',
                 headerTitleAlign: 'center',
-                headerLeft: () => <Header navigation={navigation} /> //<FIcons name='menu' onPress={props.navigation.openDrawer} size={24} color={route.name == 'exclusive'?'white':'black'} style={{width:24,height:24, marginLeft:13}} />
+                headerLeft: () => <Header navigation={navigation} />
               };
             }}
           />
-          {/* <Stack.Screen name='UpcomingBooking' component={UpcomingBooking} options={{ headerShown: false }} /> */}
-          {/* <Stack.Screen name='socialLogin' component={login.} options={{ headerShown: false }} /> */}
+          <Stack.Screen name='ChangePassword' component={ChangePassword} 
+            options={({ navigation, route }) => {
+              return {
+                headerStyle: { backgroundColor: '#FBFBFB' },
+                headerTitle: route.params.name,
+                headerTitleAlign: 'center',
+                headerLeft: () => <Header navigation={navigation} />
+              };
+            }} />
+          <Stack.Screen name='EmailVerification' component={EmailVerification} options={{ headerShown: false }} />
+
         </Stack.Navigator>
       </NavigationContainer>;
   };

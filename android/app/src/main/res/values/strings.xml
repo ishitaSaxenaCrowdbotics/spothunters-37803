@@ -1,4 +1,5 @@
 <resources>
     <string name="app_name">parkauthority-37803</string>
-    <string name="original_app_name">parkauthority</string>
+    <string name="original_app_name">Spot Hunters</string>
+    <string name="facebook_app_id">Your_facebook_id_here</string>
 </resources>

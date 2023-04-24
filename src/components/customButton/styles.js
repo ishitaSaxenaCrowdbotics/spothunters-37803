@@ -23,7 +23,13 @@ const styles = StyleSheet.create({
         color: '#1E8FFF', 
         fontWeight: '700',
         fontSize: 14
-    }
+    },
+    disabledContainer: {
+        borderRadius: 24, 
+        backgroundColor: 'grey', 
+        padding: 12, 
+        alignItems: 'center'
+    },
 })
 
 export default styles

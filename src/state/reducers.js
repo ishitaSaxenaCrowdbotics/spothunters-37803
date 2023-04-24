@@ -3,7 +3,10 @@ const initialState = {
   token: '',
   data: {},
   tutorial: [],
-  emailVerify: {}
+  emailVerify: {},
+  rememberMe: false,
+  parkingSearchList: [],
+  parkingPlace: {}
 }
 const SpotHunterReducer = (state = initialState, action) =>{
     switch (action.type) {
@@ -28,6 +31,11 @@ const SpotHunterReducer = (state = initialState, action) =>{
                 ...state,
                 emailVerify: action.payload
             }
+        case 'REMEMBER_ME':
+            return {
+                ...state,
+                rememberMe: true
+            }
         case 'RESET':
             return {
                 userData: {},
@@ -36,6 +44,19 @@ const SpotHunterReducer = (state = initialState, action) =>{
                 tutorial: [],
                 emailVerify: {}
             }
+        case 'SET_PARKING_SEARCH':
+            return {
+                ...state,
+                parkingSearchList: action.payload
+                
+            }
+
+        case 'SET_PARKING_SEARCH_ID':
+            return {
+                ...state,
+                parkingPlace: action.payload
+            }
+        
         default:
         return state
     }

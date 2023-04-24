@@ -1,102 +1,88 @@
-import React, { useEffect } from "react";
-import { View, Text, Button, TouchableOpacity, Image } from "react-native";
+import React, { useEffect, useRef, useState } from "react";
+import { View, Text, Button, TouchableOpacity, Image, Dimensions } from "react-native";
 import AppIntroSlider from "react-native-app-intro-slider";
 import { CustomButton } from "../../components/customButton";
+import Carousel, {Pagination} from 'react-native-snap-carousel';
+import { commonStyles } from "../../styles";
+import styles from "./styles";
+
 
 const OnBoarding = (props) => {
 
-    useEffect(() => {
-      }, []);
+  const [index, setIndex] = useState(0)
+  const isCarousel = useRef(null);
 
-      const slides = [
-        {
-          key: 1,
-          title: 'Lorem Ipsum is simply',
-          text: 'At magnum periculum adiit in quo aut perferendis doloribus asperiores repellat hanc ego assentior.',
-          image: require('../../assets/image1.jpeg'),
-          backgroundColor: '#59b2ab',
-        },
-        {
-          key: 2,
-          title: 'Lorem Ipsum is simply',
-          text: 'At magnum periculum adiit in quo aut perferendis doloribus asperiores repellat hanc ego assentior.',
-          image: require('../../assets/image2.jpeg'),
-          backgroundColor: '#febe29',
-        },
-        {
-          key: 3,
-          title: 'Lorem Ipsum is simply',
-          text: 'At magnum periculum adiit in quo aut perferendis doloribus asperiores repellat hanc ego assentior.',
-          image: require('../../assets/image2.jpeg'),
-          backgroundColor: '#22bcb5',
-        }
-      ];
-      const renderItem = ({ item }) => {
-        return (
-          <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center'}}>
-            <Image source={item.image} style={{width: 280, height: 280}}/>
-            <Text style={{marginTop: 42, textAlign: 'center'}}>{item.title}</Text>
-            <Text style={{marginTop: 12, textAlign: 'center'}}>{item.text}</Text>
-          </View>
-        );
-      }
-      const _renderNextButton = () => {
-        return (
-          <View style={{borderRadius: 20, borderWidth: 1, borderColor: '#1E8FFF', padding: 10, alignItems: 'center', width: 90}}>
-              <Text style={{color: '#1E8FFF'}}>
-              Next
-              </Text>
-          </View>
-        )
-      }
-      const _renderPrevButton = () => {
-        return (
-          <View style={{borderRadius: 20, borderWidth: 1, borderColor: '#1E8FFF', padding: 10, alignItems: 'center', width: 90}}>
-              <Text style={{color: '#1E8FFF'}}>
-              Prev
-              </Text>
-          </View>
-        )
-      }
+  const slides = [
+    {
+      key: 1,
+      title: 'Lorem Ipsum is simply',
+      text: 'At magnum periculum adiit in quo aut perferendis doloribus asperiores repellat hanc ego assentior.',
+      image: require('../../assets/image1.jpeg'),
+      backgroundColor: '#59b2ab',
+    },
+    {
+      key: 2,
+      title: 'Lorem Ipsum is simply',
+      text: 'At magnum periculum adiit in quo aut perferendis doloribus asperiores repellat hanc ego assentior.',
+      image: require('../../assets/image2.jpeg'),
+      backgroundColor: '#febe29',
+    },
+    {
+      key: 3,
+      title: 'Lorem Ipsum is simply',
+      text: 'At magnum periculum adiit in quo aut perferendis doloribus asperiores repellat hanc ego assentior.',
+      image: require('../../assets/image2.jpeg'),
+      backgroundColor: '#22bcb5',
+    }
+  ];
+  const renderItem = ({ item }) => {
+    return (
+      <View style={[commonStyles.flex1, commonStyles.justifyContentCenter, commonStyles.alignItemsCenter, commonStyles.paddingHorizontal30]}>
+        <Image source={item.image} style={styles.size280}/>
+        <Text style={[commonStyles.text_big_bold, styles.marginTop42, commonStyles.centerTextAlign]}>{item.title}</Text>
+        <Text style={[commonStyles.text_small_thick, commonStyles.marginTop12, commonStyles.centerTextAlign]}>{item.text}</Text>
+      </View>
+    );
+  }
 
   return (
-    <View style={{ flex: 1, paddingHorizontal: 48 }}>
-      <AppIntroSlider 
-        renderItem={renderItem} 
-        data={slides} 
-        onDone={() => props.navigation.navigate('Login')} 
-        showPrevButton
-        showDoneButton={false}
-        renderNextButton={_renderNextButton}
-        renderPrevButton={_renderPrevButton}
-        activeDotStyle={{backgroundColor: '#1E8FFF'}}
-        dotStyle={{backgroundColor:'#1E8FFF80'}}
-        prevLabel={'Prev'}/>
+    <View style={commonStyles.fullHeight}>
+      <Carousel
+        ref={isCarousel}
+        windowSize={Dimensions.get('window').width}
+        data={slides}
+        renderItem={renderItem}
+        sliderWidth={Dimensions.get('window').width}
+        itemWidth={Dimensions.get('window').width}
+        onSnapToItem={index => setIndex(index)}
+      />
+      <Pagination
+        dotsLength={slides.length}
+        activeDotIndex={index}
+        carouselRef={isCarousel}
+        dotStyle={styles.dotStyle}
+        tappableDots={true}
+        inactiveDotStyle={{
+          backgroundColor: '#1E8FFF80',
+        }}
+        inactiveDotOpacity={0.4}
+        inactiveDotScale={0.6}
+      />
+      <View style={[commonStyles.flexRow, commonStyles.justifyContentBetween, styles.paddingHorizontal48]}>
         <CustomButton
-          onPress={() => props.navigation.navigate('TutorialScreen')}
-          isPrimaryButton
-          style={{marginVertical: 30}} 
-          label={'GET STARTED'} />
-      {/* <View style={{height: 280, width: 280, backgroundColor: 'grey', borderRadius: 24}} />
-      <Text style={{marginTop: 42, textAlign: 'center'}}>Lorem Ipsum is simply </Text>
-      <Text style={{marginTop: 12, textAlign: 'center'}}>At magnum periculum adiit in quo aut perferendis doloribus asperiores repellat hanc ego assentior. </Text>
-      <View style={{flexDirection: 'row', marginTop: 40}}>
-          <TouchableOpacity style={{borderRadius: 24, borderWidth: 1, borderColor: '#1E8FFF', padding: 10, flex: 1, alignItems: 'center', marginRight: 20}}>
-              <Text style={{color: '#1E8FFF'}}>
-              PREV
-              </Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={{borderRadius: 24, borderWidth: 1, borderColor: '#1E8FFF', padding: 10, flex: 1, alignItems: 'center'}}>
-              <Text style={{color: '#1E8FFF'}}>
-              NEXT
-              </Text>
-          </TouchableOpacity>
+          onPress={() => { isCarousel?.current?.snapToPrev()}}
+          style={[styles.flex5, commonStyles.marginRight20]}
+          label={'PREV'} />
+          <CustomButton
+          onPress={() => { isCarousel?.current?.snapToNext() }}
+          style={styles.flex5}
+          label={'NEXT'} />
       </View>
-      <TouchableOpacity style={{borderRadius: 24, backgroundColor: '#1E8FFF', padding: 10, alignItems: 'center', marginTop: 30}} onPress={() => props.navigation.navigate('Login')}>
-          <Text style={{color: 'white'}}>
-          GET STARTED
-          </Text>
-      </TouchableOpacity> */}
+      <CustomButton
+        onPress={() => props.navigation.navigate('TutorialScreen')}
+        isPrimaryButton
+        style={styles.margin30} 
+        label={'GET STARTED'} />
     </View>
   );
 };
