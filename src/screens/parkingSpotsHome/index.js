@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import { FlatList, SafeAreaView, View, Text, TouchableOpacity, Platform } from 'react-native';
+import { FlatList, SafeAreaView, View, Text, TouchableOpacity, Platform, ActivityIndicator, RefreshControl } from 'react-native';
 import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete';
 import { Icon } from 'react-native-elements'
 import Maps from '../../../modules/maps';
 import { autoCompleteStyles } from '../../../modules/maps/styles';
 import { ListParkingSpotItem } from '../../components/parkingSpots';
 import { colors, commonStyles } from '../../styles';
-import { parkingSearchRequest } from '../../utils/service';
+import { parkingSearchListRequest } from '../../utils/service';
 import { useDispatch, useSelector } from 'react-redux';
 import SelectTime from '../../components/selectTime';
 import Geolocation from 'react-native-geolocation-service'
@@ -20,6 +20,7 @@ const ParkingSpotsHome = (props) => {
     const [isClosest, setClosest] = useState(false)
     const [isAirport, setAirport] = useState(false)
     const [isModal, setModal] = useState(false)
+    const [loading, setLoading] = useState(false)
     const [defaultOrigin, setDefaultOrigin] = useState({
         latitude: 28.6107092000000000,
         longitude: 77.1943697000000000,
@@ -37,7 +38,6 @@ const ParkingSpotsHome = (props) => {
 
     const dispatch = useDispatch()
     let parkingSearchList = useSelector(state => state?.app?.parkingSearchList)
-    console.log('parkingSearchList: ', parkingSearchList)
 
     const getCurrentLocation = () => {
         try {
@@ -50,7 +50,6 @@ const ParkingSpotsHome = (props) => {
                 if (res == "granted") {
                   Geolocation.getCurrentPosition(
                     (position) => {
-                      console.log(position);
                       setDefaultOrigin({
                             latitude: position?.coords?.latitude,
                             longitude: position?.coords?.longitude
@@ -77,32 +76,64 @@ const ParkingSpotsHome = (props) => {
     }, [])
 
     const getParkingPlaces = async () => {
-        const resp = await dispatch(parkingSearchRequest())
+        setLoading(true)
+        const resp = await dispatch(parkingSearchListRequest())
         console.log('resp: ', resp)
+        if(resp){
+            setLoading(false)
+        }
     }
 
+    let reqData = {}
     const handleFilter = async(type) => {
-        let reqData = null
+        setLoading(true)
+        reqData = {
+            best_price: isBTPrice,
+            weighted: isMostWeighted,
+            closest: !isClosest ? '' : `${defaultOrigin.latitude},${defaultOrigin.longitude}`,
+            is_airport: isAirport
+        }
+
         if(type === 'price') {
             setBTPrice(!isBTPrice)
+            // reqData = {...reqData,
+            //         best_price: !isBTPrice}
+            reqData.best_price= !isBTPrice
         } else if(type === 'mostweighted') {
             setMostWeighted(!isMostWeighted)
+            // reqData = {...reqData,
+            reqData.weighted= !isMostWeighted
+            // }
         } else if(type === 'closest') {
             setClosest(!isClosest)
+            // reqData = {...reqData,
+            reqData.closest= isClosest ? '' : `${defaultOrigin.latitude},${defaultOrigin.longitude}`
+            // }
         } else if(type === 'airport') {
             setAirport(!isAirport)
-            reqData = {
-                is_airport: !isAirport,
-            }
+            // reqData = {...reqData,
+            reqData.is_airport= !isAirport
+            // }
         }
-        const resp1 = await dispatch(parkingSearchRequest(reqData))
+        console.log('req: ', reqData)
+        const resp1 = await dispatch(parkingSearchListRequest(reqData))
         console.log('resp1: ', resp1)
+        if(resp1){
+            setLoading(false)
+        }
     }
+
+    const goBack = () => {
+        props?.navigation.goBack();
+      }
 
   return (
       <SafeAreaView style={{backgroundColor: 'white', flex: 1}}>
         <View style={{ zIndex: 1, height: 85, justifyContent: 'space-between', position: isMapView ? 'absolute' : null, width: '100%'}}>
             <View style={{flexDirection: 'row', top: 10}}>
+            <TouchableOpacity onPress={goBack} style={[commonStyles.justifyContentCenter, commonStyles.alignItemsCenter]}>
+                <Icon name="chevron-back" type='ionicon' size={24} color={colors.black} containerStyle={commonStyles.marginHorizontal16} />
+            </TouchableOpacity>
                 <GooglePlacesAutocomplete
                     placeholder='Search location'
                     minLength={2}
@@ -125,16 +156,16 @@ const ParkingSpotsHome = (props) => {
                 <TouchableOpacity onPress={() => setModal(true)} style={{flex: 0.2, alignSelf: 'center'}}>
                     <Icon name="time-outline" type='ionicon' size={25} color={'black'}/>
                 </TouchableOpacity>
-                </View>
+            </View>
 
             <View style={{flexDirection: 'row', paddingHorizontal: 16}}>
-                <TouchableOpacity style={{backgroundColor: isBTPrice ? colors.COLOR_F8D247:'#EDEEF1', paddingHorizontal: 8, paddingVertical: 4, borderRadius: 40, marginRight: 10}} onPress={() => handleFilter('price')}>
+                <TouchableOpacity style={{backgroundColor: isBTPrice ? colors.COLOR_F8D247:'#EDEEF1', paddingHorizontal: 8, paddingVertical: 4, borderRadius: 40, marginRight: 10}} onPress={() => handleFilter('price')} disabled={isAirport}>
                     <Text style={commonStyles.text_xs_thick}>best price</Text>
                 </TouchableOpacity>
-                <TouchableOpacity style={{backgroundColor: isMostWeighted ? colors.COLOR_F8D247:'#EDEEF1', paddingHorizontal: 8, paddingVertical: 4, borderRadius: 40, marginRight: 10}} onPress={() => handleFilter('mostweighted')}>
+                <TouchableOpacity style={{backgroundColor: isMostWeighted ? colors.COLOR_F8D247:'#EDEEF1', paddingHorizontal: 8, paddingVertical: 4, borderRadius: 40, marginRight: 10}} onPress={() => handleFilter('mostweighted')} disabled={isAirport}>
                     <Text style={commonStyles.text_xs_thick}>most weighted</Text>
                 </TouchableOpacity>
-                <TouchableOpacity style={{backgroundColor: isClosest ? colors.COLOR_F8D247:'#EDEEF1', paddingHorizontal: 8, paddingVertical: 4, borderRadius: 40, marginRight: 10}} onPress={() => handleFilter('closest')}>
+                <TouchableOpacity style={{backgroundColor: isClosest ? colors.COLOR_F8D247:'#EDEEF1', paddingHorizontal: 8, paddingVertical: 4, borderRadius: 40, marginRight: 10}} onPress={() => handleFilter('closest')} disabled={isAirport}>
                     <Text style={commonStyles.text_xs_thick}>Closest</Text>
                 </TouchableOpacity>
                 <TouchableOpacity style={{backgroundColor: isAirport ? colors.COLOR_F8D247:'#EDEEF1', paddingHorizontal: 8, paddingVertical: 4, borderRadius: 40}} onPress={() => handleFilter('airport')}>
@@ -145,6 +176,8 @@ const ParkingSpotsHome = (props) => {
         {isMapView ? 
         <Maps handleListView={() => onHandleListView(false)} showSearchInput={true} navigation={props.navigation} markedLocations={parkingSearchList?.results} />
         : 
+        <>
+        {loading ? <ActivityIndicator style={{marginTop: 50}} size="large" color={colors.base} /> : 
         <>
         <View style={{ paddingHorizontal: 16, flexDirection: 'row', justifyContent: 'space-between', marginBottom: 8, marginTop: 10 }}>
             <Text style={[commonStyles.text_xs_thick, {textAlignVertical: 'center'}]}>
@@ -161,13 +194,21 @@ const ParkingSpotsHome = (props) => {
             showsVerticalScrollIndicator={true}
             renderItem={renderItemPrev}
             keyExtractor={(item, index) => `${item.id}-${index}`}
+            refreshControl={
+                <RefreshControl
+                  refreshing={loading}
+                  onRefresh={getParkingPlaces}
+                />
+            }
         /> : 
         <View style={{justifyContent: 'center', height:'70%', alignItems: 'center'}}>
             <Text style={commonStyles.text_big_bold}>no results found...</Text>
         </View>}
         </>
         }
-        <SelectTime isModal={isModal} setModal={setModal} />
+        </>
+        }
+        <SelectTime isModal={isModal} setModal={setModal} setLoading={setLoading} />
     </SafeAreaView>
   );
 }

@@ -13,6 +13,7 @@ const QrCode = (props) => {
       .then(res => res.json())
       .then(res => {
         setIsLoader(false);
+        console.log('res')
         setQr(res.qrcode);
       })
       .catch(e => {

@@ -51,3 +51,31 @@ export function setParkingSearchByID(response) {
         payload: response
     }
 }
+
+export function upcomingBookings(response) {
+    return { 
+        type: 'UPCOMING_BOOKING', 
+        payload: response
+    }
+}
+
+export function prevBookings(response) {
+    return { 
+        type: 'PREVIOUS_BOOKING', 
+        payload: response
+    }
+}
+
+export function parkingCompHome(response) {
+    return { 
+        type: 'PARKING_COMP_HOME', 
+        payload: response
+    }
+}
+
+export function filters(response) {
+    return { 
+        type: 'APPLY_FILTERS', 
+        payload: response
+    }
+}

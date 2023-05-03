@@ -14,8 +14,8 @@ const Login = (props) => {
   const [isAccountCreate, setIsAccountCreate] = useState(props?.route?.params?.isSignup)
   const [toggleCheckBox, setToggleCheckBox] = useState(false)
   const [rememberMe, setRememberMe] = useState(false)
-  const [email, setEmail] = useState('')//test1@gmail.com
-  const [password, setPassword] = useState('') //test
+  const [email, setEmail] = useState('')//test1@gmail.com jainlavika19+95@gmail.com
+  const [password, setPassword] = useState('') //test lavika19
   const [mobileNumber, setMobileNumber] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')// reNxsgmgx5
   const [isloading, setIsloading] = useState(false)
@@ -33,7 +33,7 @@ const Login = (props) => {
       }
       const resp1 = await dispatch(signUpRequest(signUpData))
       if (resp1?.status){
-        props.navigation.navigate('EmailVerification', {email, isCreateAccount: props.route.params?.isCreateAccount})
+        props.navigation.navigate('EmailVerification', {email, isSignup: props.route.params?.isSignup})
       } else {
         if(resp1?.data?.statusCode === 401){
           Alert.alert(
@@ -94,15 +94,15 @@ const Login = (props) => {
   }
 
   const onLoginValidate = () => {
-    let reg = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w\w+)+$/;
-    if(password){
+    // let reg = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w\w+)+$/;
+    if(email && password){
       return false
     }
     return true
   }
   const onSignValidate = () => {
-    let reg = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w\w+)+$/;
-    if(reg.test(email) && password && toggleCheckBox && mobileNumber && confirmPassword && (confirmPassword === password)){
+    // let reg = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w\w+)+$/;
+    if(email && password && toggleCheckBox && mobileNumber && confirmPassword && (confirmPassword === password)){
       return false
     }
     return true
@@ -118,7 +118,7 @@ const Login = (props) => {
       <View style={styles.container}>
         <Image source={require('../../assets/logo.png')} style={[commonStyles.size111, commonStyles.alignSelfCenter, commonStyles.size111]} />
         <Text style={styles.headingText}>Spot Hunters</Text>
-        <Text style={[commonStyles.text_large_bold, commonStyles.marginTop12, commonStyles.centerTextAlign]}>Sign In</Text>
+        <Text style={[commonStyles.text_large_bold, commonStyles.marginTop12, commonStyles.centerTextAlign]}>{isAccountCreate ? 'Sign Up' : 'Sign In'}</Text>
         <FloatingTextInput
           style={commonStyles.marginTop20} 
           label={isAccountCreate ? 'Email ID *' : 'Email ID *'}
@@ -148,19 +148,19 @@ const Login = (props) => {
           </>
         }
         {!isAccountCreate && 
-        // <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
-        //   <View style={{flexDirection:'row'}}>
-        //   <CheckBox 
-        //       value={rememberMe}
-        //       onValueChange={(newValue) => setRememberMe(newValue)}/>
-        //   <Text style={{fontSize: 10, textAlignVertical: 'center'}}>Remember me</Text>
-        //   </View>
+        <View style={[commonStyles.marginTop12, {flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'}]}>
+          <View style={{flexDirection:'row'}}>
+          <CheckBox 
+              value={rememberMe}
+              onValueChange={(newValue) => setRememberMe(newValue)}/>
+          <Text style={{fontSize: 10, textAlignVertical: 'center'}}>Remember me</Text>
+          </View>
           <TouchableOpacity onPress={() => props.navigation.navigate('ChangePassword', {name: 'Forgot Password'})}>
-            <Text style={[commonStyles.text_xxs_thick, commonStyles.marginTop12, commonStyles. centerTextAlign, commonStyles.blueTextColor, commonStyles.alignSelfEnd]}>
+            <Text style={[commonStyles.text_xxs_thick, commonStyles. centerTextAlign, commonStyles.blueTextColor, commonStyles.alignSelfEnd]}>
               Forgot Password?
               </Text>
           </TouchableOpacity>
-        // </View>
+        </View>
           }
         {isAccountCreate && 
           <View style={[commonStyles.flexRow, commonStyles.marginTop16]}>
@@ -184,7 +184,7 @@ const Login = (props) => {
           onPress={onLoginPress}
           isPrimaryButton
           style={commonStyles.marginTop30} 
-          label={isAccountCreate ? 'CREATE ACCOUNT' : 'LOGIN'} />
+          label={isAccountCreate ? 'Create Account' : 'Login'} />
           {isloading && <ActivityIndicator  size="large" style={commonStyles.marginTop10}
                 color='#1E8FFF' />}
         <View style={commonStyles.marginTop30}>

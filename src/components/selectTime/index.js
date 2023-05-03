@@ -6,17 +6,18 @@ import { CustomButton } from '../customButton';
 import FloatingTextInput from '../floatingTextInput';
 import CheckBox from '@react-native-community/checkbox';
 import { useDispatch } from 'react-redux';
-import { parkingSearchRequest } from '../../utils/service';
+import { parkingSearchListRequest } from '../../utils/service';
 import MonthPicker from 'react-native-month-year-picker';
-import { convertTime12to24 } from '../../utils';
+import { convertTime12to24, toUnixTime } from '../../utils';
 import { DatePickerIOS } from 'react-native';
+import { filters } from '../../state/actions';
 
 const SelectTime = (props) => {
 
     const [isSelected, setSelected] = useState(props?.type || 'Hourly')
     const [startDate, setStartDate] = useState(new Date())
     const [endDate, setEndDate] = useState(new Date())
-    const [month, setMonth] = useState(new Date())
+    const [month, setMonth] = useState(new Date(new Date().getFullYear(), new Date().getMonth() + 1))
     const [open, setOpen] = useState({isOpen: false, type: ''})
     const [isOpenMonthPicker, setIsOpenMonthPicker] = useState(false)
     const data = [{title: 'Mon', id: 1, value: 'Monday', isSelected: false},{title: 'Tues', id: 2, value: 'Tuesday', isSelected: false},{title: 'Wed', id: 3, value: 'Wednesday', isSelected: false},{title: 'Thurs', id: 4, value: 'Thursday', isSelected: false},{title: 'Fri', id: 5, value: 'Friday', isSelected: false},{title: 'Sat', id: 6, value: 'Saturday', isSelected: false},{title: 'Sun', id: 7, value: 'Sunday', isSelected: false}]
@@ -32,7 +33,6 @@ const SelectTime = (props) => {
             value={toggleCheckBox[index].isSelected}
             onValueChange={(newValue) => {
               let temp = toggleCheckBox.map((product) => {
-                console.log('product ', product)
                 if (item.id === product.id) {
                   return { ...product, isSelected: newValue };
                 }
@@ -46,8 +46,7 @@ const SelectTime = (props) => {
     }
 
     const onValueChange = (event, newDate) => {
-        const selectedDate = newDate || month 
-        console.log('selectedDate: ', selectedDate.getFullYear())       
+        const selectedDate = newDate || month      
         setIsOpenMonthPicker(false);
         setMonth(selectedDate);
       }
@@ -61,26 +60,36 @@ const SelectTime = (props) => {
           data = startDate.toLocaleDateString()
         } else if (isSelected === 'Weekly'){
           data = `${startdate.toLocaleDateString()} - ${endDate.toLocaleDateString()}`
-        } else if (isSelected === 'Montly'){
+        } else if (isSelected === 'Monthly'){
           data = month
         }
         props?.selectTime(data)
         props.setModal(false)
       } else {
-        const startdate = convertTime12to24(startDate.toLocaleTimeString());
-        const enddate = convertTime12to24(endDate.toLocaleTimeString());
+        props?.setLoading(true)
         const day = toggleCheckBox.filter((item) => item.isSelected).map((item) => item.value)
         let availability = null
           availability = isSelected
+          console.log('availability: ', availability)
         const reqData = {
-          places_working_time__day: day,
-          places_working_time__end_time__lte: enddate,
-          places_working_time__start_time__gte: startdate,
+          day: availability === 'Hourly' ? day : '',
+          end: toUnixTime(endDate.getFullYear(), endDate.getMonth()+1, endDate.getDate(), endDate.getHours(), endDate.getMinutes(), endDate.getSeconds()),
+          start: availability === 'Monthly' ? toUnixTime(month.getFullYear(), month.getMonth()+1, 1, 11, 30, 0) : toUnixTime(startDate.getFullYear(), startDate.getMonth()+1, startDate.getDate(), startDate.getHours(), startDate.getMinutes(), startDate.getSeconds()),
           availability: availability
         }
+        dispatch(filters({
+            endDate: endDate.toLocaleString(),
+            startDate: startDate.toLocaleString(), 
+            availability: availability, 
+            month: `${monthNames[month.getMonth()]}, ${month.getFullYear()}`, 
+            day
+          }))
         props.setModal(false)
-        // const resp1 = await dispatch(parkingSearchRequest(reqData))
-        // console.log('resp1, :', resp1)
+        const resp1 = await dispatch(parkingSearchListRequest(reqData))
+        if(resp1){
+          props?.setLoading(false)
+        }
+        console.log('resp1, :', resp1)
       }
     }
 
@@ -90,7 +99,7 @@ const SelectTime = (props) => {
         setStartDate(new Date())
         setEndDate(new Date())
       } else if(type === 'Monthly'){
-        availability = 'Monthly'
+        setMonth(new Date(new Date().getFullYear(), new Date().getMonth() + 1))
       } else if(type === 'Weekly'){
         setStartDate(new Date())
         var newDate = new Date()
@@ -102,9 +111,6 @@ const SelectTime = (props) => {
       }
     }
 
-    console.log('startDate: ', startDate.toLocaleDateString())
-    console.log('endDate: ', endDate.toLocaleDateString())
-    console.log('props?.type: ', props?.type === 'Daily' || 'test')
   return (
     <Modal
       visible={props.isModal}
@@ -121,24 +127,24 @@ const SelectTime = (props) => {
               <Text style={[commonStyles.text_xl_bold, commonStyles.centerTextAlign]}>Select Time</Text>
               <Text style={[commonStyles.text_big, commonStyles.marginTop30]}>Parking type</Text>
               <View style={{flexDirection: 'row', marginVertical: 30}}>
-                { props?.type !== 'Hourly' ||
+                { (props?.type !== 'Hourly' && props?.isBooking) ||
                   <TouchableOpacity style={{backgroundColor: isSelected === 'Hourly' ? colors.base:'#EDEEF1', paddingHorizontal: 8, paddingVertical: 4, flex: 1}} onPress={() => onPresTab('Hourly')}>
                       <Text style={[commonStyles.text_big, isSelected === 'Hourly' ? commonStyles.whiteTextColor : commonStyles.blackTextColor]}>Hourly</Text>
                   </TouchableOpacity>
                 }
-                { props?.type !== 'Monthly' ||
-                  <TouchableOpacity style={{backgroundColor: isSelected === 'Monthly' ? colors.base:'#EDEEF1', paddingHorizontal: 8, paddingVertical: 4, flex: 1}} onPress={() => onPresTab('Monthly')}>
-                      <Text style={[commonStyles.text_big, isSelected === 'Monthly' ? commonStyles.whiteTextColor : commonStyles.blackTextColor]}>Monthly</Text>
+                { (props?.type !== 'Daily' && props?.isBooking) ||
+                  <TouchableOpacity style={{backgroundColor: isSelected === 'Daily' ? colors.base:'#EDEEF1', paddingHorizontal: 8, paddingVertical: 4, flex: 1}} onPress={() => onPresTab('Daily')}>
+                      <Text style={[commonStyles.text_big, isSelected === 'Daily' ? commonStyles.whiteTextColor : commonStyles.blackTextColor]}>Daily</Text>
                   </TouchableOpacity>
                 }
-                { props?.type !== 'Weekly' ||
+                { (props?.type !== 'Weekly' && props?.isBooking) ||
                   <TouchableOpacity style={{backgroundColor: isSelected === 'Weekly' ? colors.base:'#EDEEF1', paddingHorizontal: 8, paddingVertical: 4, flex: 1}} onPress={() => onPresTab('Weekly')}>
                       <Text style={[commonStyles.text_big, isSelected === 'Weekly' ? commonStyles.whiteTextColor : commonStyles.blackTextColor]}>Weekly</Text>
                   </TouchableOpacity>
                 }
-                { props?.type !== 'Daily' ||
-                  <TouchableOpacity style={{backgroundColor: isSelected === 'Daily' ? colors.base:'#EDEEF1', paddingHorizontal: 8, paddingVertical: 4, flex: 1}} onPress={() => onPresTab('Daily')}>
-                      <Text style={[commonStyles.text_big, isSelected === 'Daily' ? commonStyles.whiteTextColor : commonStyles.blackTextColor]}>Daily</Text>
+                { (props?.type !== 'Monthly' && props?.isBooking) ||
+                  <TouchableOpacity style={{backgroundColor: isSelected === 'Monthly' ? colors.base:'#EDEEF1', paddingHorizontal: 8, paddingVertical: 4, flex: 1}} onPress={() => onPresTab('Monthly')}>
+                      <Text style={[commonStyles.text_big, isSelected === 'Monthly' ? commonStyles.whiteTextColor : commonStyles.blackTextColor]}>Monthly</Text>
                   </TouchableOpacity>
                 }
               </View>
@@ -148,7 +154,7 @@ const SelectTime = (props) => {
                     <FloatingTextInput
                           label='Start Time*'
                           editable={false}
-                          value={startDate.toLocaleTimeString()}/>
+                          value={startDate.toLocaleString()}/>
                   </TouchableOpacity>
                 }
                 {isSelected === 'Hourly' &&
@@ -157,7 +163,7 @@ const SelectTime = (props) => {
                           label='End Time*'
                           style={commonStyles.marginTop16}
                           editable={false}
-                          value={endDate.toLocaleTimeString()}/>
+                          value={endDate.toLocaleString()}/>
                   </TouchableOpacity>
                 }
                 {isSelected === 'Monthly' &&
@@ -186,15 +192,18 @@ const SelectTime = (props) => {
                 modal
                 is24hourSource="locale"
                 locale="en"
+                minimumDate={isSelected !== 'Hourly' ? new Date() : null}
                 open={open.isOpen}
-                mode={isSelected === 'Hourly' ? 'time' : 'date'}
+                mode={isSelected === 'Hourly' ? 'datetime' : 'date'}
                 date={(open.type === 'startDate' || open.type === 'Daily'|| open.type === 'Weekly') ? startDate : endDate}
                 onConfirm={(date) => {
-                  if(open.type === 'startDate' || open.type === 'Daily'|| open.type === 'Weekly'){
+                  if(open.type === 'Weekly'){
                     setStartDate(date)
                     var newDate = new Date(date);
                     newDate.setDate(date.getDate() + 7)
                     setEndDate(newDate)
+                  } else if(open.type === 'startDate' || open.type === 'Daily') {
+                    setStartDate(date)
                   } else {
                     setEndDate(date)
                   }
@@ -207,8 +216,7 @@ const SelectTime = (props) => {
                 <MonthPicker
                   onChange={onValueChange}
                   value={month}
-                  minimumDate={new Date()}
-                  maximumDate={new Date(2025, 5)}
+                  minimumDate={new Date(new Date().getFullYear(), new Date().getMonth() + 1)}
                   locale="en"
                 />
               )}
@@ -228,7 +236,7 @@ const SelectTime = (props) => {
                 onPress={applyFilter}
                 isPrimaryButton
                 style={commonStyles.marginTop24} 
-                label={props?.isBooking ? 'Select Time' : 'Apply'} />
+                label={props?.isBooking ? 'Select' : 'Apply'} />
             </View>
           </TouchableOpacity>
         </View>

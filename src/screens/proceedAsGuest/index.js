@@ -21,7 +21,8 @@ const ProceedAsGuest = (props) => {
     }
     const resp1 = await dispatch(proceedGuestRequest(reqData))
       if (resp1?.status){
-        props.navigation.navigate('MainNav')
+        // props.navigation.navigate('MainNav')
+        props.navigation.navigate('EmailVerification', {email: emailId, isGuest: true})
       } else {
         Alert.alert('Something went wrong')
       }

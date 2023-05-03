@@ -86,7 +86,7 @@ const ChangePassword = (props) => {
           onPress={onButtonPress}
           isPrimaryButton
           disabled={props.route.params?.isChangePassword ? !(newPassword && confirmPassword && currentPassword) : onValidate()}
-          label={props.route.params?.isChangePassword ? 'UPDATE PASSWORD' : 'RESET PASSWORD'} />
+          label={props.route.params?.isChangePassword ? 'Update Password' : 'Reset Password'} />
         {status && 
           <Text style={[commonStyles.text_small, commonStyles.marginTop24, commonStyles.redTextColor]}>
             Verification Link has been sent to your inbox. please click on verification link to reset password

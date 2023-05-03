@@ -6,6 +6,7 @@ import { styles } from './styles';
 // import Icon from 'react-native-vector-icons/Ionicons';
 import { Icon } from 'react-native-elements'
 import QrCode from '../qrCode';
+import { calcTotalTime, formatTime } from '../../utils';
 
 const UpcomingBooking = forwardRef((props, ref) => {
 
@@ -15,22 +16,29 @@ const UpcomingBooking = forwardRef((props, ref) => {
         setModal(true)
     }
 
+    const qrCode = {
+        inTime: formatTime(props?.item?.start),
+        endTime: formatTime(props?.item?.end),
+        price: `$${props?.item?.fare}`,
+        bookingID: props?.item?.id
+    }
+
   return (
     <>
         <View style={[styles.container, {width: props?.fullView ? null : 305}]}>
         <View style={{flexDirection: 'row'}}>
             <View style={commonStyles.flex8}>
                 <Text style={[commonStyles.text_large_thick, commonStyles.lightBlackTextColor]}>
-                    NCP Car Park Manchester
+                    {props?.item?.place?.name}
                 </Text>
                 <Text style={[commonStyles.text_xs, commonStyles.darkGreyTextColor, commonStyles.marginTop8]}>
-                    Rental ID: 1234567789
+                    {`Rental ID: ${props?.item?.id}`}
                 </Text>
                 <View style={[commonStyles.flexRow, commonStyles.marginTop8, commonStyles.alignItemsCenter]}>
                     {/* <Image source={require('../../assets/marker.png')} style={[commonStyles.marginRight8, commonStyles.size24]} /> */}
                     <Icon name="location-sharp" type='ionicon' size={25} color={'black'} />
                     <Text style={[commonStyles.text_xs, commonStyles.darkGreyTextColor]}>
-                        Toronto, Canada
+                        {props?.item?.place?.address}
                     </Text>
                 </View>
             </View>
@@ -48,15 +56,15 @@ const UpcomingBooking = forwardRef((props, ref) => {
                     In time
                 </Text>
                 <Text style={[commonStyles.text_xs_bold, commonStyles.blackTextColor, commonStyles.centerTextAlign]}>
-                    10:00AM
+                    {formatTime(props?.item?.start)}
                 </Text>
             </View>
             <View>
                 <Text style={[commonStyles.text_xs,commonStyles.darkGreyTextColor, commonStyles.centerTextAlign, commonStyles.marginBottom5]}>
-                    out time 
+                    Out time 
                 </Text>
                 <Text style={[commonStyles.text_xs_bold,commonStyles.blackTextColor, commonStyles.centerTextAlign]}>
-                    5:00 PM
+                    {formatTime(props?.item?.end)}
                 </Text>
             </View>
             <View>
@@ -65,7 +73,7 @@ const UpcomingBooking = forwardRef((props, ref) => {
                     Paid
                 </Text>
                 <Text style={[commonStyles.text_xs_bold, commonStyles.blackTextColor, commonStyles.centerTextAlign]}>
-                    $8.00
+                    ${props?.item?.fare}
                 </Text>
             </View>
         </View>
@@ -87,7 +95,7 @@ const UpcomingBooking = forwardRef((props, ref) => {
             </TouchableOpacity>
         </View>
         </View>
-        <QrCode isModal={isModal} setModal={setModal} data={'data'} />
+        <QrCode isModal={isModal} setModal={setModal} data={JSON.stringify(qrCode)} />
     </>
   );
 })

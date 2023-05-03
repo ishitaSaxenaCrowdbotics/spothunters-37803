@@ -1,73 +1,118 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, TouchableOpacity, ScrollView, Image, SafeAreaView, FlatList } from 'react-native';
+import { View, Text, TouchableOpacity, ScrollView, Image, SafeAreaView, FlatList, Alert, RefreshControl, ActivityIndicator } from 'react-native';
 import PreviousBooking from '../../components/previousBooking';
 import UpcomingBooking from '../../components/upcomingBooking';
 import FloatingTextInput from '../../components/floatingTextInput';
 import { CustomButton } from '../../components/customButton';
-import { useSelector } from 'react-redux';
-import { commonStyles } from '../../styles';
+import { useDispatch, useSelector } from 'react-redux';
+import { colors, commonStyles } from '../../styles';
 import styles from './styles';
+import { previousBookingRequest, upcomingBookingRequest } from '../../utils/service';
 
 const Home = (props) => {
 
+    const [loadingUp, setLoadingUp] = useState(true)
+    const [loadingPrev, setLoadingPrev] = useState(true)
+
     const data = [{id: 1},{id: 2},{id: 3},{id: 4},{id: 5}]
-    const [searchText, setSearchText] = useState('')
+    const dispatch = useDispatch()
 
     let userData = useSelector(state => state?.app?.userData)
+    let upcomingBookings = useSelector(state => state?.app?.upcomingBookings)
+    let prevBookings = useSelector(state => state?.app?.prevBookings)
 
-    const renderItem = () => {
-        return(<UpcomingBooking navigation={props.navigation}/>)
+    const renderItem = ({item}) => {
+        return(<UpcomingBooking navigation={props.navigation} item={item}/>)
     }
-    const renderItemPrev = () => {
-        return(<PreviousBooking />) 
+    const renderItemPrev = ({item}) => {
+        return(<PreviousBooking item={item} />) 
     }
 
-    let rememberMe = useSelector(state => state?.app?.rememberMe)
-    console.log('sfse: ', rememberMe)
+    const getBookingData = async (isLoad) => {
+        if(isLoad){
+            setLoadingUp(true)
+            setLoadingPrev(true)
+        }
+        const resp1 = await dispatch(previousBookingRequest())
+        if (resp1?.count > 0){
+            console.log('prev resp: ', resp1)
+            setLoadingPrev(false)
+        } else {
+            setLoadingPrev(false)
+        }
+        const res2 = await dispatch(upcomingBookingRequest())
+        if (res2?.count > 0){
+            setLoadingUp(false)
+            console.log('upcoming resp1: ', res2)
+        } else {
+            setLoadingUp(false)
+        }
+    }
+
+    useEffect(() => {
+        getBookingData()
+    }, [])
+
   return (
       <SafeAreaView style={styles.container}>
-        <ScrollView contentContainerStyle={commonStyles.justifyContentCenter}>
+        <ScrollView contentContainerStyle={commonStyles.justifyContentCenter}
+        refreshControl={
+            <RefreshControl
+              refreshing={loadingUp || loadingPrev}
+              onRefresh={() => getBookingData(true)}
+            />
+        }>
             <View style={styles.subContainer}>
                 <Text style={commonStyles.text_xl_thick}>
                     My Bookings
                 </Text>
-                <TouchableOpacity onPress={() => props.navigation.navigate('UpcomingBookings')}>
-                    <Text style={commonStyles.text_xs}>
+                { upcomingBookings?.results?.length > 0 && <TouchableOpacity onPress={() => props.navigation.navigate('BookListing', {screen: 'BookingsList', params: {upcoming: true}})}>
+                    <Text style={[commonStyles.text_xs, commonStyles.darkGreyTextColor]}>
                         Show All
                     </Text>
-                </TouchableOpacity>
+                </TouchableOpacity>}
             </View>
-            <FlatList 
-            nestedScrollEnabled
-                horizontal
-                data={data}
-                showsVerticalScrollIndicator={true}
-                renderItem={renderItem}
-                keyExtractor={(item, index) => `${item.id}-${index}`}/>
+            {loadingUp ? <ActivityIndicator style={{marginTop: 50}} size="large" color={colors.base} /> : 
+                <>{ upcomingBookings?.results?.length > 0 ?
+                    <FlatList 
+                        nestedScrollEnabled
+                        horizontal
+                        data={upcomingBookings?.results}
+                        showsVerticalScrollIndicator={true}
+                        renderItem={renderItem}
+                        keyExtractor={(item, index) => `${item.id}-${index}`}/> : <View style={commonStyles.alignItemsCenter}><Text style={commonStyles.text_large}>no results found...</Text></View>
+                    }
+                </>
+            }
             {!userData?.is_guest &&
                 <>
                     <View style={styles.subContainer}>
                         <Text style={commonStyles.text_xl_thick}>
                             Previous Reservations
                         </Text>
-                        <TouchableOpacity onPress={() => props.navigation.navigate('PreviousBookings')}>
-                            <Text style={commonStyles.text_xs}>
+                        { prevBookings?.results?.length > 0 && <TouchableOpacity onPress={() => props.navigation.navigate('BookListing', {screen: 'BookingsList'})}>
+                            <Text style={[commonStyles.text_xs, commonStyles.darkGreyTextColor]}>
                                 Show All
                             </Text>
-                        </TouchableOpacity>
+                        </TouchableOpacity>}
                     </View>
-                    <FlatList 
-                    nestedScrollEnabled
-                        horizontal
-                        data={data}
-                        showsVerticalScrollIndicator={true}
-                        renderItem={renderItemPrev}
-                        keyExtractor={(item, index) => `${item.id}-${index}`}/>
+                    {loadingPrev ? <ActivityIndicator style={{marginTop: 50}} size="large" color={colors.base} /> : 
+                       <>{ prevBookings?.results?.length > 0 ?
+                       <FlatList 
+                            nestedScrollEnabled
+                            horizontal
+                            data={prevBookings?.results}
+                            showsVerticalScrollIndicator={true}
+                            renderItem={renderItemPrev}
+                            keyExtractor={(item, index) => `${item.id}-${index}`}/> : <View style={commonStyles.alignItemsCenter}><Text style={commonStyles.text_large}>no results found...</Text></View>
+                        }
+                        </>
+                    }
                 </>
             }
         </ScrollView>
         <View style={[commonStyles.paddingHorizontal8, commonStyles.paddingVertical16, commonStyles.whiteBackground]}>
-                <CustomButton label={'BOOK NEW PARKING'} isPrimaryButton onPress={() => props.navigation.navigate('booking')} />
+                <CustomButton label={'Book New Parking'} isPrimaryButton onPress={() => props.navigation.navigate('booking')} />
         </View>
     </SafeAreaView>
   );

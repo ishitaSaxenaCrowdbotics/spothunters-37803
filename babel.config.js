@@ -9,6 +9,9 @@ module.exports = {
       "safe": false,
       "allowUndefined": true
     }],
-    "import-glob-meta"
+    "import-glob-meta",
+    ['react-native-reanimated/plugin',{
+      relativeSourceLocation: true
+    }],
   ]
 };

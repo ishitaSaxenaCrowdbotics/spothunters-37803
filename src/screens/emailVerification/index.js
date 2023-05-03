@@ -15,12 +15,12 @@ const EmailVerification = (props) => {
     const dispatch = useDispatch()
 
     const onVerifyCode = async () => {
-        const resp = await dispatch(verifyEmailRequest({pin: code, email: emailId}))
+        const resp = await dispatch(verifyEmailRequest({pin: code, email: emailId, guest: props?.route?.params?.isGuest ? true : false})) 
         console.log(resp)
         if(resp.status){
           Alert.alert('code verified successfully')
-          if(props.route.params?.isCreateAccount){
-            props.navigation.replace('Payment');  
+          if(props.route.params?.isSignup){
+            props.navigation.replace('MainNav', { screen: 'booking', params: { screen: 'ParkingSpotsHome' }});  
           } else {
             props.navigation.replace('MainNav');
           }
@@ -63,12 +63,12 @@ const EmailVerification = (props) => {
             isPrimaryButton
             disabled={!code}
             style={commonStyles.marginTop16} 
-            label={'VERIFY'} />
+            label={'Verify'} />
         <CustomButton 
             isPrimaryButton
             onPress={onResendCode}
             style={commonStyles.marginTop16} 
-            label={'SEND NEW CODE'} />
+            label={'Send New Code'} />
     </View>
   );
 }

@@ -1,21 +1,40 @@
 import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, Image, Modal } from 'react-native';
 import { TextInput } from 'react-native-gesture-handler';
-import { commonStyles } from '../../styles';
-import { utils } from '../../utils';
+import { useDispatch } from 'react-redux';
+import { colors, commonStyles } from '../../styles';
+import { calcTotalTime, formatTime, utils } from '../../utils';
+import { checkInRequest } from '../../utils/service';
 import { styles } from './styles';
 
 const ParkingCompReservation = (props) => {
+
+  const [loading, setLoading] = useState(true)
+    const dispatch = useDispatch()
+
+  const onCheckInPress = async (item) => {
+    if(!item?.verified){
+      setLoading(true)
+      const resp1 = await dispatch(checkInRequest(item?.id))
+      if (resp1?.status){
+          console.log('prev resp: ', resp1)
+          setLoading(false)
+          props?.getBookingData()
+      } else {
+          setLoading(false)
+      }
+    }
+  }
 
   return (
     <>
       <View style={styles.container}>
         <View style={styles.subContainer}>
                 <Text style={[commonStyles.text_xs, commonStyles.lightGreyTextColor]}>
-                  Res ID: 13246896
+                  {`Res ID: ${props?.item?.id} `}
                 </Text>
                 <Text style={[commonStyles.text_xs, commonStyles.lightGreyTextColor]}>
-                  1  jan 23
+                  {props?.item?.start.split('T')[0]}
                 </Text>
         </View>
         <View style={[styles.subContainer, commonStyles.marginTop16]}>
@@ -24,7 +43,7 @@ const ParkingCompReservation = (props) => {
                     In time
                 </Text>
                 <Text style={[commonStyles.text_xs, commonStyles.darkGreyTextColor]}>
-                    10:00AM
+                  {formatTime(props?.item?.start)}
                 </Text>
             </View>
             <View>
@@ -32,7 +51,7 @@ const ParkingCompReservation = (props) => {
                     out time 
                 </Text>
                 <Text style={[commonStyles.text_xs, commonStyles.darkGreyTextColor, commonStyles.centerTextAlign]}>
-                    5:00 PM
+                  {formatTime(props?.item?.end)}
                 </Text>
             </View>
             <View>
@@ -40,17 +59,17 @@ const ParkingCompReservation = (props) => {
                     Total Time
                 </Text>
                 <Text style={[commonStyles.text_xs, commonStyles.darkGreyTextColor, commonStyles.rightTextAlign]}>
-                    5:00 PM
+                  {calcTotalTime(props?.item?.start, props?.item?.end)}
                 </Text>
             </View>
         </View>
         <View style={{flexDirection: 'row', justifyContent: 'space-between', marginTop: 5, alignItems: 'center'}}>
                 <Text style={[commonStyles.text_large_thick, commonStyles.blackTextColor, commonStyles.marginRight8]}>
-                  $10 Paid
+                  {`$${props?.item?.fare} ${props?.item?.payment_mode ? 'Paid' : 'Unpaid'}`}
                 </Text>
-            <TouchableOpacity style={{backgroundColor: props.item?.checked ? '#DDDDDD' : 'white', borderRadius: 37, paddingVertical: 5,  width: 113, borderWidth: 1, borderColor: props.item?.checked ? 'white' : '#1E8FFF'}} onPress={() => {}}>
-                <Text style={[commonStyles.text_xs_thick, {color: props.item?.checked ? '#0F8849' : '#1E8FFF', marginLeft: 5, textAlign: 'center'}]}>
-                  { props.item?.checked ? 'Checked' : 'Checked in'}
+            <TouchableOpacity style={{backgroundColor: props.item?.verified ? colors.base : 'white', borderRadius: 37, paddingVertical: 5,  width: 113, borderWidth: 1, borderColor: props.item?.verified ? 'white' : '#1E8FFF'}} onPress={() => onCheckInPress(props?.item)}>
+                <Text style={[commonStyles.text_xs_thick, {color: props.item?.verified ? colors.white : '#1E8FFF', marginLeft: 5, textAlign: 'center'}]}>
+                  { props.item?.verified ? 'Checked' : 'Check in'}
                 </Text>
             </TouchableOpacity>
         </View>

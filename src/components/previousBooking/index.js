@@ -1,12 +1,11 @@
-import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, Image, Modal } from 'react-native';
-import { TextInput } from 'react-native-gesture-handler';
+import React, { useEffect, useState } from 'react';
+import { View, Text, TouchableOpacity, Modal, findNodeHandle, Keyboard } from 'react-native';
 import { colors, commonStyles } from '../../styles';
-import { utils } from '../../utils';
+import { calcTotalTime, formatTime, utils } from '../../utils';
 import { styles } from './styles';
 import { CustomButton } from '../customButton';
 import Icon from 'react-native-vector-icons/Ionicons';
-import { Rating, AirbnbRating } from 'react-native-elements';
+import { AirbnbRating } from 'react-native-elements';
 import { useDispatch } from 'react-redux';
 import { rateReviewRequest } from '../../utils/service';
 import FloatingTextInput from '../floatingTextInput';
@@ -17,16 +16,46 @@ const PreviousBooking = (props) => {
   const [sentFeedBackModal, setSentFeedBackModal] = useState(false)
   const [isRateClicked, setRateClicked] = useState(false)
   const [rate, setRate] = useState(0)
+  const [keyboardFlag, setKeyboardFlag] = useState(false)
   const [review, setReview] = useState('')
   const dispatch = useDispatch()
+  let keyboardDidShowListener=null
+  let keyboardDidHideListener=null
 
   const handleRateParking = () => {
     setSentFeedBackModal(false)
   }
 
+  useEffect(() => {
+    keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', () =>
+    _keyboardDidShow()
+  )
+  keyboardDidHideListener = Keyboard.addListener('keyboardDidHide', () =>
+    _keyboardDidHide()
+  )
+  return () => {
+    keyboardDidShowListener && keyboardDidShowListener.remove()
+    keyboardDidHideListener && keyboardDidHideListener.remove()
+  }
+  },[])
+
+  const _keyboardDidShow = () => {
+    setKeyboardFlag(true)
+  }
+
+  const _keyboardDidHide = () => {
+    setKeyboardFlag(false)
+  }
+
+  const getMargin = () => {
+    return {
+      marginBottom: keyboardFlag ? 150 : 0
+    }
+  }
+
   const  onHandlePublishFeedback = async() => {
     const reqData = {
-      place: 3,
+      place: props?.item?.place?.id,
       rating: rate,
       review
     }
@@ -43,7 +72,6 @@ const PreviousBooking = (props) => {
   }
 
   const ratingCompleted = (rating) => {
-    console.log("Rating is: " + rating)
     setRate(rating)
     setRateClicked(true)
   }
@@ -54,13 +82,13 @@ const PreviousBooking = (props) => {
         <View style={commonStyles.flexRow}>
             <View style={commonStyles.flex8}>
                 <Text style={[commonStyles.text_large_thick, commonStyles.lightBlackTextColor]}>
-                    NCP Car Park Manchester
+                  {props?.item?.place?.name}
                 </Text>
                 <View style={[ commonStyles.marginTop8, commonStyles.flexRow, , commonStyles.alignItemsCenter]}>
                     {/* <Image source={require('../../assets/marker.png')} style={[commonStyles.marginRight8, commonStyles.size24]} /> */}
                     <Icon name="location-sharp" size={25} color={'black'} />
                     <Text style={[commonStyles.text_xs, commonStyles.darkGreyTextColor]}>
-                        Toronto, Canada
+                      {props?.item?.place?.address}
                     </Text>
                 </View>
             </View>
@@ -71,15 +99,15 @@ const PreviousBooking = (props) => {
                     In time
                 </Text>
                 <Text style={[commonStyles.text_xs_bold, commonStyles.blackTextColor, commonStyles. centerTextAlign]}>
-                    10:00AM
+                {formatTime(props?.item?.start)}
                 </Text>
             </View>
             <View>
                 <Text style={[commonStyles.text_xs, commonStyles.darkGreyTextColor, commonStyles.centerTextAlign, commonStyles.marginBottom5]}>
-                    out time 
+                    Out time 
                 </Text>
                 <Text style={[commonStyles.text_xs_bold, commonStyles.blackTextColor, commonStyles. centerTextAlign]}>
-                    5:00 PM
+                {formatTime(props?.item?.end)}
                 </Text>
             </View>
             <View>
@@ -87,7 +115,7 @@ const PreviousBooking = (props) => {
                     Total Time
                 </Text>
                 <Text style={[commonStyles.text_xs_bold, commonStyles.blackTextColor, commonStyles. centerTextAlign]}>
-                  5:00 PM
+                  {calcTotalTime(props?.item?.start, props?.item?.end)}
                 </Text>
             </View>
         </View>
@@ -97,7 +125,7 @@ const PreviousBooking = (props) => {
                   Total Paid
                 </Text>
                 <Text style={[commonStyles.text_xs_bold, commonStyles.blackTextColor]}>
-                  $8.00
+                  ${props?.item?.fare}
                 </Text>
             </View>
             <TouchableOpacity style={styles.rateContainer} onPress={() => setRateParkingModal(true)}>
@@ -121,8 +149,8 @@ const PreviousBooking = (props) => {
           setRateClicked(false)
           setReview('')
         }} >
-          <View style={styles.modalContainer}>
-            <View style={[styles.modalSubContainer, { height: isRateClicked ? utils.getWindowHeight() * 0.75 : utils.getWindowHeight() * 0.42}]}>
+          <View style={[styles.modalContainer]}>
+            <View style={[styles.modalSubContainer, getMargin(), { height: isRateClicked ? utils.getWindowHeight() * 0.75 : utils.getWindowHeight() * 0.50}]}>
               <View style={{flexDirection: 'row', justifyContent: 'space-between'}} onPress={() => setRateParkingModal(false)}>
                 <Text style={[commonStyles.text_large_thick, commonStyles.lightBlackTextColor]}>
                   NCP Car Park Manchester
@@ -148,17 +176,20 @@ const PreviousBooking = (props) => {
               <Text style={[{alignSelf: 'flex-start'},commonStyles.text_large, commonStyles.darkBlackTextColor, commonStyles.marginTop16]}>
                 Your rating helps us to improve
               </Text>
-              <View style={{ paddingVertical: 20}}>
+              <View >
               <AirbnbRating
                 onFinishRating={ratingCompleted}
                 defaultRating={0}
-                showRating={false}
+                reviews={[
+                  'Poor',
+                  'Bad',
+                  'Good',
+                  'Very good',
+                  'Execellent',
+                ]}
               />
               </View>
               {isRateClicked && <>
-                <Text style={[commonStyles.text_xxl_thick, commonStyles.marginBottom24]}>
-                  Okay
-                </Text>
                 <FloatingTextInput
                   style={commonStyles.marginTop24} 
                   label={'What could Have been Better?'}
@@ -172,6 +203,7 @@ const PreviousBooking = (props) => {
                 style={commonStyles.marginTop24}/>
               </>}
             </View>
+
           </View>
       </Modal>
       <Modal

@@ -34,8 +34,8 @@ const InviteFriends = (props) => {
   }
 
   const onLoginValidate = () => {
-    let reg = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w\w+)+$/;
-    if(reg.test(emailID)){
+    // let reg = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w\w+)+$/;
+    if(emailID){
       return false
     }
     return true

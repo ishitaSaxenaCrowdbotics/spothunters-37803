@@ -5,8 +5,12 @@ const initialState = {
   tutorial: [],
   emailVerify: {},
   rememberMe: false,
-  parkingSearchList: [],
-  parkingPlace: {}
+  parkingSearchList: {},
+  parkingPlace: {},
+  upcomingBookings: [],
+  prevBookings: [],
+  parkingCompHome: [],
+  filters: {}
 }
 const SpotHunterReducer = (state = initialState, action) =>{
     switch (action.type) {
@@ -48,14 +52,32 @@ const SpotHunterReducer = (state = initialState, action) =>{
             return {
                 ...state,
                 parkingSearchList: action.payload
-                
             }
-
         case 'SET_PARKING_SEARCH_ID':
             return {
                 ...state,
                 parkingPlace: action.payload
             }
+        case 'UPCOMING_BOOKING':
+            return {
+                ...state,
+                upcomingBookings: action.payload
+            }
+        case 'PREVIOUS_BOOKING':
+            return {
+                ...state,
+                prevBookings: action.payload
+            }
+        case 'PARKING_COMP_HOME':
+            return {
+                ...state,
+                parkingCompHome: action.payload
+            }
+        case 'APPLY_FILTERS':
+            return {
+                ...state,
+                filters: action.payload
+            }       
         
         default:
         return state

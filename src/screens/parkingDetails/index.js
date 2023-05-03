@@ -16,6 +16,20 @@ const ParkingDetails = (props) => {
     const [iscreateAccountModal, setCreateAccountModal] = useState(false)
     let parkingPlace = useSelector(state => state?.app?.parkingPlace)
     let userData = useSelector(state => state?.app?.userData)
+    let filters = useSelector(state => state?.app?.filters)
+    console.log('filters: ', filters)
+
+    const bookingData = () => {
+        if (filters.availability === 'Monthly'){
+            return filters.month
+        } else if (filters.availability === 'Daily'){
+            return new Date(filters.startDate)?.toLocaleDateString()
+        } else if (filters.availability === 'Weekly'){
+            return new Date(filters.startDate)?.toLocaleDateString() + ' - ' + new Date(filters.endDate)?.toLocaleDateString()
+        } else {
+            return filters.startDate + ' - ' + filters.endDate + ', ' + filters.day
+        }
+    }
 
     const dist = convertToMeterToMiles(getDistance(
         {longitude: props.route.params?.origin?.longitude, latitude: props.route.params?.origin?.latitude}, 
@@ -86,11 +100,7 @@ const ParkingDetails = (props) => {
                     renderItem={renderItem}
                     keyExtractor={(item, index) => `${item.id}-${index}`}/>
                 <Text style={[commonStyles.text_small_thick, commonStyles.marginVertical12]}>Parking Type : {parkingPlace?.availability}</Text>
-                <Text>{timeData}</Text>
-                <CustomButton
-                    onPress={() => setModal(true)}
-                    style={commonStyles.marginTop24} 
-                    label={'Select Time'} />
+                <Text>{bookingData()}</Text>
             </View>
         </ScrollView>
         <View style={{paddingHorizontal: 8, paddingVertical: 16, backgroundColor: 'white', flexDirection: 'row', justifyContent: 'space-between'}}>

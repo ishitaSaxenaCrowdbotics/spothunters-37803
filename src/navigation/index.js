@@ -21,8 +21,7 @@ import privacyPolicy from '../../modules/privacy-policy';
 import ParkingCompHome from '../screens/parkingCompHome';
 import ParkingDetails from '../screens/parkingDetails';
 import { useSelector } from 'react-redux';
-import PreviousBookings from '../screens/previousBookings';
-import UpcomingBookings from '../screens/upcomingBooking';
+import BookingsList from '../screens/BookingList';
 import ParkingSpotsHome from '../screens/parkingSpotsHome'
 import { colors, commonStyles } from '../styles';
 import { Icon } from 'react-native-elements'
@@ -232,11 +231,29 @@ const Booking = props => {
           };
         }}
       >
-        <BookNav.Screen name='ParkingSpotsHome' component={ParkingSpotsHome}/>
-        <BookNav.Screen name='ParkingDetails' component={ParkingDetails}/>
-        <Drawer.Screen name='Payment' component={Payment}/>
-        <Drawer.Screen name='Login' component={Login}/>
+        <BookNav.Screen name='ParkingSpotsHome' component={ParkingSpotsHome} options={{ headerShown: false }}/>
+        <BookNav.Screen name='Parking Details' component={ParkingDetails}/>
+        <BookNav.Screen name='Payment' component={Payment}/>
+        <BookNav.Screen name='Login' component={Login}/>
       </BookNav.Navigator>
+    </>
+  );
+};
+
+const BookList = createStackNavigator();
+const BookListing = props => {
+  return (
+    <>
+      <BookList.Navigator
+        screenOptions={({ navigation, route }) => {
+          return {
+            headerTitle: route.name,
+            headerLeft: () => <Header navigation={navigation} />
+          };
+        }}
+      >
+        <Drawer.Screen name='BookingsList' component={BookingsList}/>
+      </BookList.Navigator>
     </>
   );
 };
@@ -251,7 +268,7 @@ const MainNav = props => {
         screenOptions={({ navigation, route }) => {
             return {
               headerStyle: { backgroundColor: '#FBFBFB' },
-              headerTitle: route.name === 'ParkingCompHome' ? 'Home' : route.name,
+              headerTitle: route.name === 'ParkingCompHome' || route.name === 'Home' ? `Hi, ${userData?.name}` : route.name,
               headerLeft: () => <DrawerHeader navigation={navigation} />
             };
           }}>
@@ -263,8 +280,7 @@ const MainNav = props => {
         <Drawer.Screen name="Terms And Conditions" component={termsAndConditions.navigator} />
         <Drawer.Screen name="Privacy Policy" component={privacyPolicy.navigator} />
         <Drawer.Screen name='Delete Account' component={DeleteAccount} />
-        <Drawer.Screen name='PreviousBookings' component={PreviousBookings}/>
-        <Drawer.Screen name='UpcomingBookings' component={UpcomingBookings}/>
+        <Drawer.Screen name='BookListing' component={BookListing} options={{ headerShown: false }}/>
         <Drawer.Screen name='ViewReports' component={ViewReports}/>
         <Drawer.Screen
           name="booking"

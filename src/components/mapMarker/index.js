@@ -7,14 +7,12 @@ import { parkingSearchByIDRequest } from '../../utils/service';
 import { useDispatch } from 'react-redux';
 
 export const MapMarker = (props) => {
-
-  console.log('marker props: ', props)
   const dispatch = useDispatch()
 
   const onHandleParkingDetail = async () => {
     const resp = await dispatch(parkingSearchByIDRequest(props?.item?.id))
     console.log('resp: ', resp)
-    props.navigation.navigate('ParkingDetails', {id: props?.item?.id, origin: props?.origin})
+    props.navigation.navigate('Parking Details', {id: props?.item?.id, origin: props?.origin})
   }
 
   return (

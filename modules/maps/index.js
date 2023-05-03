@@ -16,7 +16,7 @@ import { getDistance } from 'geolib';
 import { convertToMeterToMiles } from "../../src/utils";
 import { Icon } from "react-native-elements";
 import { useDispatch, useSelector } from "react-redux";
-import { parkingSearchRequest } from "../../src/utils/service";
+import { parkingSearchListRequest } from "../../src/utils/service";
 import { MapMarker } from '../../src/components/mapMarker'
 
 // {latitude: 28.363201, longitude: 77.361887, price: 100, dist: 100}, {latitude: 28.361427, longitude: 77.359869, price: 300, dist: 200}, {latitude: 28.357537, longitude: 77.358495, price: 400, dist: 150}
@@ -43,10 +43,9 @@ const Maps = ({navigation, handleListView, origin, enableDirections = true, show
 
   const dispatch = useDispatch()
   let parkingSearchList = useSelector(state => state?.app?.parkingSearchList)
-  console.log('parkingSearchList: ', parkingSearchList)
 
   const getParkingPlaces = async () => {
-      const resp = await dispatch(parkingSearchRequest())
+      const resp = await dispatch(parkingSearchListRequest())
       console.log('resp: ', resp)
       if(resp.id){
           Alert.alert('feedback sent')
@@ -64,7 +63,6 @@ const Maps = ({navigation, handleListView, origin, enableDirections = true, show
             if (res == "granted") {
               Geolocation.getCurrentPosition(
                 (position) => {
-                  console.log(position);
                   setDefaultOrigin({
                         latitude: position?.coords?.latitude,
                         longitude: position?.coords?.longitude
@@ -86,7 +84,6 @@ const Maps = ({navigation, handleListView, origin, enableDirections = true, show
 }
 
   useEffect(() => {
-    console.log(mapRef)
     handleAnimate({ latitude: defaultOrigin?.latitude, longitude: defaultOrigin?.longitude });
   },[mapRef])
 

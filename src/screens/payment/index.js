@@ -6,11 +6,13 @@ const Payment = (props) => {
     <View
       style={{
         flex: 1,
-        backgroundColor: 'red'
+        backgroundColor: 'white',
+        justifyContent: 'center',
+        alignItems: 'center'
       }}
     >
-            <Text>
-            Profile
+            <Text style={{fontSize: 28}}>
+            Coming Soon...
             </Text>
     </View>
   );

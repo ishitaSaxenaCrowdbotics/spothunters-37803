@@ -22,7 +22,7 @@ export const MapParkingSpotItem = (props) => {
   const onHandleParkingDetail = async () => {
     const resp = await dispatch(parkingSearchByIDRequest(props?.item?.id))
     console.log('resp: ', resp)
-    props.navigation.navigate('ParkingDetails', {id: props?.item?.id, origin: props?.defaultOrigin})
+    props.navigation.navigate('Parking Details', {id: props?.item?.id, origin: props?.defaultOrigin})
   }
 
   return (
@@ -51,7 +51,7 @@ export const MapParkingSpotItem = (props) => {
                         $ {props?.item?.price.toFixed(2)}
                       </Text>
                   </TouchableOpacity>
-                  <CustomButton textStyle={commonStyles.text_xs_thick} style={commonStyles.padding8} label={'BOOK PARKING'} isPrimaryButton onPress={onHandleParkingDetail} />
+                  <CustomButton textStyle={commonStyles.text_xs_thick} style={commonStyles.padding8} label={'Book Parking'} isPrimaryButton onPress={onHandleParkingDetail} />
               </View>
             </View>
         </View>
@@ -81,7 +81,7 @@ export const ListParkingSpotItem = (props) => {
   const onHandleParkingDetail = async() => {
     const resp = await dispatch(parkingSearchByIDRequest(props?.item?.id))
     console.log('resp: ', resp)
-    props.navigation.navigate('ParkingDetails', {id: props?.item?.id, origin: props?.defaultOrigin})
+    props.navigation.navigate('Parking Details', {id: props?.item?.id, origin: props?.defaultOrigin})
   }
 
   const dist = getDistance(
@@ -131,7 +131,7 @@ export const ListParkingSpotItem = (props) => {
                       $ {props?.item?.price.toFixed(2)}
                     </Text>
                 </View>
-                <CustomButton style={[commonStyles.flex8, commonStyles.paddingVertical8]} textStyle={commonStyles.text_xs_thick} label={'BOOK PARKING'} isPrimaryButton onPress={onHandleParkingDetail} />
+                <CustomButton style={[commonStyles.flex8, commonStyles.paddingVertical8]} textStyle={commonStyles.text_xs_thick} label={'Book Parking'} isPrimaryButton onPress={onHandleParkingDetail} />
             </View>
         </View>
     </>

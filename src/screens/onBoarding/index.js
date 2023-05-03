@@ -72,17 +72,17 @@ const OnBoarding = (props) => {
         <CustomButton
           onPress={() => { isCarousel?.current?.snapToPrev()}}
           style={[styles.flex5, commonStyles.marginRight20]}
-          label={'PREV'} />
+          label={'Prev'} />
           <CustomButton
           onPress={() => { isCarousel?.current?.snapToNext() }}
           style={styles.flex5}
-          label={'NEXT'} />
+          label={'Next'} />
       </View>
       <CustomButton
         onPress={() => props.navigation.navigate('TutorialScreen')}
         isPrimaryButton
         style={styles.margin30} 
-        label={'GET STARTED'} />
+        label={'Get Started'} />
     </View>
   );
 };
