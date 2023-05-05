@@ -269,5 +269,8 @@ export const commonStyles = StyleSheet.create({
   },
   flexShrink1: {
     flexShrink: 1
+  },
+  paddingRight10: {
+    paddingRight: 10
   }
 });

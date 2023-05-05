@@ -13,7 +13,8 @@ import Geolocation from 'react-native-geolocation-service'
 import { PERMISSIONS, request } from 'react-native-permissions';
 
 const ParkingSpotsHome = (props) => {
-    const data = [{id: 1},{id: 2},{id: 3},{id: 4},{id: 5}]
+    
+    const [inputValue, setInputValue] = useState("");
     const [isMapView, setMapView] = useState(false)
     const [isBTPrice, setBTPrice] = useState(false)
     const [isMostWeighted, setMostWeighted] = useState(false)
@@ -125,40 +126,56 @@ const ParkingSpotsHome = (props) => {
 
     const goBack = () => {
         props?.navigation.goBack();
-      }
+    }
+
+    const getAddressHandle = (address) => {
+        setInputValue("");
+        console.log(address)
+        const latitude = address.geometry.location.lat;
+        const longitude = address.geometry.location.lng;
+        setDefaultOrigin({
+            ...defaultOrigin,
+            latitude: latitude,
+            longitude: longitude,
+        });
+        // const resp = await dispatch(parkingSearchListRequest())
+        // console.log('resp: ', resp)
+        // if(resp){
+        //     setLoading(false)
+        // }
+    }
 
   return (
       <SafeAreaView style={{backgroundColor: 'white', flex: 1}}>
-        <View style={{ zIndex: 1, height: 85, justifyContent: 'space-between', position: isMapView ? 'absolute' : null, width: '100%'}}>
-            <View style={{flexDirection: 'row', top: 10}}>
-            <TouchableOpacity onPress={goBack} style={[commonStyles.justifyContentCenter, commonStyles.alignItemsCenter]}>
-                <Icon name="chevron-back" type='ionicon' size={24} color={colors.black} containerStyle={commonStyles.marginHorizontal16} />
-            </TouchableOpacity>
+        <View style={{ zIndex: 1, height: inputValue ? '100%' : 85, justifyContent: 'space-between', position: isMapView ? 'absolute' : null, width: '100%', marginTop: 30}}>
+            <View style={{flexDirection: 'row', flex: 0.7, alignItems: inputValue ? 'flex-start' : 'center'}}>
+                <TouchableOpacity onPress={goBack} style={[commonStyles.justifyContentCenter, commonStyles.alignItemsCenter]}>
+                    <Icon name="chevron-back" type='ionicon' size={24} color={colors.black} containerStyle={commonStyles.marginHorizontal16} />
+                </TouchableOpacity>
                 <GooglePlacesAutocomplete
                     placeholder='Search location'
                     minLength={2}
                     autoFocus={false}
                     returnKeyType={"default"}
                     fetchDetails={true}
-                    // textInputProps={{
-                    // onChangeText: (text) => setInputValue(text)
-                    // }}
-                    // onPress={(data, details = null) => getAddressHandle(details)}
+                    textInputProps={{
+                    onChangeText: (text) => setInputValue(text)
+                    }}
+                    onPress={(data, details = null) => getAddressHandle(details)}
                     styles={autoCompleteStyles}
                     query={{
-                    key: 'AIzaSyAzo9Xzk5QwuAixqF8Kxdxp1zgMfL2DtKA',
+                    key: 'AIzaSyA1S6jipglBXWIlzsw_lXx5bktRQCmfpNA',
                     language: "en"
                     }}
                 />
-                <TouchableOpacity onPress={getCurrentLocation} style={{flex: 0.2, alignSelf: 'center'}}>
+                <TouchableOpacity onPress={getCurrentLocation} style={{flex: 0.2, alignSelf: inputValue ? 'flex-start' : 'center'}}>
                     <Icon name="gps-fixed" type='material' size={25} color={'black'} />
                 </TouchableOpacity>
-                <TouchableOpacity onPress={() => setModal(true)} style={{flex: 0.2, alignSelf: 'center'}}>
+                {!inputValue && <TouchableOpacity onPress={() => setModal(true)} style={{flex: 0.2, alignSelf: 'center'}}>
                     <Icon name="time-outline" type='ionicon' size={25} color={'black'}/>
-                </TouchableOpacity>
+                </TouchableOpacity>}
             </View>
-
-            <View style={{flexDirection: 'row', paddingHorizontal: 16}}>
+            {!inputValue && <View style={{flexDirection: 'row', paddingHorizontal: 16, flex: 0.3}}>
                 <TouchableOpacity style={{backgroundColor: isBTPrice ? colors.COLOR_F8D247:'#EDEEF1', paddingHorizontal: 8, paddingVertical: 4, borderRadius: 40, marginRight: 10}} onPress={() => handleFilter('price')} disabled={isAirport}>
                     <Text style={commonStyles.text_xs_thick}>best price</Text>
                 </TouchableOpacity>
@@ -171,7 +188,7 @@ const ParkingSpotsHome = (props) => {
                 <TouchableOpacity style={{backgroundColor: isAirport ? colors.COLOR_F8D247:'#EDEEF1', paddingHorizontal: 8, paddingVertical: 4, borderRadius: 40}} onPress={() => handleFilter('airport')}>
                     <Text style={commonStyles.text_xs_thick}>airport</Text>
                 </TouchableOpacity>
-            </View>
+            </View>}
         </View>
         {isMapView ? 
         <Maps handleListView={() => onHandleListView(false)} showSearchInput={true} navigation={props.navigation} markedLocations={parkingSearchList?.results} />

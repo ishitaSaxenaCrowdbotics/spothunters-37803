@@ -1,17 +1,24 @@
-import React, { forwardRef, useState } from 'react';
-import { View, Text, Image } from 'react-native';
-import { TouchableOpacity } from 'react-native-gesture-handler';
+import React, { forwardRef, useEffect, useState } from 'react';
+import { View, Text, Image, TouchableOpacity, Button, Linking, Platform } from 'react-native';
 import { colors, commonStyles } from '../../styles';
 import { styles } from './styles';
 // import Icon from 'react-native-vector-icons/Ionicons';
 import { Icon } from 'react-native-elements'
 import QrCode from '../qrCode';
-import { calcTotalTime, formatTime } from '../../utils';
+import { convertToMeterToMiles, formatTime } from '../../utils';
+import { PERMISSIONS, request } from 'react-native-permissions';
+import Geolocation from 'react-native-geolocation-service'
+import { getDistance } from 'geolib';
 
 const UpcomingBooking = forwardRef((props, ref) => {
 
     const [isModal, setModal] = useState(false)
+    const [defaultOrigin, setDefaultOrigin] = useState();
 
+    useEffect(() => {
+        getCurrentLocation()
+    },[])
+    
     const openQrCode = () => {
         setModal(true)
     }
@@ -21,6 +28,50 @@ const UpcomingBooking = forwardRef((props, ref) => {
         endTime: formatTime(props?.item?.end),
         price: `$${props?.item?.fare}`,
         bookingID: props?.item?.id
+    }
+
+    const getCurrentLocation = () => {
+        try {
+            request(
+                Platform.select({
+                  android: PERMISSIONS.ANDROID.ACCESS_FINE_LOCATION,
+                  ios: PERMISSIONS.IOS.LOCATION_WHEN_IN_USE
+                })
+              ).then(res => {
+                if (res == "granted") {
+                  Geolocation.getCurrentPosition(
+                    (position) => {
+                      setDefaultOrigin({
+                            latitude: position?.coords?.latitude,
+                            longitude: position?.coords?.longitude
+                          });
+                    },
+                    (error) => {
+                      console.log(error.code, error.message);
+                    },
+                    { enableHighAccuracy: true, timeout: 15000, maximumAge: 10000 }
+                );
+                } else {
+                }
+              });
+            } catch (error) {
+              console.log("location set error:", error);
+            }
+      }
+
+      
+    const dist = () => defaultOrigin?.longitude && convertToMeterToMiles(getDistance(
+        {longitude: defaultOrigin?.longitude, latitude: defaultOrigin?.latitude}, 
+        {longitude: props?.item?.place?.lat, latitude: props?.item?.place?.long}))?.toFixed(1)
+
+    const onDirection = () => {
+        Linking.canOpenURL(`https://www.google.com/maps/dir/${defaultOrigin?.latitude},${defaultOrigin?.longitude}/${parseFloat(props?.item?.place?.lat)},${parseFloat(props?.item?.place?.long)}/`).then(supported => {
+            if (supported) {
+                Linking.openURL(`https://www.google.com/maps/dir/${defaultOrigin?.latitude},${defaultOrigin?.longitude}/${parseFloat(props?.item?.place?.lat)},${parseFloat(props?.item?.place?.long)}/`);
+            } else {
+                console.log("Don't know how to open URI: ");
+            }
+        });
     }
 
   return (
@@ -42,13 +93,14 @@ const UpcomingBooking = forwardRef((props, ref) => {
                     </Text>
                 </View>
             </View>
-            <View style={[commonStyles.flex2, commonStyles.alignItemsCenter]}>
+            {defaultOrigin?.longitude &&
+            <TouchableOpacity style={[commonStyles.flex2, commonStyles.alignItemsCenter]} onPress={onDirection}>
                 <Icon name="directions" type='font-awesome-5' size={40} color={colors.base} />
                 {/* <Image source={require('../../assets/markerButton.png')} /> */}
                 <Text style={[commonStyles.text_xs, commonStyles.darkGreyTextColor]}>
-                    2 km
+                    {`${dist()}mi`}
                 </Text>
-            </View>
+            </TouchableOpacity>}
         </View>
         <View style={[commonStyles.flexRow, commonStyles. justifyContentBetween, commonStyles.marginTop16]}>
             <View>

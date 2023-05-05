@@ -1,10 +1,8 @@
 import { getDistance } from 'geolib';
 import React from 'react';
-import { View, Text, TouchableOpacity, Image, FlatList, Dimensions } from 'react-native';
+import { View, Text, TouchableOpacity, Image, FlatList, Dimensions, Button } from 'react-native';
 import { Icon } from 'react-native-elements';
-import SvgUri from 'react-native-svg-uri';
 import { useDispatch } from 'react-redux';
-// import Icon from 'react-native-vector-icons/Ionicons';
 import { CustomButton } from '../../components/customButton';
 import { colors, commonStyles } from '../../styles';
 import { convertToMeterToMiles } from '../../utils';
@@ -25,9 +23,16 @@ export const MapParkingSpotItem = (props) => {
     props.navigation.navigate('Parking Details', {id: props?.item?.id, origin: props?.defaultOrigin})
   }
 
+  const onItemPress = () => {
+    props?.selectLocation({
+      latitude: parseFloat(props?.item?.lat),
+      longitude: parseFloat(props?.item?.long)
+    })
+  }
+
   return (
     <>
-        <View style={styles.container}>
+        <TouchableOpacity style={[styles.container, {height: 120}]} onPress={onItemPress}>
               <Image source={{uri: props?.item?.places_image[0]?.image}} style={styles.subContainer} />
             <View style={commonStyles.flex1}>
                 <View>
@@ -40,7 +45,7 @@ export const MapParkingSpotItem = (props) => {
                         {convertToMeterToMiles(dist).toFixed(1)}mi
                       </Text>
                       <Icon name="location-sharp" type='ionicon' size={25} color={colors.black} />
-                      <Text style={[commonStyles.text_xs, commonStyles.darkGreyTextColor, commonStyles.flexShrink1]}>
+                      <Text style={[commonStyles.text_xs, commonStyles.darkGreyTextColor, commonStyles.flexShrink1]} ellipsizeMode='tail' numberOfLines={1}>
                         {props?.item?.address}
                       </Text>
                     </View>
@@ -54,7 +59,7 @@ export const MapParkingSpotItem = (props) => {
                   <CustomButton textStyle={commonStyles.text_xs_thick} style={commonStyles.padding8} label={'Book Parking'} isPrimaryButton onPress={onHandleParkingDetail} />
               </View>
             </View>
-        </View>
+        </TouchableOpacity>
     </>
   );
 }
@@ -69,12 +74,6 @@ export const ListParkingSpotItem = (props) => {
             <Text style={[commonStyles.text_xxs_thick, styles.marginRight2]}>{item.name}</Text>
             <Icon name="send" type='feather' size={15} color={colors.black} />
         </View>
-    )
-  }
-
-  const renderImages = ({item}) => {
-    return(
-           <Image source={{uri: item?.image}} style={{width: Dimensions.get("window").width*0.80, marginRight: 5, borderRadius: 8}} />
     )
   }
 

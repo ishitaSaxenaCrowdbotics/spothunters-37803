@@ -19,8 +19,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { parkingSearchListRequest } from "../../src/utils/service";
 import { MapMarker } from '../../src/components/mapMarker'
 
-// {latitude: 28.363201, longitude: 77.361887, price: 100, dist: 100}, {latitude: 28.361427, longitude: 77.359869, price: 300, dist: 200}, {latitude: 28.357537, longitude: 77.358495, price: 400, dist: 150}
-const Maps = ({navigation, handleListView, origin, enableDirections = true, showSearchInput = true, markerImage, originTitle, originDescription, apiKey='AIzaSyAzo9Xzk5QwuAixqF8Kxdxp1zgMfL2DtKA', onNavigationStart, onNavigationError, getDuration, markerColor, getDestinationAddress, strokeColor, strokeWidth, onLatLngChange, markerImageStyle = {}, mainContainerStyle = {}, markedLocations=[], onDragEnd, onDrag, onDragStart }) => {
+const Maps = ({navigation, handleListView, origin, enableDirections = true, showSearchInput = true, markerImage, originTitle, originDescription, apiKey='AIzaSyA1S6jipglBXWIlzsw_lXx5bktRQCmfpNA', onNavigationStart, onNavigationError, getDuration, markerColor, getDestinationAddress, strokeColor, strokeWidth, onLatLngChange, markerImageStyle = {}, mainContainerStyle = {}, markedLocations=[], onDragEnd, onDrag, onDragStart }) => {
   // const [mapRef, setMapRef] = useState(null);
   const [defaultOrigin, setDefaultOrigin] = useState({
     latitude: 28.6107092000000000,
@@ -239,32 +238,20 @@ const Maps = ({navigation, handleListView, origin, enableDirections = true, show
   };
 
   const renderItem = ({item}) => {
-    return(<MapParkingSpotItem navigation={navigation}  item={item} defaultOrigin={defaultOrigin} />)
-}
+    return(<MapParkingSpotItem navigation={navigation}  item={item} defaultOrigin={defaultOrigin} selectLocation={selectLocation} />)
+  }
+
+  const selectLocation = (region) => {
+    mapRef?.current?.animateToRegion( {
+      latitude: region?.latitude,
+      longitude: region?.longitude,
+      latitudeDelta: LATITUDE_DELTA,
+      longitudeDelta: LONGITUDE_DELTA,
+  }, 100);
+  };
 
   return (
     <View style={[styles.view, mainContainerStyle]}>
-      {/* <View style={{ zIndex: 1000, height: inputValue ? "100%" : 50 }}>
-        {
-          showSearchInput && <GooglePlacesAutocomplete
-            placeholder='Search location'
-            minLength={2}
-            autoFocus={false}
-            returnKeyType={"default"}
-            fetchDetails={true}
-            textInputProps={{
-              onChangeText: (text) => setInputValue(text)
-            }}
-            onPress={(data, details = null) => getAddressHandle(details)}
-            styles={autoCompleteStyles}
-            query={{
-              key: apiKey,
-              language: "en"
-            }}
-          />
-        }
-      </View> */}
-
       <MapView
         initialRegion={{
           latitude: defaultOrigin.latitude,

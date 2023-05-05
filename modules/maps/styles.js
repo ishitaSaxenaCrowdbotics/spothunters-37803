@@ -1,4 +1,5 @@
 import { StyleSheet, Dimensions } from "react-native";
+import { colors } from "../../src/styles";
 
 const { width, height } = Dimensions.get("window");
 
@@ -21,7 +22,11 @@ export const styles = StyleSheet.create({
     alignItems: "center"
   },
   map: {
-    ...StyleSheet.absoluteFillObject
+    position: 'absolute',
+    bottom: 0,
+    right: 0,
+    left: 0,
+    top: 0
   },
   searchbar: {
     backgroundColor: "white",
@@ -50,15 +55,24 @@ export const styles = StyleSheet.create({
 });
 
 export const autoCompleteStyles = StyleSheet.create({
-  textInputContainer: {
-    marginHorizontal: 15,
-  },
   textInput: {
     height: 44,
     color: "#5d5d5d",
-    fontSize: 16
+    fontSize: 16,
+    backgroundColor: colors.COLOR_E9E9E9
   },
   predefinedPlacesDescription: {
     color: "#1faadb"
+  },
+  row: {
+    padding: 13,
+    height: 44,
+    flexDirection: 'row',
+    borderLeftWidth: 0.5,
+    borderRightWidth: 0.5
+  },
+  separator: {
+    height: 1,
+    backgroundColor: '#c8c7cc',
   }
 });
