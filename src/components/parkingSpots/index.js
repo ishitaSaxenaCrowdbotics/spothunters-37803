@@ -53,7 +53,7 @@ export const MapParkingSpotItem = (props) => {
               <View style={[styles.textContainer, commonStyles.justifyContentBetween]}>
                   <TouchableOpacity >
                       <Text style={[commonStyles.text_xs_bold, commonStyles.blackTextColor]}>
-                        $ {props?.item?.price.toFixed(2)}
+                        {`$ ${props?.item?.price.toFixed(2)} ${props?.item?.availability === 'Hourly' ? '/hr' : ''} `}
                       </Text>
                   </TouchableOpacity>
                   <CustomButton textStyle={commonStyles.text_xs_thick} style={commonStyles.padding8} label={'Book Parking'} isPrimaryButton onPress={onHandleParkingDetail} />
@@ -127,7 +127,7 @@ export const ListParkingSpotItem = (props) => {
             <View style={[commonStyles.flexRow, commonStyles. justifyContentBetween, commonStyles.alignItemsCenter]}>
                 <View style={[commonStyles.alignItemsCenter, commonStyles.flex2]}>
                     <Text style={[commonStyles.text_xs_bold, commonStyles.blackTextColor]}>
-                      $ {props?.item?.price.toFixed(2)}
+                      {`$ ${props?.item?.price.toFixed(2)}${props?.item?.availability === 'Hourly' ? '/hr' : ''} `}
                     </Text>
                 </View>
                 <CustomButton style={[commonStyles.flex8, commonStyles.paddingVertical8]} textStyle={commonStyles.text_xs_thick} label={'Book Parking'} isPrimaryButton onPress={onHandleParkingDetail} />

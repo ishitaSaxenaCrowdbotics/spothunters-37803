@@ -14,8 +14,8 @@ const Login = (props) => {
   const [isAccountCreate, setIsAccountCreate] = useState(props?.route?.params?.isSignup)
   const [toggleCheckBox, setToggleCheckBox] = useState(false)
   const [rememberMe, setRememberMe] = useState(false)
-  const [email, setEmail] = useState('')//test1@gmail.com jainlavika19+95@gmail.com mandeep.kumar+1@crowdbotics.com
-  const [password, setPassword] = useState('') //test lavika19 Admin123
+  const [email, setEmail] = useState('jainlavika19+95@gmail.com')//test1@gmail.com jainlavika19+95@gmail.com mandeep.kumar+1@crowdbotics.com
+  const [password, setPassword] = useState('lavika19') //test lavika19 Admin123
   const [mobileNumber, setMobileNumber] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')// reNxsgmgx5
   const [isloading, setIsloading] = useState(false)

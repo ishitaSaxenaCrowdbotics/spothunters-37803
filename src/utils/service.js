@@ -325,13 +325,15 @@ export const parkingSearchListRequest = (reqData) => async (dispatch) => {
 
 export const parkingSearchByIDRequest = (reqData) => async (dispatch) => {
   console.log('request: ', reqData)
-    const requestUrl = ['GET', `${API_URL}/parking/api/v1/search/${reqData}/`];
+    const requestUrl = ['GET', `${API_URL}/parking/api/v1/parking-spot-detail/${reqData}/`];
+    let user = await get_auth();
     console.log('requestUrl: ', requestUrl)
     let response = await fetch(requestUrl[1], {
       method: requestUrl[0],
       headers: {
         'Content-type': 'application/json',
         accept: 'application/json',
+        Authorization: `Token ${user?.token}`
       },
     });
     let json = await response.json();
@@ -512,8 +514,9 @@ export const modifySpotRequest = (data, id) => async (dispatch) => {
   return json
 }
 
-export const managePaymentRequest = () => async (dispatch) => {
-    const requestUrl = ['GET', `${API_URL}/user/api/v1/manage-payment/`];
+export const managePaymentRequest = (reqData) => async (dispatch) => {
+  const requestUrl = reqData ? ['GET', `${API_URL}/user/api/v1/manage-payment/?search=${reqData?.search ? reqData?.search : ''}&start_date=${reqData?.start_date ? reqData?.start_date : ''}&end_date=${reqData?.end_date ? reqData?.end_date : ''}`] : ['GET', `${API_URL}/user/api/v1/manage-payment/`]
+    // const requestUrl = ['GET', `${API_URL}/user/api/v1/manage-payment/`];
     console.log('requestUrl: ', requestUrl)
     let user = await get_auth();
     let response = await fetch(requestUrl[1], {
@@ -529,3 +532,28 @@ export const managePaymentRequest = () => async (dispatch) => {
     dispatch(managePayments(json))
     return json
 }
+
+ export const downloadReportRequest = (reqData) => async (dispatch) => {
+   const requestUrl = reqData ? ['GET', `${API_URL}/user/api/v1/manage-payment/generate-pdf-report/?search=${reqData?.search ? reqData?.search : ''}&start_date=${reqData?.start_date ? reqData?.start_date : ''}&end_date=${reqData?.end_date ? reqData?.end_date : ''}`] : ['GET', `${API_URL}/user/api/v1/manage-payment/generate-pdf-report/`]
+      // const requestUrl = ['GET', `${API_URL}/user/api/v1/manage-payment/`];
+     console.log('requestUrl: ', requestUrl)
+     let user = await get_auth();
+     let response = await fetch(requestUrl[1], {
+       method: requestUrl[0],
+       headers: {
+         'Content-type': 'application/json',
+         accept: 'application/json',
+         Authorization: `Token ${user?.token}`
+       },
+     });
+    let json = await response.json();
+    console.log('response: ', json)
+    const blob = new Blob([resp], { type: "application/pdf" })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement("a")
+    a.href = url
+    a.download = "example.pdf"
+    a.click()
+    URL.revokeObjectURL(url)
+        // return json
+ }

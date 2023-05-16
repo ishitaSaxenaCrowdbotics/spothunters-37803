@@ -133,6 +133,7 @@ const ViewReports = (props) => {
                             date={startDate}
                             onConfirm={(date) => {
                               setStartDate(date)
+                              setIsStartDateOpen(false)
                             }}
                             onCancel={() => {
                               setIsStartDateOpen(false)
@@ -147,6 +148,7 @@ const ViewReports = (props) => {
                             date={endDate}
                             onConfirm={(date) => {
                               setEndDate(date)
+                              setIsEndDateOpen(false)
                             }}
                             onCancel={() => {
                               setIsEndDateOpen(false)

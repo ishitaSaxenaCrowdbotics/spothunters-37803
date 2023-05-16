@@ -5,18 +5,20 @@ import { colors, commonStyles } from '../../styles';
 import { Icon } from 'react-native-elements';
 import { useDispatch, useSelector } from 'react-redux';
 import { getDistance } from 'geolib';
-import { convertToMeterToMiles, toUnixTime } from '../../utils';
+import { calculateTotalHours, convertToMeterToMiles } from '../../utils';
 import SelectTime from '../../components/selectTime';
 import { CreateAccountPopup } from '../../components/createAccountPopUp';
 import { LogoutPopup } from '../../components/logOutPopup';
 import { bookSpotRequest } from '../../utils/service';
 import moment from 'moment';
+import { TouchableOpacity } from 'react-native-gesture-handler';
 
 const ParkingDetails = (props) => { 
 
     const dispatch = useDispatch()
     const [iscreateAccountModal, setCreateAccountModal] = useState(false)
     const [modalVisible, setModalVisible] = useState(false)
+    const [tabSelected, setTabSelected] = useState(2)
     let parkingPlace = useSelector(state => state?.app?.parkingPlace)
     let userData = useSelector(state => state?.app?.userData)
     let filters = useSelector(state => state?.app?.filters)
@@ -80,6 +82,12 @@ const ParkingDetails = (props) => {
         }
     }
 
+    const numofHours = calculateTotalHours(filters?.start, filters?.end) * filters?.day.length
+    console.log('diff: ', numofHours)
+    const parkingFare = parkingPlace?.availability === 'Hourly' ? numofHours * parseFloat(parkingPlace?.price?.toFixed(2)) : parkingPlace?.price?.toFixed(2)
+    const commission = parkingFare * parseFloat(parkingPlace?.commission?.toFixed(2)) * .01
+    const total_price = parseFloat(commission?.toFixed(2)) + parseFloat(parkingFare?.toFixed(2))
+
   return (
       <SafeAreaView style={{backgroundColor: '#FBFBFB', flex: 1}}>
         <ScrollView contentContainerStyle={{justifyContent: 'center'}}>
@@ -118,16 +126,32 @@ const ParkingDetails = (props) => {
                     keyExtractor={(item, index) => `${item.id}-${index}`}/>
                 <Text style={[commonStyles.text_small_thick, commonStyles.marginVertical12]}>Parking Type : {parkingPlace?.availability}</Text>
                 <Text>{bookingData()}</Text>
+                {parkingPlace?.is_payment_available && 
+                        <View style={[commonStyles.flexRow, commonStyles.paddingVertical16, commonStyles.fullWidth, commonStyles.justifyContentBetween]}>
+                            <TouchableOpacity style={[commonStyles.flex1, commonStyles.marginRight20, commonStyles.padding8, {backgroundColor: tabSelected === 1 ? colors.base : colors.COLOR_FBFBFB}]} onPress={() => setTabSelected(1)}>
+                                <Text style={[tabSelected === 1 ? commonStyles.whiteTextColor : commonStyles.blackTextColor]}>{`Pay Reservation Fee $${commission?.toFixed(2)}`}</Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity style={[commonStyles.flex1, commonStyles.padding8, {backgroundColor: tabSelected === 2 ? colors.base : colors.COLOR_FBFBFB}]} onPress={() => setTabSelected(2)}>
+                                <Text style={[tabSelected === 2 ? commonStyles.whiteTextColor : commonStyles.blackTextColor]}>{`Pay Full Fare $${total_price.toFixed(2)}`}</Text>
+                            </TouchableOpacity>
+                        </View>
+                }
             </View>
         </ScrollView>
         <View style={{paddingHorizontal: 8, paddingVertical: 16, backgroundColor: 'white', flexDirection: 'row', justifyContent: 'space-between'}}>
             <View style={{flex: 0.5, alignItems: 'center', justifyContent: 'center'}}>
                 <Text style={[commonStyles.text_xs_bold, {textAlign: 'center'}]}>
-                    $ {parkingPlace?.price?.toFixed(2)}
+                   {`Parking Fare: $${parkingFare.toFixed(2)}`}
+                </Text>
+                <Text style={[commonStyles.text_xs_bold, {textAlign: 'center'}]}>
+                    {`Reservation Fee: $${commission?.toFixed(2)}`}
+                </Text>
+                <Text style={[commonStyles.text_xs_bold, {textAlign: 'center'}]}>
+                    {`Total Fee: $${total_price.toFixed(2)}`}
                 </Text>
             </View>
             <View style={{flex: 0.5}}>
-                <CustomButton label={'Book Spot'} isPrimaryButton onPress={() => setModalVisible(true)} />
+                <CustomButton label={`Pay ${(parkingPlace?.is_payment_available && tabSelected === 1) ? `$${commission?.toFixed(2)}` : `$${total_price.toFixed(2)}`}`} isPrimaryButton onPress={() => setModalVisible(true)} />
             </View>
         </View>
         <CreateAccountPopup isModal={iscreateAccountModal} setModal={setCreateAccountModal} navigation={props.navigation}/>

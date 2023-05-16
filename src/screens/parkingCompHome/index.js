@@ -119,6 +119,7 @@ const ParkingCompHome = (props) => {
                             date={startDate}
                             onConfirm={(date) => {
                               setStartDate(date)
+                              setIsStartDateOpen(false)
                             }}
                             onCancel={() => {
                               setIsStartDateOpen(false)

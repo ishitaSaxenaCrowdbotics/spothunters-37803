@@ -58,7 +58,60 @@ export const formatTime = dateStr => {
   
   }
 
- export const toUnixTime = (year, month, day, hr, min, sec) => {
-    const date = new Date(Date.UTC(year, month - 1, day, hr, min, sec));
-    return Math.floor(date.getTime()/1000);
+export const toUnixTime = (year, month, day, hr, min, sec) => {
+  const date = new Date(Date.UTC(year, month - 1, day, hr, min, sec));
+  return Math.floor(date.getTime()/1000);
+}
+
+export const calculateTotalHours = (start, end) => {
+
+  let starttemp = new Date(start * 1000).toLocaleString("en-US", {
+  
+  hour: "numeric",
+  
+  minute: "numeric",
+  
+  hour12: true
+  
+  })
+  
+  let endtemp = new Date(end * 1000).toLocaleString("en-US", {
+  
+  hour: "numeric",
+  
+  minute: "numeric",
+  
+  hour12: true
+  
+  })
+  
+  // Convert start and end times to Date objects
+  
+  const startDate = new Date(`2000-01-01 ${starttemp}`)
+  
+  const endDate = new Date(`2000-01-02 ${endtemp}`)
+  
+  
+  
+  
+  // Calculate the time difference in milliseconds
+  
+  let timeDiff = endDate - startDate
+  
+  // Handle cases where the end time is before the start time (crossing midnight)
+  
+  if (timeDiff < 0) {
+  
+  timeDiff += 24 * 60 * 60 * 1000 // Add 24 hours in milliseconds
+  
+  }
+  
+  // Convert milliseconds to hours
+  
+  const hoursDiff = Math.floor(timeDiff / (1000 * 60 * 60))
+  
+  console.log(hoursDiff)
+  
+  return hoursDiff
+  
   }

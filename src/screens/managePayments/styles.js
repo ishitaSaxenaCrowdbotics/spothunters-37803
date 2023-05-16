@@ -16,5 +16,19 @@ export const styles = StyleSheet.create({
         borderRadius: 37, 
         paddingVertical: 6,  
         width: 113
-    }
+    },
+    modalContainer: {
+        flex:1, 
+        backgroundColor: '#000000CC'
+    },
+    centerContainer: {
+        flex:1, 
+        justifyContent: 'center', 
+        alignItems: 'center'
+    },
+    subContainer: {
+        backgroundColor: colors.white, 
+        borderRadius: 8, 
+        padding: 24
+    },
   });
