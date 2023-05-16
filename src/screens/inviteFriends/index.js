@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, Alert } from 'react-native';
+import { View, Text, TouchableOpacity, Alert, SafeAreaView } from 'react-native';
 import { useDispatch } from 'react-redux';
 import { CustomButton } from '../../components/customButton';
 import FloatingTextInput from '../../components/floatingTextInput';
@@ -42,36 +42,39 @@ const InviteFriends = (props) => {
   }
 
   return (
-    <View style={styles.container}>
-      <Text style={commonStyles.text_small}>
-        Share this link with your friends
-      </Text>
-      <FloatingTextInput
-        disabled
-        label='App Id' 
-        style={commonStyles.marginTop20}
-        value={appID}
-        onChangeText={() => setappID(appID)}/>
-      <CustomButton label={'Copy link to share'} style={commonStyles.marginTop16} onPress={onCopy} />
-      <Text style={[commonStyles.text_small, commonStyles.centerTextAlign, commonStyles.marginTop24]}>
-        Or
-      </Text>
-      <Text style={[commonStyles.text_small, commonStyles.marginTop24]}>
-        Invite friends to join Spot Hunters Via Email
-      </Text>
-      <FloatingTextInput
-        label='Email ID *'
-        style={commonStyles.marginTop20} 
-        value={emailID}
-        onChangeText={(value) => setEmailId(value)}/>
-      <CustomButton
-          onPress={onSubmit}
-          isPrimaryButton
-          disabled={onLoginValidate()}
-          style={commonStyles.marginTop16} 
-          label={'Send Link'} />
-      <Toast />
-    </View>
+    <SafeAreaView style={commonStyles.flex1}>
+      <View style={styles.container}>
+        <Text style={commonStyles.text_small}>
+          Share this link with your friends
+        </Text>
+        <FloatingTextInput
+          disabled
+          label='App Id' 
+          style={commonStyles.marginTop20}
+          value={appID}
+          onChangeText={() => setappID(appID)}/>
+        <CustomButton label={'Copy link to share'} style={commonStyles.marginTop16} onPress={onCopy} />
+        <Text style={[commonStyles.text_small, commonStyles.centerTextAlign, commonStyles.marginTop24]}>
+          Or
+        </Text>
+        <Text style={[commonStyles.text_small, commonStyles.marginTop24]}>
+          Invite friends to join Spot Hunters Via Email
+        </Text>
+        <FloatingTextInput
+          label='Email ID *'
+          placeholder='someone@gmail.com'
+          style={commonStyles.marginTop20} 
+          value={emailID}
+          onChangeText={(value) => setEmailId(value)}/>
+        <CustomButton
+            onPress={onSubmit}
+            isPrimaryButton
+            disabled={onLoginValidate()}
+            style={commonStyles.marginTop16} 
+            label={'Send Link'} />
+        <Toast />
+      </View>
+    </SafeAreaView>
   );
 }
 

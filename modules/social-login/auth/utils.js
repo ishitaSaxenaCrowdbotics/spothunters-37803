@@ -1,5 +1,5 @@
 // Please, update the values below as instructed in the README.md file.
-export const GOOGLE_WEB_CLIENT_ID = "XXXXXX.apps.googleusercontent.com";
+export const GOOGLE_WEB_CLIENT_ID = "993169876801-92aink9vca20s5ver7bj9uapbmlkgia1.apps.googleusercontent.com";
 export const GOOGLE_IOS_CLIENT_ID = "YYYYYY.apps.googleusercontent.com";
 export const APPLE_SERVICE_ID = "com.crowdbotics.APP_NAME";
 export const APPLE_REDIRECT_CALLBACK =

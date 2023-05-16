@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, Image, Alert } from 'react-native';
+import { View, Text, Image, Alert, SafeAreaView } from 'react-native';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import { useDispatch } from 'react-redux';
 import { CustomButton } from '../../components/customButton';
@@ -35,6 +35,7 @@ const EmailVerification = (props) => {
     }
 
   return (
+    <SafeAreaView style={[commonStyles.flex1, commonStyles.whiteBackground]}>
     <View
       style={[commonStyles.whiteBackground, commonStyles.flex1, commonStyles.paddingHorizontal16]}>
         <View style={[commonStyles.flexRow, commonStyles.alignItemsCenter, commonStyles.marginTop30]}>
@@ -50,12 +51,14 @@ const EmailVerification = (props) => {
         <FloatingTextInput 
             style={commonStyles.marginTop24} 
             label={'Email ID *'}
+            placeholder='someone@gmail.com'
             disabled
             onChangeText={(value) => setEmailId(emailId)}
             value={emailId}/>
         <FloatingTextInput
             style={commonStyles.marginTop24} 
             label={'Verification code *'}
+            placeholder='0000'
             value={code}
             onChangeText={(value) => setCode(value)}/>
         <CustomButton
@@ -70,6 +73,7 @@ const EmailVerification = (props) => {
             style={commonStyles.marginTop16} 
             label={'Send New Code'} />
     </View>
+    </SafeAreaView>
   );
 }
 

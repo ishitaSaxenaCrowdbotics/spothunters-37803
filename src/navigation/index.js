@@ -2,7 +2,9 @@ import React, { useEffect, useState } from 'react';
 import {
   Text,
   View,
-  TouchableOpacity
+  TouchableOpacity,
+  SafeAreaView,
+  Alert
 } from 'react-native';
 import {
   createDrawerNavigator,
@@ -20,7 +22,7 @@ import termsAndConditions from '../../modules/terms-and-conditions';
 import privacyPolicy from '../../modules/privacy-policy';
 import ParkingCompHome from '../screens/parkingCompHome';
 import ParkingDetails from '../screens/parkingDetails';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import BookingsList from '../screens/BookingList';
 import ParkingSpotsHome from '../screens/parkingSpotsHome'
 import { colors, commonStyles } from '../styles';
@@ -30,13 +32,35 @@ import Login from '../screens/login';
 import { createStackNavigator } from '@react-navigation/stack';
 import { Header } from '../components/header';
 import ViewReports from '../screens/viewReports';
+import BookingConfirmation from '../screens/bookingConfirmation';
+import { logoutRequest } from '../utils/service';
+import { removeAuthData } from '../utils';
+import { reset } from '../state/actions';
+import ManagePayment from '../screens/managePayments';
 
 function CustomDrawerContent(props) {
     const [modalVisible, setModalVisible] = useState(false)
     let userData = useSelector(state => state?.app?.userData)
+    console.log('tokens navi: ', userData)
+
+    const dispatch = useDispatch()
+    const onLogout = async () => {
+        const resp = await dispatch(logoutRequest())
+            removeAuthData()
+            dispatch(reset())
+            props.navigation.reset({routes:[{name: 'Login'}]})
+        console.log('resp: ', resp)
+        if(resp.status){
+            Alert.alert('loggged out successfully')
+            setModalVisible(false)
+            removeAuthData()
+            dispatch(reset())
+            props.navigation.reset({routes:[{name: 'Login'}]})
+        }
+    }
 
   return (
-    <>
+    <SafeAreaView style={commonStyles.flex1}>
     <View style={{marginLeft: 24, marginVertical: 30, flexDirection: 'row', justifyContent: 'space-between', marginRight: 30}}>
         <Text style={commonStyles.text_small}>{userData?.email}</Text>
         <TouchableOpacity onPress={() => {
@@ -54,11 +78,6 @@ function CustomDrawerContent(props) {
         <DrawerItem
             icon={({focused, color, size}) => (
                 <Icon name="home-sharp" type='ionicon' size={25} color={colors.black} />
-                // <SvgUri
-                //     width={size}
-                //     height={size}
-                //     source={require('../assets/home.svg')}
-                //     />
                 )}
             label={'Home'}
             labelStyle={[commonStyles.text_large, { color: '#1A1D1E'}]}
@@ -70,11 +89,6 @@ function CustomDrawerContent(props) {
         <DrawerItem
             icon={({focused, color, size}) => (
                 <Icon name="ios-share-social-sharp" type='ionicon' size={25} color={colors.black} />
-                // <SvgUri
-                //     width={size}
-                //     height={size}
-                //     source={require('../assets/inviteFriends.svg')}
-                //     />
                 )}
             label={'Invite Friends'}
             labelStyle={[commonStyles.text_large, { color: '#1A1D1E'}]}
@@ -87,12 +101,6 @@ function CustomDrawerContent(props) {
         <DrawerItem
             icon={({focused, color, size}) => (
                 <Icon name="ios-lock-closed" type='ionicon' size={25} color={colors.black} />
-                
-                // <SvgUri
-                //     width={size}
-                //     height={size}
-                //     source={require('../assets/change_password.svg')}
-                //     />
                 )}
             label={'Change Password'}
             labelStyle={[commonStyles.text_large, { color: '#1A1D1E'}]}
@@ -104,26 +112,16 @@ function CustomDrawerContent(props) {
         <DrawerItem
             icon={({focused, color, size}) => (
                 <Icon name="ios-wallet" type='ionicon' size={25} color={colors.black} />
-                // <SvgUri
-                //     width={size}
-                //     height={size}
-                //     source={require('../assets/manage_payments.svg')}
-                //     />
                 )}
             label={'Manage Payments'}
             labelStyle={[commonStyles.text_large, { color: '#1A1D1E'}]}
             onPress={() => {
-                props.navigation.navigate('Invite Friends');
+                props.navigation.navigate('Manage Payment');
             }}
         />}
         <DrawerItem
             icon={({focused, color, size}) => (
                 <Icon name="file-text-o" type='font-awesome' size={25} color={colors.black} />
-                // <SvgUri
-                //     width={size}
-                //     height={size}
-                //     source={require('../assets/privacy_policy.svg')}
-                //     />
                 )}
             label={'Privacy Policy'}
             labelStyle={[commonStyles.text_large, { color: '#1A1D1E'}]}
@@ -134,11 +132,6 @@ function CustomDrawerContent(props) {
         <DrawerItem
             icon={({focused, color, size}) => (
                 <Icon name="folder-open-outline" type='ionicon' size={25} color={colors.black} />
-                // <SvgUri
-                //     width={size}
-                //     height={size}
-                //     source={require('../assets/term_condition.svg')}
-                //     />
                 )}
             label={'Terms and Conditions'}
             labelStyle={[commonStyles.text_large, { color: '#1A1D1E'}]}
@@ -148,12 +141,7 @@ function CustomDrawerContent(props) {
         />
         <DrawerItem
             icon={({focused, color, size}) => (
-                <Icon name="send" type='feather' size={25} color={colors.black} />
-                // <SvgUri
-                //     width={size}
-                //     height={size}
-                //     source={require('../assets/send_icon.svg')}
-                //     />
+                <Icon name="send" type='feather' size={25} color={colors.black} />                
                 )}
             label={'Feedback'}
             labelStyle={[commonStyles.text_large, { color: '#1A1D1E'}]}
@@ -165,11 +153,6 @@ function CustomDrawerContent(props) {
         <DrawerItem
             icon={({focused, color, size}) => (
                 <Icon name="account-remove" type='material-community' size={25} color={colors.black} />
-                // <SvgUri
-                //     width={size}
-                //     height={size}
-                //     source={require('../assets/delete_account.svg')}
-                //     />
                 )}
             label={'Delete the account'}
             labelStyle={[commonStyles.text_large, { color: '#1A1D1E'}]}
@@ -177,21 +160,6 @@ function CustomDrawerContent(props) {
                 props.navigation.navigate('Delete Account');
             }}
         />}
-        <DrawerItem
-            icon={({focused, color, size}) => (
-                <Icon name="account-remove" type='material-community' size={25} color={colors.black} />
-                // <SvgUri
-                //     width={size}
-                //     height={size}
-                //     source={require('../assets/delete_account.svg')}
-                //     />
-                )}
-            label={'View Reports'}
-            labelStyle={[commonStyles.text_large, { color: '#1A1D1E'}]}
-            onPress={() => {
-                props.navigation.navigate('ViewReports');
-            }}
-        />
       </DrawerContentScrollView>
       <View style={{ height: 50, marginTop: 'auto', marginBottom: 24 }}>
         <TouchableOpacity
@@ -214,8 +182,14 @@ function CustomDrawerContent(props) {
           <Text style={[commonStyles.text_large_thick, {color: '#1E8FFF'}]}>Logout</Text>
         </TouchableOpacity>
       </View>
-      <LogoutPopup visible={modalVisible} onClose={() => setModalVisible(false)} navigation={props.navigation} />
-    </>
+      <LogoutPopup 
+        visible={modalVisible} 
+        header='Log out'
+        subHeader='Do you want to log out?'
+        primaryButton='Log out'
+        navigation={props.navigation} 
+        onLogout={onLogout} />
+    </SafeAreaView>
   );
 }
 
@@ -235,6 +209,7 @@ const Booking = props => {
         <BookNav.Screen name='Parking Details' component={ParkingDetails}/>
         <BookNav.Screen name='Payment' component={Payment}/>
         <BookNav.Screen name='Login' component={Login}/>
+        <BookNav.Screen name='Confirmation' component={BookingConfirmation}/>
       </BookNav.Navigator>
     </>
   );
@@ -282,6 +257,7 @@ const MainNav = props => {
         <Drawer.Screen name='Delete Account' component={DeleteAccount} />
         <Drawer.Screen name='BookListing' component={BookListing} options={{ headerShown: false }}/>
         <Drawer.Screen name='ViewReports' component={ViewReports}/>
+        <Drawer.Screen name='Manage Payment' component={ManagePayment}/>
         <Drawer.Screen
           name="booking"
           component={Booking}

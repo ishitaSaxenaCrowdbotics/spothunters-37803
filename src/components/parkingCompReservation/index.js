@@ -69,7 +69,7 @@ const ParkingCompReservation = (props) => {
                 </Text>
             <TouchableOpacity style={{backgroundColor: props.item?.verified ? colors.base : 'white', borderRadius: 37, paddingVertical: 5,  width: 113, borderWidth: 1, borderColor: props.item?.verified ? 'white' : '#1E8FFF'}} onPress={() => onCheckInPress(props?.item)}>
                 <Text style={[commonStyles.text_xs_thick, {color: props.item?.verified ? colors.white : '#1E8FFF', marginLeft: 5, textAlign: 'center'}]}>
-                  { props.item?.verified ? 'Checked' : 'Check in'}
+                  { props.item?.verified ? 'Checked in' : 'Check in'}
                 </Text>
             </TouchableOpacity>
         </View>

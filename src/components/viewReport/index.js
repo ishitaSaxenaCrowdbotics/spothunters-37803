@@ -1,8 +1,8 @@
 import React from 'react';
 import { Text, View } from 'react-native';
-import { Icon } from 'react-native-elements';
-import { colors, commonStyles } from '../../styles';
+import { commonStyles } from '../../styles';
 import { styles } from './styles';
+import { calcTotalTime, formatTime } from '../../utils';
 
 const ViewReport = props => {
 
@@ -12,15 +12,15 @@ const ViewReport = props => {
     <View style={{flexDirection: 'row'}}>
         <View style={commonStyles.flex1}>
             <Text style={[commonStyles.text_large_thick, commonStyles.lightBlackTextColor]}>
-                01 Jan, 23
+                {props?.item?.start.split('T')[0]}
             </Text>
             <Text style={[commonStyles.text_xs, commonStyles.darkGreyTextColor, commonStyles.marginTop8]}>
-                Booking ID: 1234567789
+                {`Booking ID: ${props?.item?.id} `}
             </Text>
         </View>
         <View style={[commonStyles.flex1, commonStyles.justifyContentCenter, {alignItems: 'flex-end'}]}>
-            <Text style={[commonStyles.text_big_thick, commonStyles.greenTextColor]}>
-                $ 10 Paid
+            <Text style={[commonStyles.text_big_thick, props?.item?.payment ? commonStyles.greenTextColor : commonStyles.redTextColor]}>
+                {`$${props?.item?.fare} ${props?.item?.payment ? 'Paid' : 'Pending'}`}
             </Text>
         </View>
     </View>
@@ -30,7 +30,7 @@ const ViewReport = props => {
                 In time
             </Text>
             <Text style={[commonStyles.text_xs_bold, commonStyles.blackTextColor, commonStyles.centerTextAlign]}>
-                10:00AM
+                {formatTime(props?.item?.start)}
             </Text>
         </View>
         <View>
@@ -38,7 +38,7 @@ const ViewReport = props => {
                 out time 
             </Text>
             <Text style={[commonStyles.text_xs_bold,commonStyles.blackTextColor, commonStyles.centerTextAlign]}>
-                5:00 PM
+                {formatTime(props?.item?.end)}
             </Text>
         </View>
         <View>
@@ -46,7 +46,7 @@ const ViewReport = props => {
                 Total Time
             </Text>
             <Text style={[commonStyles.text_xs_bold, commonStyles.blackTextColor, commonStyles.centerTextAlign]}>
-                5:00 PM
+                {calcTotalTime(props?.item?.start, props?.item?.end)}
             </Text>
         </View>
     </View>

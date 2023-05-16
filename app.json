@@ -1,4 +1,13 @@
 {
   "name": "parkauthority_37803",
-  "displayName": "parkauthority_37803"
+  "displayName": "parkauthority_37803",
+  "expo": {
+    "android": {
+      "googleServicesFile": "./google-services.json"
+    },
+    "ios": {
+      "googleServicesFile": "./GoogleService-Info.plist"
+    },
+    "plugins": ["@react-native-google-signin/google-signin"]
+  }
 }

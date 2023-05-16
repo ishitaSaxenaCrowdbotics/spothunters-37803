@@ -3,31 +3,34 @@ import { View, Text, ScrollView, Image, SafeAreaView, FlatList, Dimensions } fro
 import { CustomButton } from '../../components/customButton';
 import { colors, commonStyles } from '../../styles';
 import { Icon } from 'react-native-elements';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { getDistance } from 'geolib';
-import { convertToMeterToMiles } from '../../utils';
+import { convertToMeterToMiles, toUnixTime } from '../../utils';
 import SelectTime from '../../components/selectTime';
 import { CreateAccountPopup } from '../../components/createAccountPopUp';
+import { LogoutPopup } from '../../components/logOutPopup';
+import { bookSpotRequest } from '../../utils/service';
+import moment from 'moment';
 
 const ParkingDetails = (props) => { 
 
-    const [isModal, setModal] = useState(false)
-    const [timeData, setTimeData] = useState()
+    const dispatch = useDispatch()
     const [iscreateAccountModal, setCreateAccountModal] = useState(false)
+    const [modalVisible, setModalVisible] = useState(false)
     let parkingPlace = useSelector(state => state?.app?.parkingPlace)
     let userData = useSelector(state => state?.app?.userData)
     let filters = useSelector(state => state?.app?.filters)
     console.log('filters: ', filters)
 
     const bookingData = () => {
-        if (filters.availability === 'Monthly'){
-            return filters.month
-        } else if (filters.availability === 'Daily'){
-            return new Date(filters.startDate)?.toLocaleDateString()
-        } else if (filters.availability === 'Weekly'){
-            return new Date(filters.startDate)?.toLocaleDateString() + ' - ' + new Date(filters.endDate)?.toLocaleDateString()
+        if (filters?.availability === 'Monthly'){
+            return moment(filters?.month).format("MMMM, YYYY")
+        } else if (filters?.availability === 'Daily'){
+            return moment(filters?.start*1000).format("YYYY-MM-DD")
+        } else if (filters?.availability === 'Weekly'){
+            return moment(filters?.start*1000).format("YYYY-MM-DD") + ' - ' + moment(filters?.end*1000).format("YYYY-MM-DD")
         } else {
-            return filters.startDate + ' - ' + filters.endDate + ', ' + filters.day
+            return moment(filters?.start*1000).format("YYYY-MM-DD, HH:MM:SS") + ' - ' + moment(filters?.end*1000).format("YYYY-MM-DD, HH:MM:SS") + ', ' + filters?.day
         }
     }
 
@@ -38,7 +41,7 @@ const ParkingDetails = (props) => {
     const renderItem = ({item}) => {
         return(
             <View style={{backgroundColor: '#E9E9E9', padding: 8, marginRight: 16, flexDirection: 'row', marginBottom: 8}}>
-                <Text style={[commonStyles.text_xxs_thick, { marginRight: 2}]}>{item.name}</Text>
+                <Text style={[commonStyles.text_xxs_thick, { marginRight: 2}]}>{item?.name}</Text>
                 <Icon name="send" type='feather' size={15} color={colors.black} />
             </View>
         )
@@ -50,16 +53,30 @@ const ParkingDetails = (props) => {
         )
     }
 
-    const selectTime = type => {
-        setTimeData(type)
-    }
+    const bookNow = async () => {
 
-    const bookNow = () => {
-        console.log('userData: ', userData)
-        if(userData?.is_guest){
-            setCreateAccountModal(true)
-        } else {
-            props.navigation.navigate('Payment')
+        console.log('enddate: ', filters?.endDate)
+        const req = {
+            "place": parkingPlace?.id,
+            end: filters?.availability === 'Monthly' ? moment(filters?.month).format("YYYY-MM-DDThh:mm:ss") + 'Z' : moment(filters?.endDate).format("YYYY-MM-DDThh:mm:ss") + 'Z',
+            start: filters?.availability === 'Monthly' ? moment(filters?.month).format("YYYY-MM-DDThh:mm:ss") + 'Z' : moment(filters?.startDate).format("YYYY-MM-DDThh:mm:ss") + 'Z',
+            "fare": parkingPlace?.price?.toFixed(2),
+            "days": filters?.day?.toString(),
+            "payment": false,
+            "payment_mode": "Cash"
+        }
+
+        console.log('req: ', req)
+
+        const resp = await dispatch(bookSpotRequest(req))
+        console.log('resp: ', resp)
+        if(resp?.status){
+            if(userData?.is_guest){
+                setModalVisible(false)
+                setCreateAccountModal(true)
+            } else {
+                props.navigation.reset({routes:[{name: 'Confirmation'}]})
+            }
         }
     }
 
@@ -85,7 +102,7 @@ const ParkingDetails = (props) => {
                         </Text>
                     </View>
                     <View style={{flexDirection: 'column', flex: 0.2, alignItems: 'center'}}>
-                        <Icon name="directions" type='font-awesome-5' size={40} color={colors.base} />
+                        <Icon name="map-pin" type='font-awesome' size={25} color={colors.black} />
                         <Text style={[commonStyles.text_xs, {color: '#6A6A6A'}]}>
                             {dist} mi
                         </Text>
@@ -110,11 +127,18 @@ const ParkingDetails = (props) => {
                 </Text>
             </View>
             <View style={{flex: 0.5}}>
-                <CustomButton label={'Book Spot'} isPrimaryButton onPress={bookNow} />
+                <CustomButton label={'Book Spot'} isPrimaryButton onPress={() => setModalVisible(true)} />
             </View>
         </View>
-        <SelectTime isModal={isModal} setModal={setModal} isBooking type={parkingPlace?.availability} selectTime={selectTime} />
         <CreateAccountPopup isModal={iscreateAccountModal} setModal={setCreateAccountModal} navigation={props.navigation}/>
+        <LogoutPopup
+            visible={modalVisible} 
+            header='Booking Confirmation'
+            subHeader='Are you sure you want to book?'
+            primaryButton='Yes'
+            navigation={props.navigation} 
+            onLogout={bookNow}
+            onClose={() => setModalVisible(false)} />
     </SafeAreaView>
   );
 }

@@ -6,11 +6,12 @@ import { CustomButton } from '../customButton';
 import FloatingTextInput from '../floatingTextInput';
 import CheckBox from '@react-native-community/checkbox';
 import { useDispatch } from 'react-redux';
-import { parkingSearchListRequest } from '../../utils/service';
+import { modifySpotRequest, parkingSearchListRequest } from '../../utils/service';
 import MonthPicker from 'react-native-month-year-picker';
 import { convertTime12to24, toUnixTime } from '../../utils';
 import { DatePickerIOS } from 'react-native';
 import { filters } from '../../state/actions';
+import moment from 'moment';
 
 const SelectTime = (props) => {
 
@@ -30,6 +31,7 @@ const SelectTime = (props) => {
       return(
         <>
           <CheckBox 
+          style={{marginLeft: 5, marginVertical: 5}}
             value={toggleCheckBox[index].isSelected}
             onValueChange={(newValue) => {
               let temp = toggleCheckBox.map((product) => {
@@ -40,7 +42,7 @@ const SelectTime = (props) => {
               });
               setToggleCheckBox(temp);
             }}/>
-            <Text style={[commonStyles.text_xs_thick, commonStyles.textAlignVerticalCenter, commonStyles.marginRight8]}>{item.title}</Text>
+            <Text style={[commonStyles.text_xs_thick, commonStyles.textAlignVerticalCenter, commonStyles.marginHorizontal8, {alignSelf: 'center'}]}>{item.title}</Text>
         </>
       )
     }
@@ -53,24 +55,28 @@ const SelectTime = (props) => {
 
     const applyFilter = async() => {
       if(props?.isBooking){
-        let data = null
-        if (isSelected === 'Hourly'){
-          data = `${startdate.toLocaleTimeString()} - ${endDate.toLocaleTimeString()}`
-        } else if (isSelected === 'Daily'){
-          data = startDate.toLocaleDateString()
-        } else if (isSelected === 'Weekly'){
-          data = `${startdate.toLocaleDateString()} - ${endDate.toLocaleDateString()}`
-        } else if (isSelected === 'Monthly'){
-          data = month
+        let availability = null
+        availability = isSelected
+        const req = {
+            place: props?.data?.place?.id,
+            end: availability === 'Monthly' ? moment(month).format("YYYY-MM-DDThh:mm:ss") + 'Z' : moment(endDate).format("YYYY-MM-DDThh:mm:ss") + 'Z',
+            start: availability === 'Monthly' ? moment(month).format("YYYY-MM-DDThh:mm:ss") + 'Z' : moment(startDate).format("YYYY-MM-DDThh:mm:ss") + 'Z',
         }
-        props?.selectTime(data)
-        props.setModal(false)
+        console.log('req: ', req)
+        const resp = await dispatch(modifySpotRequest(req, props?.data?.id))
+        if(resp?.status){
+          props?.getBookingData()
+          props.setModal(false)
+        } else {
+          props.setModal(false)
+        }
+        console.log('resp: ', resp)
       } else {
         props?.setLoading(true)
         const day = toggleCheckBox.filter((item) => item.isSelected).map((item) => item.value)
         let availability = null
-          availability = isSelected
-          console.log('availability: ', availability)
+        availability = isSelected
+        console.log('availability: ', availability)
         const reqData = {
           day: availability === 'Hourly' ? day : '',
           end: toUnixTime(endDate.getFullYear(), endDate.getMonth()+1, endDate.getDate(), endDate.getHours(), endDate.getMinutes(), endDate.getSeconds()),
@@ -78,12 +84,15 @@ const SelectTime = (props) => {
           availability: availability
         }
         dispatch(filters({
-            endDate: endDate.toLocaleString(),
-            startDate: startDate.toLocaleString(), 
-            availability: availability, 
-            month: `${monthNames[month.getMonth()]}, ${month.getFullYear()}`, 
-            day
-          }))
+          end: toUnixTime(endDate.getFullYear(), endDate.getMonth()+1, endDate.getDate(), endDate.getHours(), endDate.getMinutes(), endDate.getSeconds()),
+          start: availability === 'Monthly' ? toUnixTime(month.getFullYear(), month.getMonth()+1, 1, 11, 30, 0) : toUnixTime(startDate.getFullYear(), startDate.getMonth()+1, startDate.getDate(), startDate.getHours(), startDate.getMinutes(), startDate.getSeconds()),
+          availability: availability, 
+          month: `${monthNames[month.getMonth()]}, ${month.getFullYear()}`, 
+          day
+        }))
+
+          console.log('hourly: ', startDate.getFullYear(), startDate.getMonth()+1, startDate.getDate(), startDate.getHours(), startDate.getMinutes(), startDate.getSeconds())
+
         props.setModal(false)
         const resp1 = await dispatch(parkingSearchListRequest(reqData))
         if(resp1){

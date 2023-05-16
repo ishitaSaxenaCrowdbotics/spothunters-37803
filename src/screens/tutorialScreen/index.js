@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { View, TouchableOpacity, Text, ActivityIndicator } from "react-native";
+import { View, TouchableOpacity, Text, ActivityIndicator, SafeAreaView } from "react-native";
 import Video from "react-native-video";
 import { useDispatch, useSelector } from "react-redux";
 import { CustomButton } from "../../components/customButton";
@@ -65,6 +65,7 @@ const TutorialScreen = (props) => {
   }
 
   return (
+    <SafeAreaView style={commonStyles.flex1}>
     <View style={commonStyles.flex1}>
       {(videoData?.results && videoData?.results?.length > 0) &&
       <Video
@@ -89,6 +90,7 @@ const TutorialScreen = (props) => {
           style={styles.proceedButton} 
           label={btnText} />
     </View>
+    </SafeAreaView>
   );
 };
 

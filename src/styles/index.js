@@ -109,6 +109,9 @@ export const commonStyles = StyleSheet.create({
   marginHorizontal16: {
     marginHorizontal: 16
   },
+  marginHorizontal8: {
+    marginHorizontal: 8
+  },
   centerTextAlign: {
     textAlign: 'center'
   },
@@ -166,6 +169,9 @@ export const commonStyles = StyleSheet.create({
   },
   marginLeft8: {
     marginLeft: 8
+  },
+  marginLeft15: {
+    marginLeft: 15
   },
   marginTop8: {
     marginTop: 8
@@ -254,6 +260,9 @@ export const commonStyles = StyleSheet.create({
   },
   alignSelfEnd: {
     alignSelf: 'flex-end'
+  },
+  alignSelfStart: {
+    alignSelf: 'flex-start'
   },
   paddingHorizontal30: {
     paddingHorizontal: 30

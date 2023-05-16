@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, TouchableOpacity, Alert } from 'react-native';
+import { View, Text, TouchableOpacity, Alert, SafeAreaView } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
 import { CustomButton } from '../../components/customButton';
 import FloatingTextInput from '../../components/floatingTextInput';
@@ -29,6 +29,7 @@ const SendFeedback = (props) => {
   },[userData])
 
   return (
+    <SafeAreaView style={commonStyles.flex1}>
     <View style={styles.container}>
       <Text style={commonStyles.text_large_thick}>
         Help us to improve
@@ -38,15 +39,16 @@ const SendFeedback = (props) => {
       </Text>
       <FloatingTextInput
         label='Email ID *'
+        placeholder='someone@gmail.com'
         style={commonStyles.marginTop20} 
         value={emailID}
         disabled
         onChangeText={() => setEmailID(emailID)}/>
       <FloatingTextInput
         label='Message*'
+        placeholder='feedback to be given here'
         multiline 
         numberOfLines={10}
-        style={commonStyles.marginTop20} 
         value={msg}
         onChangeText={(value) => setMsg(value)}/>
         <CustomButton
@@ -56,6 +58,7 @@ const SendFeedback = (props) => {
           style={commonStyles.marginTop24} 
           label={'Submit'} />
     </View>
+    </SafeAreaView>
   );
 }
 

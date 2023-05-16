@@ -1,4 +1,4 @@
-import { parkingCompHome, prevBookings, setLoginData, setParkingSearch, setParkingSearchByID, setSignupData, tutorialData, upcomingBookings } from "../state/actions";
+import { managePayments, parkingCompHome, prevBookings, reports, setLoginData, setParkingSearch, setParkingSearchByID, setSignupData, tutorialData, upcomingBookings } from "../state/actions";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export const set_auth = async data =>
@@ -15,6 +15,32 @@ export const loginRequest = (reqData) => async (dispatch) => {
   console.log('req: ', reqData)
   let statusCode
     const requestUrl = ['POST', `${BASE_API_URL}/login/`];
+    let response = await fetch(requestUrl[1], {
+      method: requestUrl[0],
+      headers: {
+        'Content-type': 'application/json',
+        accept: 'application/json',
+      },
+      body: JSON.stringify(reqData)
+    }).then(response => { 
+      statusCode = response.status
+      return response });
+    let json = await response.json();
+    json.data={
+      ... json.data,
+      statusCode
+    }
+    console.log('statusCode json data: ', json.data)
+    dispatch(setLoginData(json.data))
+    set_auth(Object.assign({}, json.data));
+    return json
+}
+
+export const googleLoginRequest = (reqData) => async (dispatch) => {
+  console.log('req: ', reqData)
+  let statusCode
+    const requestUrl = ['POST', `${API_URL}/modules/social-auth/google/login/`];
+    console.log('url: ', requestUrl)
     let response = await fetch(requestUrl[1], {
       method: requestUrl[0],
       headers: {
@@ -279,7 +305,7 @@ export const parkingSearchListRequest = (reqData) => async (dispatch) => {
   console.log('request: ', reqData)
   let responseData = null
   const baseUrl = `${API_URL}/parking/api/v1/search-spots/`
-  const reqUrl = `${baseUrl}?${reqData?.is_airport ? 'is_airport=true' : ''}${reqData?.best_price ? `&best_price=${reqData?.best_price}` : ''}${reqData?.closest ? `&closest=${reqData?.closest}` : ''}${reqData?.weighted ? `&weighted=${reqData?.weighted}` : ''}${reqData?.availability ? `&availability=${reqData?.availability}` : ''}${reqData?.start ? `&start=${reqData?.start}` : ''}${reqData?.end ? `&end=${reqData?.end}` : ''}${reqData?.day ? `&day=${reqData?.day}` : ''}`
+  const reqUrl = `${baseUrl}?${reqData?.is_airport ? 'is_airport=true' : ''}${reqData?.best_price ? `&best_price=${reqData?.best_price}` : ''}${reqData?.closest ? `&closest=${reqData?.closest}` : ''}${reqData?.weighted ? `&weighted=${reqData?.weighted}` : ''}${reqData?.availability ? `availability=${reqData?.availability}` : ''}${reqData?.start ? `&start=${reqData?.start}` : ''}${reqData?.end ? `&end=${reqData?.end}` : ''}${reqData?.day ? `&day=${reqData?.day}` : ''}${reqData?.g_location ? `&g_location=${reqData?.g_location}` : ''}`
   const url = reqData ? reqUrl : baseUrl
 
   const requestUrl = ['GET', url];
@@ -388,7 +414,7 @@ export const upcomingBookingRequest = () => async (dispatch) => {
 }
 
 export const ParkingCompHomeRequest = (reqData) => async (dispatch) => {
-  const requestUrl = reqData ? ['GET', `${API_URL}/parking/api/v1/parkcomp-home/?search=${reqData}`] : ['GET', `${API_URL}/parking/api/v1/parkcomp-home/`]
+  const requestUrl = reqData ? ['GET', `${API_URL}/parking/api/v1/parkcomp-home/?search=${reqData?.search ? reqData?.search : ''}&date=${reqData?.date ? reqData?.date : ''}`] : ['GET', `${API_URL}/parking/api/v1/parkcomp-home/`]
   console.log('requestUrl: ', requestUrl)
   let user = await get_auth();
   console.log('user?.token: ', user?.token)
@@ -427,4 +453,79 @@ export const checkInRequest = (data) => async (dispatch) => {
   console.log('response: ', json)
   // dispatch(parkingCompHome(json))
   return json
+}
+
+export const reportRequest = (reqData) => async (dispatch) => {
+  const requestUrl = reqData ? ['GET', `${API_URL}/parking/api/v1/parkcomp-report/?search=${reqData?.search ? reqData?.search : ''}&start_date=${reqData?.start_date ? reqData?.start_date : ''}&end_date=${reqData?.end_date ? reqData?.end_date : ''}&last_week=${reqData?.last_week ? reqData?.last_week : ''}&last_month=${reqData?.last_month ? reqData?.last_month : ''}`] : ['GET', `${API_URL}/parking/api/v1/parkcomp-report/`]
+  console.log(requestUrl)
+  let user = await get_auth()
+  console.log('token: ', user?.token)
+  let response = await fetch(requestUrl[1], {
+    method: requestUrl[0],
+    headers: {
+      'Content-type': 'application/json',
+      accept: 'application/json',
+      Authorization: `Token ${user?.token}`
+    },
+  });
+  let json = await response.json();
+  console.log('response: ', json)
+  dispatch(reports(json))
+  return json
+}
+
+export const bookSpotRequest = (data) => async (dispatch) => {
+  const requestUrl = ['POST', `${API_URL}/parking/api/v1/book-spot/`];
+  console.log('requestUrl: ', requestUrl)
+  let user = await get_auth();
+  let response = await fetch(requestUrl[1], {
+    method: requestUrl[0],
+    headers: {
+      'Content-type': 'application/json',
+      accept: 'application/json',
+      Authorization: `Token ${user?.token}`
+    },
+    body: JSON.stringify(data)
+  });
+  let json = await response.json();
+  console.log('response: ', json)
+  // dispatch(parkingCompHome(json))
+  return json
+}
+
+export const modifySpotRequest = (data, id) => async (dispatch) => {
+  const requestUrl = ['PATCH', `${API_URL}/parking/api/v1/book-spot/${id}/`];
+  console.log('requestUrl: ', requestUrl)
+  let user = await get_auth();
+  let response = await fetch(requestUrl[1], {
+    method: requestUrl[0],
+    headers: {
+      'Content-type': 'application/json',
+      accept: 'application/json',
+      Authorization: `Token ${user?.token}`
+    },
+    body: JSON.stringify(data)
+  });
+  let json = await response.json();
+  console.log('response: ', json)
+  // dispatch(parkingCompHome(json))
+  return json
+}
+
+export const managePaymentRequest = () => async (dispatch) => {
+    const requestUrl = ['GET', `${API_URL}/user/api/v1/manage-payment/`];
+    console.log('requestUrl: ', requestUrl)
+    let user = await get_auth();
+    let response = await fetch(requestUrl[1], {
+      method: requestUrl[0],
+      headers: {
+        'Content-type': 'application/json',
+        accept: 'application/json',
+        Authorization: `Token ${user?.token}`
+      },
+    });
+    let json = await response.json();
+    console.log('response: ', json)
+    dispatch(managePayments(json))
+    return json
 }

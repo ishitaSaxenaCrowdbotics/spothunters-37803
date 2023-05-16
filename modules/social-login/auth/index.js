@@ -52,7 +52,9 @@ export const facebookLogin = createAsyncThunk(
 export const googleLogin = createAsyncThunk(
   "login/googleLogin",
   async (payload) => {
+    console.log(':response dummy : ', response)
     const response = await api.apiGoogleLogin(payload);
+    console.log(':response: ', response)
     return response.data;
   }
 );

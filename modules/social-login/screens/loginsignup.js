@@ -33,6 +33,7 @@ import {
   appleLogin
 } from "../auth";
 import { unwrapResult } from "@reduxjs/toolkit";
+import { googleLoginRequest } from "../../../src/utils/service";
 
 // Custom Text Input
 export const TextInputField = (props) => (
@@ -133,22 +134,33 @@ export const onFacebookConnect = async (dispatch, navigation) => {
   }
 };
 
-export const onGoogleConnect = async (dispatch, navigation) => {
+export const onGoogleConnect = async (dispatch, navigation, socialAuths) => {
+  console.log('tokens: google data')
   GoogleSignin.configure({
     webClientId: GOOGLE_WEB_CLIENT_ID, // client ID of type WEB for your server
+    androidClientId: GOOGLE_WEB_CLIENT_ID,
     offlineAccess: true, // if you want to access Google API on behalf of the user FROM YOUR SERVER
     forceCodeForRefreshToken: false,
     iosClientId: GOOGLE_IOS_CLIENT_ID
   });
   try {
-    await GoogleSignin.hasPlayServices();
-    await GoogleSignin.signIn();
+    const userInfo1 = await GoogleSignin.hasPlayServices();
+    console.log('userInfo: google', userInfo1)
+    const userInfo = await GoogleSignin.signIn();
+    console.log('userInfo: google', userInfo)
     const tokens = await GoogleSignin.getTokens();
-    dispatch(googleLogin({ access_token: tokens.accessToken }))
-      .then(unwrapResult)
-      .then((res) => {
-        if (res.key) navigation.navigate(HOME_SCREEN_NAME);
-      });
+    console.log('tokens: google', tokens)
+    const resp1 = await dispatch(googleLoginRequest({ access_token: tokens.accessToken }))
+    console.log('google response: ', resp1)
+    if(resp1?.token){
+      socialAuths && socialAuths()
+    }
+    // dispatch(googleLogin({ access_token: tokens.accessToken }))
+    //   .then(unwrapResult)
+    //   .then((res) => {
+    //     console.log('res.key: ', res.key)
+    //     if (res.key) navigation.navigate(HOME_SCREEN_NAME);
+    //   });
   } catch (err) {
     if (err.code === statusCodes.SIGN_IN_CANCELLED) {
       Alert.alert("Error", "The user canceled the signin request.");

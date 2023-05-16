@@ -10,7 +10,9 @@ const initialState = {
   upcomingBookings: [],
   prevBookings: [],
   parkingCompHome: [],
-  filters: {}
+  filters: {},
+  reportList: [],
+  managePayment: []
 }
 const SpotHunterReducer = (state = initialState, action) =>{
     switch (action.type) {
@@ -77,8 +79,18 @@ const SpotHunterReducer = (state = initialState, action) =>{
             return {
                 ...state,
                 filters: action.payload
-            }       
-        
+            }
+        case 'REPORTS':
+            return {
+                ...state,
+                reportList: action.payload
+            }
+        case 'MANAGE_PAYMENT':
+            return {
+                ...state,
+                managePayment: action.payload
+            }  
+            
         default:
         return state
     }

@@ -193,6 +193,7 @@ const PreviousBooking = (props) => {
                 <FloatingTextInput
                   style={commonStyles.marginTop24} 
                   label={'What could Have been Better?'}
+                  placeholder='What could have been better?'
                   onChangeText={(review) => setReview(review)}
                   value={review}/>
                 <CustomButton 

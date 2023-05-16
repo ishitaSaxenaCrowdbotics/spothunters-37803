@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { View, Dimensions, TouchableOpacity, Image, Platform, Text, FlatList } from "react-native";
+import { View, Dimensions, TouchableOpacity, Image, Platform, Text, FlatList, SafeAreaView } from "react-native";
 import { styles, autoCompleteStyles } from "./styles";
 // @ts-ignore
 import { GooglePlacesAutocomplete } from "react-native-google-places-autocomplete";
@@ -53,6 +53,26 @@ const Maps = ({navigation, handleListView, origin, enableDirections = true, show
 
   const getCurrentLocation = () => {
     try {
+      if(Platform.OS === 'ios'){
+        Geolocation.requestAuthorization("always")
+        Geolocation.setRNConfiguration({
+            skipPermissionRequests: false,
+           authorizationLevel: 'always',
+         });
+        Geolocation.getCurrentPosition(
+            (position) => {
+            setDefaultOrigin({
+                    latitude: position?.coords?.latitude,
+                    longitude: position?.coords?.longitude
+                });
+            },
+            (error) => {
+            // See error code charts below.
+            console.log('vbnm', error.code, error.message);
+            },
+            { enableHighAccuracy: true, timeout: 15000, maximumAge: 10000 }
+        );
+      } else {
         request(
             Platform.select({
               android: PERMISSIONS.ANDROID.ACCESS_FINE_LOCATION,
@@ -77,6 +97,7 @@ const Maps = ({navigation, handleListView, origin, enableDirections = true, show
               // console.log("Location is not enabled");
             }
           });
+      }
         } catch (error) {
           console.log("location set error:", error);
         }
@@ -251,108 +272,110 @@ const Maps = ({navigation, handleListView, origin, enableDirections = true, show
   };
 
   return (
-    <View style={[styles.view, mainContainerStyle]}>
-      <MapView
-        initialRegion={{
-          latitude: defaultOrigin.latitude,
-          longitude: defaultOrigin.longitude,
-          latitudeDelta: LATITUDE_DELTA,
-          longitudeDelta: LONGITUDE_DELTA
-        }}
-        ref={mapRef}
-        onPress={onMapPress}
-        style={styles.map}
-      >
-        {markedLocations && markedLocations.map((item, index) =>
-          {
-            const dist = getDistance(
-              {longitude: defaultOrigin.longitude, latitude: defaultOrigin.latitude}, 
-              {longitude: item.long, latitude: item.lat})
-          return(
-          <Marker
-          // onMarkerPress={() => console.log('pressed')}
-            onMar
-            key={index}
-            coordinate={{ latitude: parseFloat(item.lat), longitude: parseFloat(item.long) }}
-            title={item?.title}
-            description={item?.description}
-            pinColor={markerColor}
-          >
-            {/* <Callout> */}
-              <MapMarker dist={dist} item={item} navigation={navigation}  origin={defaultOrigin}/>
-            {/* </Callout> */}
-          </Marker>)
-          })}
-
-        <Marker
-          key={1}
-          draggable
-          coordinate={{ latitude: defaultOrigin.latitude, longitude: defaultOrigin.longitude }}
-          title={defaultOrigin?.title}
-          description={defaultOrigin?.description}
-          pinColor={markerColor || null}
-          onPress={() => setOriginAddress(defaultOrigin, "origin")}
-          onDrag={() => handleOnDrag()}
-          onDragStart={() => handleOnDragStart()}
-          onDragEnd={(e) => handleDragOrigin(e)}
+    <SafeAreaView style={commonStyles.flex1}>
+      <View style={[styles.view, mainContainerStyle]}>
+        <MapView
+          initialRegion={{
+            latitude: defaultOrigin.latitude,
+            longitude: defaultOrigin.longitude,
+            latitudeDelta: LATITUDE_DELTA,
+            longitudeDelta: LONGITUDE_DELTA
+          }}
+          ref={mapRef}
+          onPress={onMapPress}
+          style={styles.map}
         >
-        </Marker>
-        {destination && (
+          {markedLocations && markedLocations.map((item, index) =>
+            {
+              const dist = getDistance(
+                {longitude: defaultOrigin.longitude, latitude: defaultOrigin.latitude}, 
+                {longitude: item.long, latitude: item.lat})
+            return(
+            <Marker
+            // onMarkerPress={() => console.log('pressed')}
+              onMar
+              key={index}
+              coordinate={{ latitude: parseFloat(item.lat), longitude: parseFloat(item.long) }}
+              title={item?.title}
+              description={item?.description}
+              pinColor={markerColor}
+            >
+              {/* <Callout> */}
+                <MapMarker dist={dist} item={item} navigation={navigation}  origin={defaultOrigin}/>
+              {/* </Callout> */}
+            </Marker>)
+            })}
+
           <Marker
-            key={2}
+            key={1}
             draggable
-            coordinate={destination}
-            title={destination?.title}
-            description={destination?.description}
+            coordinate={{ latitude: defaultOrigin.latitude, longitude: defaultOrigin.longitude }}
+            title={defaultOrigin?.title}
+            description={defaultOrigin?.description}
             pinColor={markerColor || null}
-            onPress={() => setOriginAddress(destination, "destination")}
+            onPress={() => setOriginAddress(defaultOrigin, "origin")}
             onDrag={() => handleOnDrag()}
             onDragStart={() => handleOnDragStart()}
-            onDragEnd={(e) => handleDragDest(e)}
-
+            onDragEnd={(e) => handleDragOrigin(e)}
           >
-            {markerImage && (
-              <Image
-                source={{ uri: markerImage }}
-                style={[styles.marker, markerImageStyle]}
-              />
-            )}
           </Marker>
-        )}
-        {destination && <MapViewDirections
-          origin={{ latitude: defaultOrigin.latitude, longitude: defaultOrigin.longitude }}
-          waypoints={[
-            { latitude: defaultOrigin.latitude, longitude: defaultOrigin.longitude },
-            { latitude: destination?.latitude, longitude: destination?.longitude }
-          ]}
-          destination={{ latitude: destination?.latitude, longitude: destination?.longitude }}
-          apikey={apiKey}
-          strokeWidth={strokeWidth || 4}
-          strokeColor={strokeColor || "hotpink"}
-          optimizeWaypoints={true}
-          onStart={(params) => handleOnStart(params)}
-          onReady={(result) => handleOnReady(result)}
-          onError={(errorMessage) => handleOnError(errorMessage)}
-          resetOnChange={false}
-        />}
-      </MapView>
-      <TouchableOpacity style={{position: "absolute", bottom: 190,zIndex: 990, backgroundColor: '#333232', alignItems: 'center', alignSelf: 'center', paddingVertical: 6, paddingHorizontal: 12, borderRadius: 8, flexDirection: 'row'}} onPress={handleListView}>
-          {/* <SvgUri
-           width={21}
-           height={24}
-           source={require('../../src/assets/listView.svg')} /> */}
-           <Icon name='view-agenda-outline' type='material-community' color={colors.white} size={24} />
-          <Text style={{fontSize: 12, fontWeight: '600', color:'white', marginLeft: 10}}>List View</Text>
-      </TouchableOpacity>
-      <FlatList
-        nestedScrollEnabled
-        horizontal
-        style={{ position: "absolute",bottom:40,zIndex: 990,borderRadius: 30}}
-        data={parkingSearchList?.results}
-        showsVerticalScrollIndicator={true}
-        renderItem={renderItem}
-        keyExtractor={(item, index) => `${item.id}-${index}`}/>
-    </View>
+          {destination && (
+            <Marker
+              key={2}
+              draggable
+              coordinate={destination}
+              title={destination?.title}
+              description={destination?.description}
+              pinColor={markerColor || null}
+              onPress={() => setOriginAddress(destination, "destination")}
+              onDrag={() => handleOnDrag()}
+              onDragStart={() => handleOnDragStart()}
+              onDragEnd={(e) => handleDragDest(e)}
+
+            >
+              {markerImage && (
+                <Image
+                  source={{ uri: markerImage }}
+                  style={[styles.marker, markerImageStyle]}
+                />
+              )}
+            </Marker>
+          )}
+          {destination && <MapViewDirections
+            origin={{ latitude: defaultOrigin.latitude, longitude: defaultOrigin.longitude }}
+            waypoints={[
+              { latitude: defaultOrigin.latitude, longitude: defaultOrigin.longitude },
+              { latitude: destination?.latitude, longitude: destination?.longitude }
+            ]}
+            destination={{ latitude: destination?.latitude, longitude: destination?.longitude }}
+            apikey={apiKey}
+            strokeWidth={strokeWidth || 4}
+            strokeColor={strokeColor || "hotpink"}
+            optimizeWaypoints={true}
+            onStart={(params) => handleOnStart(params)}
+            onReady={(result) => handleOnReady(result)}
+            onError={(errorMessage) => handleOnError(errorMessage)}
+            resetOnChange={false}
+          />}
+        </MapView>
+        <TouchableOpacity style={{position: "absolute", bottom: 190,zIndex: 990, backgroundColor: '#333232', alignItems: 'center', alignSelf: 'center', paddingVertical: 6, paddingHorizontal: 12, borderRadius: 8, flexDirection: 'row'}} onPress={handleListView}>
+            {/* <SvgUri
+            width={21}
+            height={24}
+            source={require('../../src/assets/listView.svg')} /> */}
+            <Icon name='view-agenda-outline' type='material-community' color={colors.white} size={24} />
+            <Text style={{fontSize: 12, fontWeight: '600', color:'white', marginLeft: 10}}>List View</Text>
+        </TouchableOpacity>
+        <FlatList
+          nestedScrollEnabled
+          horizontal
+          style={{ position: "absolute",bottom:40,zIndex: 990,borderRadius: 30}}
+          data={parkingSearchList}
+          showsVerticalScrollIndicator={true}
+          renderItem={renderItem}
+          keyExtractor={(item, index) => `${item.id}-${index}`}/>
+      </View>
+    </SafeAreaView>
   );
 };
 

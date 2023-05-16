@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, Alert } from 'react-native';
+import { View, Text, Alert, SafeAreaView } from 'react-native';
 import { useDispatch } from 'react-redux';
 import { CustomButton } from '../../components/customButton';
 import FloatingTextInput from '../../components/floatingTextInput';
@@ -29,18 +29,19 @@ const ProceedAsGuest = (props) => {
   }
 
   return (
+    <SafeAreaView style={commonStyles.flex1}>
     <View style={styles.container}>
       <Text style={[commonStyles.text_small, commonStyles.marginTop24]}>
         To proceed as a guest, kindly provide your email address and mobile number
       </Text>
       <FloatingTextInput
         label='Email ID *'
-        style={commonStyles.marginTop20} 
+        placeholder='someone@gmail.com'
         value={emailId}
         onChangeText={(value) => setEmailId(value)}/>
       <FloatingTextInput
       label='mobile number *'
-      style={commonStyles.marginTop20} 
+      placeholder='+999999999999'
       value={mob}
       onChangeText={(value) => setMob(value)}/>
         <CustomButton
@@ -49,6 +50,7 @@ const ProceedAsGuest = (props) => {
           style={commonStyles.marginTop24} 
           label={'Proceed'} />
     </View>
+    </SafeAreaView>
   );
 }
 

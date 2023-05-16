@@ -6,11 +6,14 @@ import Maps from '../../../modules/maps';
 import { autoCompleteStyles } from '../../../modules/maps/styles';
 import { ListParkingSpotItem } from '../../components/parkingSpots';
 import { colors, commonStyles } from '../../styles';
-import { parkingSearchListRequest } from '../../utils/service';
+import { parkingSearchListRequest, parkingSearchRequest } from '../../utils/service';
 import { useDispatch, useSelector } from 'react-redux';
 import SelectTime from '../../components/selectTime';
 import Geolocation from 'react-native-geolocation-service'
 import { PERMISSIONS, request } from 'react-native-permissions';
+import { toUnixTime } from '../../utils';
+import moment from 'moment';
+import { filters } from '../../state/actions';
 
 const ParkingSpotsHome = (props) => {
     
@@ -22,12 +25,38 @@ const ParkingSpotsHome = (props) => {
     const [isAirport, setAirport] = useState(false)
     const [isModal, setModal] = useState(false)
     const [loading, setLoading] = useState(false)
+    const [selectTime, setSelectTime] = useState('')
     const [defaultOrigin, setDefaultOrigin] = useState({
         latitude: 28.6107092000000000,
         longitude: 77.1943697000000000,
         title: "",
         description: ""
-      });
+    });
+
+    let filterData = useSelector(state => state?.app?.filters)
+
+    const bookingData = () => {
+        if(filterData?.availability){
+            console.log('chnged1 filterData: ', filterData)
+            var timestemp = new Date(filterData?.start*1000);
+            console.log('chnged1 filterData dated ate: ', filterData?.start)
+            console.log('chnged1 filterData date: ', timestemp)
+            if (filterData?.availability === 'Monthly'){
+                setSelectTime(filterData?.availability + ': ' + moment(filterData?.month).format("MMMM, YYYY"))
+            } else if (filterData?.availability === 'Daily'){
+                setSelectTime(filterData?.availability + ': ' + moment(filterData?.start*1000).format("YYYY-MM-DD"))
+            } else if (filterData?.availability === 'Weekly'){
+                setSelectTime(filterData?.availability + ': ' + moment(filterData?.start*1000).format("YYYY-MM-DD") + ' - ' + moment(filterData?.end*1000).format("YYYY-MM-DD"))
+            } else {
+                setSelectTime(filterData?.availability + ': ' + moment(filterData?.start*1000).format("YYYY-MM-DD, HH:MM:SS") + ' - ' + moment(filterData?.end*1000).format("YYYY-MM-DD, HH:MM:SS") + ', ' + filterData?.day)
+            }
+        }
+    }
+
+    useEffect(() => {
+        bookingData()
+        console.log('chnged filterData: ', filterData)
+    },[filterData])
 
     const renderItemPrev = ({item}) => {
         return (<ListParkingSpotItem navigation={props.navigation} item={item} defaultOrigin={defaultOrigin} />)
@@ -40,35 +69,59 @@ const ParkingSpotsHome = (props) => {
     const dispatch = useDispatch()
     let parkingSearchList = useSelector(state => state?.app?.parkingSearchList)
 
-    const getCurrentLocation = () => {
+    const getCurrentLocation = async () => {
         try {
-            request(
-                Platform.select({
-                  android: PERMISSIONS.ANDROID.ACCESS_FINE_LOCATION,
-                  ios: PERMISSIONS.IOS.LOCATION_WHEN_IN_USE
-                })
-              ).then(res => {
-                if (res == "granted") {
-                  Geolocation.getCurrentPosition(
+            if(Platform.OS === 'ios'){
+                const locationPermissionStatus = await Geolocation.requestAuthorization("always")
+                console.log('locationPermissionStatus: ', locationPermissionStatus)
+                Geolocation.setRNConfiguration({
+                    skipPermissionRequests: false,
+                   authorizationLevel: 'always',
+                 });
+                Geolocation.getCurrentPosition(
                     (position) => {
-                      setDefaultOrigin({
+                    setDefaultOrigin({
                             latitude: position?.coords?.latitude,
                             longitude: position?.coords?.longitude
-                          });
+                        });
                     },
                     (error) => {
-                      // See error code charts below.
-                      console.log(error.code, error.message);
+                    // See error code charts below.
+                    console.log('vbnm', error.code, error.message);
                     },
                     { enableHighAccuracy: true, timeout: 15000, maximumAge: 10000 }
                 );
-                } else {
-                  // console.log("Location is not enabled");
+            } else {
+                request(
+                    Platform.select({
+                    android: PERMISSIONS.ANDROID.ACCESS_FINE_LOCATION,
+                    ios: PERMISSIONS.IOS.LOCATION_WHEN_IN_USE
+                    })
+                ).then(res => {
+                    console.log('permission: ', res)
+                    if (res == "granted") {
+                    Geolocation.getCurrentPosition(
+                        (position) => {
+                        setDefaultOrigin({
+                                latitude: position?.coords?.latitude,
+                                longitude: position?.coords?.longitude
+                            });
+                        },
+                        (error) => {
+                        // See error code charts below.
+                        console.log(error.code, error.message);
+                        },
+                        { enableHighAccuracy: true, timeout: 15000, maximumAge: 10000 }
+                    );
+                    } else {
+                    // console.log("Location is not enabled");
+                    }
+                });
                 }
-              });
             } catch (error) {
               console.log("location set error:", error);
             }
+            
     }
 
     useEffect(() => {
@@ -77,8 +130,18 @@ const ParkingSpotsHome = (props) => {
     }, [])
 
     const getParkingPlaces = async () => {
+        dispatch(filters({
+            end: toUnixTime(new Date().getFullYear(), new Date().getMonth()+1, new Date().getDate(), new Date().getHours(), new Date().getMinutes(), new Date().getSeconds()),
+            start: toUnixTime(new Date().getFullYear(), new Date().getMonth()+1, new Date().getDate(), new Date().getHours(), new Date().getMinutes(), new Date().getSeconds()),
+            availability: 'Daily', 
+          }))
         setLoading(true)
-        const resp = await dispatch(parkingSearchListRequest())
+        const reqData = {
+            end: toUnixTime(new Date().getFullYear(), new Date().getMonth()+1, new Date().getDate(), new Date().getHours(), new Date().getMinutes(), new Date().getSeconds()),
+            start: toUnixTime(new Date().getFullYear(), new Date().getMonth()+1, new Date().getDate(), new Date().getHours(), new Date().getMinutes(), new Date().getSeconds()),
+            availability: 'Daily'
+          }
+        const resp = await dispatch(parkingSearchListRequest(reqData)) 
         console.log('resp: ', resp)
         if(resp){
             setLoading(false)
@@ -128,7 +191,7 @@ const ParkingSpotsHome = (props) => {
         props?.navigation.goBack();
     }
 
-    const getAddressHandle = (address) => {
+    const getAddressHandle = async (address) => {
         setInputValue("");
         console.log(address)
         const latitude = address.geometry.location.lat;
@@ -138,11 +201,11 @@ const ParkingSpotsHome = (props) => {
             latitude: latitude,
             longitude: longitude,
         });
-        // const resp = await dispatch(parkingSearchListRequest())
-        // console.log('resp: ', resp)
-        // if(resp){
-        //     setLoading(false)
-        // }
+        const resp = await dispatch(parkingSearchListRequest({g_location: latitude+','+longitude}))
+        console.log('resp: ', resp)
+        if(resp){
+            setLoading(false)
+        }
     }
 
   return (
@@ -191,12 +254,13 @@ const ParkingSpotsHome = (props) => {
             </View>}
         </View>
         {isMapView ? 
-        <Maps handleListView={() => onHandleListView(false)} showSearchInput={true} navigation={props.navigation} markedLocations={parkingSearchList?.results} />
+        <Maps handleListView={() => onHandleListView(false)} showSearchInput={true} navigation={props.navigation} markedLocations={parkingSearchList} />
         : 
         <>
         {loading ? <ActivityIndicator style={{marginTop: 50}} size="large" color={colors.base} /> : 
         <>
-        <View style={{ paddingHorizontal: 16, flexDirection: 'row', justifyContent: 'space-between', marginBottom: 8, marginTop: 10 }}>
+        <Text style={{paddingHorizontal: 16,  marginTop: 10}}>{selectTime ? selectTime : `Daily: ${new Date().toLocaleDateString()}`}</Text>
+        <View style={{ paddingHorizontal: 16, flexDirection: 'row', justifyContent: 'space-between', marginBottom: 8, marginTop: 5 }}>
             <Text style={[commonStyles.text_xs_thick, {textAlignVertical: 'center'}]}>
                 {parkingSearchList?.count} parking spots near you
             </Text>
@@ -205,9 +269,9 @@ const ParkingSpotsHome = (props) => {
             <Text style={[commonStyles.text_xs, {color: '#1E8FFF', marginLeft: 8}]}>Map View</Text>
             </TouchableOpacity>
         </View>
-        {parkingSearchList?.results?.length > 0 ?
+        {parkingSearchList?.length > 0 ?
         <FlatList
-            data={parkingSearchList?.results}
+            data={parkingSearchList}
             showsVerticalScrollIndicator={true}
             renderItem={renderItemPrev}
             keyExtractor={(item, index) => `${item.id}-${index}`}
@@ -225,7 +289,7 @@ const ParkingSpotsHome = (props) => {
         }
         </>
         }
-        <SelectTime isModal={isModal} setModal={setModal} setLoading={setLoading} />
+        <SelectTime isModal={isModal} setModal={setModal} setLoading={setLoading}/>
     </SafeAreaView>
   );
 }

@@ -22,7 +22,7 @@ const Home = (props) => {
     let prevBookings = useSelector(state => state?.app?.prevBookings)
 
     const renderItem = ({item}) => {
-        return(<UpcomingBooking navigation={props.navigation} item={item}/>)
+        return(<UpcomingBooking navigation={props.navigation} item={item} getBookingData={getBookingData}/>)
     }
     const renderItemPrev = ({item}) => {
         return(<PreviousBooking item={item} />) 
@@ -49,6 +49,8 @@ const Home = (props) => {
         }
     }
 
+    console.log('upcoming upcomingBookings: ', upcomingBookings)
+
     useEffect(() => {
         getBookingData()
     }, [])
@@ -66,18 +68,18 @@ const Home = (props) => {
                 <Text style={commonStyles.text_xl_thick}>
                     My Bookings
                 </Text>
-                { upcomingBookings?.results?.length > 0 && <TouchableOpacity onPress={() => props.navigation.navigate('BookListing', {screen: 'BookingsList', params: {upcoming: true}})}>
+                { upcomingBookings?.length > 0 && <TouchableOpacity onPress={() => props.navigation.navigate('BookListing', {screen: 'BookingsList', params: {upcoming: true}})}>
                     <Text style={[commonStyles.text_xs, commonStyles.darkGreyTextColor]}>
                         Show All
                     </Text>
                 </TouchableOpacity>}
             </View>
             {loadingUp ? <ActivityIndicator style={{marginTop: 50}} size="large" color={colors.base} /> : 
-                <>{ upcomingBookings?.results?.length > 0 ?
+                <>{ upcomingBookings?.length > 0 ?
                     <FlatList 
                         nestedScrollEnabled
                         horizontal
-                        data={upcomingBookings?.results}
+                        data={upcomingBookings}
                         showsVerticalScrollIndicator={true}
                         renderItem={renderItem}
                         keyExtractor={(item, index) => `${item.id}-${index}`}/> : <View style={commonStyles.alignItemsCenter}><Text style={commonStyles.text_large}>no results found...</Text></View>
@@ -90,18 +92,18 @@ const Home = (props) => {
                         <Text style={commonStyles.text_xl_thick}>
                             Previous Reservations
                         </Text>
-                        { prevBookings?.results?.length > 0 && <TouchableOpacity onPress={() => props.navigation.navigate('BookListing', {screen: 'BookingsList'})}>
+                        { prevBookings?.length > 0 && <TouchableOpacity onPress={() => props.navigation.navigate('BookListing', {screen: 'BookingsList'})}>
                             <Text style={[commonStyles.text_xs, commonStyles.darkGreyTextColor]}>
                                 Show All
                             </Text>
                         </TouchableOpacity>}
                     </View>
                     {loadingPrev ? <ActivityIndicator style={{marginTop: 50}} size="large" color={colors.base} /> : 
-                       <>{ prevBookings?.results?.length > 0 ?
+                       <>{ prevBookings?.length > 0 ?
                        <FlatList 
                             nestedScrollEnabled
                             horizontal
-                            data={prevBookings?.results}
+                            data={prevBookings}
                             showsVerticalScrollIndicator={true}
                             renderItem={renderItemPrev}
                             keyExtractor={(item, index) => `${item.id}-${index}`}/> : <View style={commonStyles.alignItemsCenter}><Text style={commonStyles.text_large}>no results found...</Text></View>

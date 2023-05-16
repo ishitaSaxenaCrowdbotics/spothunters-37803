@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import { View, Text, Button, TouchableOpacity, Image, Dimensions } from "react-native";
+import { View, Text, Button, TouchableOpacity, Image, Dimensions, SafeAreaView } from "react-native";
 import AppIntroSlider from "react-native-app-intro-slider";
 import { CustomButton } from "../../components/customButton";
 import Carousel, {Pagination} from 'react-native-snap-carousel';
@@ -46,6 +46,7 @@ const OnBoarding = (props) => {
   }
 
   return (
+    <SafeAreaView style={commonStyles.flex1}>
     <View style={commonStyles.fullHeight}>
       <Carousel
         ref={isCarousel}
@@ -84,6 +85,7 @@ const OnBoarding = (props) => {
         style={styles.margin30} 
         label={'Get Started'} />
     </View>
+    </SafeAreaView>
   );
 };
 

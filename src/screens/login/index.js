@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, ScrollView, Image, Alert, ActivityIndicator } from 'react-native';
+import { View, Text, TouchableOpacity, ScrollView, Image, Alert, ActivityIndicator, SafeAreaView } from 'react-native';
 import CheckBox from '@react-native-community/checkbox';
 import { onAppleConnect, onFacebookConnect, onGoogleConnect, SocialButtonsView } from '../../../modules/social-login/screens/loginsignup';
 import { useDispatch, useSelector } from 'react-redux';
@@ -14,8 +14,8 @@ const Login = (props) => {
   const [isAccountCreate, setIsAccountCreate] = useState(props?.route?.params?.isSignup)
   const [toggleCheckBox, setToggleCheckBox] = useState(false)
   const [rememberMe, setRememberMe] = useState(false)
-  const [email, setEmail] = useState('')//test1@gmail.com jainlavika19+95@gmail.com
-  const [password, setPassword] = useState('') //test lavika19
+  const [email, setEmail] = useState('')//test1@gmail.com jainlavika19+95@gmail.com mandeep.kumar+1@crowdbotics.com
+  const [password, setPassword] = useState('') //test lavika19 Admin123
   const [mobileNumber, setMobileNumber] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')// reNxsgmgx5
   const [isloading, setIsloading] = useState(false)
@@ -93,6 +93,14 @@ const Login = (props) => {
     }
   }
 
+  const socialAuths = () => {
+    if(props.route.params?.isSignup){
+      props.navigation.replace('MainNav', { screen: 'booking', params: { screen: 'ParkingSpotsHome' }});  
+    } else {
+      props.navigation.replace('MainNav');
+    }
+  }
+
   const onLoginValidate = () => {
     // let reg = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w\w+)+$/;
     if(email && password){
@@ -114,49 +122,50 @@ const Login = (props) => {
   }
 
   return (
+    <SafeAreaView style={[commonStyles.flex1, commonStyles.whiteBackground]}>
     <ScrollView contentContainerStyle={[commonStyles.justifyContentCenter, commonStyles.whiteBackground]}>
       <View style={styles.container}>
         <Image source={require('../../assets/logo.png')} style={[commonStyles.size111, commonStyles.alignSelfCenter, commonStyles.size111]} />
         <Text style={styles.headingText}>Spot Hunters</Text>
         <Text style={[commonStyles.text_large_bold, commonStyles.marginTop12, commonStyles.centerTextAlign]}>{isAccountCreate ? 'Sign Up' : 'Sign In'}</Text>
         <FloatingTextInput
-          style={commonStyles.marginTop20} 
-          label={isAccountCreate ? 'Email ID *' : 'Email ID *'}
+          label={'Email ID *'}
+          placeholder='someone@gmail.com'
           value={email}
           onChangeText={(value) => setEmail(value)}/>
         <FloatingTextInput 
           secureTextEntry={isAccountCreate ? false : true }
-          style={commonStyles.marginTop20} 
           label={isAccountCreate ? 'mobile number *' : 'Password *'}
+          placeholder={'******'}
           value={isAccountCreate ? mobileNumber : password}
           onChangeText={(value) => {isAccountCreate ? setMobileNumber(value) : setPassword(value)}}/>
         {isAccountCreate && 
           <>
             <FloatingTextInput 
             secureTextEntry
-            style={commonStyles.marginTop20} 
             label='Password *'
+            placeholder={'******'}
             value={password}
             onChangeText={(value) => setPassword(value)}
             />
             <FloatingTextInput 
             secureTextEntry
-            style={commonStyles.marginTop20} 
             label='Confirm Password *'
+            placeholder={'******'}
             value={confirmPassword}
             onChangeText={(value) => setConfirmPassword(value)}/>
           </>
         }
         {!isAccountCreate && 
         <View style={[commonStyles.marginTop12, {flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'}]}>
-          <View style={{flexDirection:'row'}}>
+          <View style={{flexDirection:'row', alignItems: 'center'}}>
           <CheckBox 
               value={rememberMe}
               onValueChange={(newValue) => setRememberMe(newValue)}/>
-          <Text style={{fontSize: 10, textAlignVertical: 'center'}}>Remember me</Text>
+          <Text style={[commonStyles.text_xxs_bold, commonStyles.marginLeft5]}>Remember me</Text>
           </View>
           <TouchableOpacity onPress={() => props.navigation.navigate('ChangePassword', {name: 'Forgot Password'})}>
-            <Text style={[commonStyles.text_xxs_thick, commonStyles. centerTextAlign, commonStyles.blueTextColor, commonStyles.alignSelfEnd]}>
+            <Text style={[commonStyles.text_xxs_thick, commonStyles. centerTextAlign, commonStyles.blueTextColor, commonStyles.alignSelfEnd, commonStyles.textAlignVerticalCenter]}>
               Forgot Password?
               </Text>
           </TouchableOpacity>
@@ -167,7 +176,7 @@ const Login = (props) => {
             <CheckBox 
               value={toggleCheckBox}
               onValueChange={(newValue) => setToggleCheckBox(newValue)}/>
-            <View style={{flexDirection: 'row', alignItems: 'center'}}>
+            <View style={[commonStyles.marginLeft5, commonStyles.flexRow, commonStyles.alignItemsCenter]}>
               <Text style={commonStyles.text_xxs_thick }>I agree to the </Text>
               <TouchableOpacity onPress={() => props.navigation.navigate('TermsAndConditions')}>
               <Text style={[commonStyles.text_xxs_thick, commonStyles.blueTextColor]}>Terms and conditions </Text>
@@ -191,7 +200,7 @@ const Login = (props) => {
         <SocialButtonsView
           loading={false}
           onFacebookConnect={() => onFacebookConnect(dispatch, props.navigation)}
-          onGoogleConnect={() => onGoogleConnect(dispatch, props.navigation)}
+          onGoogleConnect={() => onGoogleConnect(dispatch, props.navigation, socialAuths)}
           onAppleConnect={() => onAppleConnect(dispatch, props.navigation)}
         />
       </View>
@@ -206,6 +215,7 @@ const Login = (props) => {
         </TouchableOpacity>
       </View>
     </ScrollView>
+    </SafeAreaView>
   );
 }
 

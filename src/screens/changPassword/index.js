@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, Alert, ActivityIndicator } from 'react-native';
+import { View, Text, Alert, ActivityIndicator, SafeAreaView } from 'react-native';
 import { useDispatch } from 'react-redux';
 import { CustomButton } from '../../components/customButton';
 import FloatingTextInput from '../../components/floatingTextInput';
@@ -53,6 +53,7 @@ const ChangePassword = (props) => {
   }
 
   return (
+    <SafeAreaView style={[commonStyles.flex1, commonStyles.whiteBackground]}>
     <View
       style={{
         flex: 1,
@@ -64,21 +65,24 @@ const ChangePassword = (props) => {
           style={commonStyles.marginTop16} 
           value={props.route.params?.isChangePassword ? currentPassword : emailId}
           onChangeText={(value) => props.route.params?.isChangePassword ? setCurrentPassword(value) : setEmailId(value)}
-          label={props.route.params?.isChangePassword ? 'Current Password' : 'Email ID *'}/>
+          placeholder={props.route.params?.isChangePassword ? '******' : 'someone@gmail.com *'}
+          label={props.route.params?.isChangePassword ? 'Current Password *' : 'Email ID *'}/>
         {props.route.params?.isChangePassword && 
           <>
             <FloatingTextInput 
               secureTextEntry
               style={commonStyles.marginTop16} 
-              label='New Password'
+              label='New Password *'
+              placeholder='******'
               value={newPassword}
               onChangeText={(value) => setNewPassword(value)}/>
             <FloatingTextInput 
               secureTextEntry
               style={commonStyles.marginTop16} 
               value={confirmPassword}
+              placeholder='******'
               onChangeText={(value) => setConfirmPassword(value)}
-              label='Confirm New Password'/>
+              label='Confirm New Password *'/>
            </>
         }
         <CustomButton 
@@ -95,6 +99,7 @@ const ChangePassword = (props) => {
         {isloading && <ActivityIndicator  size="large" style={commonStyles.marginTop10}
                 color={colors.base} />}
     </View>
+    </SafeAreaView>
   );
 }
 

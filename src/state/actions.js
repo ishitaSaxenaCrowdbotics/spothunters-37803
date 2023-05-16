@@ -79,3 +79,17 @@ export function filters(response) {
         payload: response
     }
 }
+
+export function reports(response) {
+    return { 
+        type: 'REPORTS', 
+        payload: response
+    }
+}
+
+export function managePayments(response) {
+    return { 
+        type: 'MANAGE_PAYMENT', 
+        payload: response
+    }
+}

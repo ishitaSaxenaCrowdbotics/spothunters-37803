@@ -9,10 +9,12 @@ import { convertToMeterToMiles, formatTime } from '../../utils';
 import { PERMISSIONS, request } from 'react-native-permissions';
 import Geolocation from 'react-native-geolocation-service'
 import { getDistance } from 'geolib';
+import SelectTime from '../selectTime';
 
 const UpcomingBooking = forwardRef((props, ref) => {
 
     const [isModal, setModal] = useState(false)
+    const [isTimeModal, setTimeModal] = useState(false)
     const [defaultOrigin, setDefaultOrigin] = useState();
 
     useEffect(() => {
@@ -30,30 +32,52 @@ const UpcomingBooking = forwardRef((props, ref) => {
         bookingID: props?.item?.id
     }
 
-    const getCurrentLocation = () => {
+    const getCurrentLocation = async () => {
         try {
-            request(
-                Platform.select({
-                  android: PERMISSIONS.ANDROID.ACCESS_FINE_LOCATION,
-                  ios: PERMISSIONS.IOS.LOCATION_WHEN_IN_USE
-                })
-              ).then(res => {
-                if (res == "granted") {
-                  Geolocation.getCurrentPosition(
+            if(Platform.OS === 'ios'){
+                const locationPermissionStatus = await Geolocation.requestAuthorization("always")
+                console.log('locationPermissionStatus: ', locationPermissionStatus)
+                Geolocation.setRNConfiguration({
+                    skipPermissionRequests: false,
+                   authorizationLevel: 'always',
+                 });
+                Geolocation.getCurrentPosition(
                     (position) => {
-                      setDefaultOrigin({
+                    setDefaultOrigin({
                             latitude: position?.coords?.latitude,
                             longitude: position?.coords?.longitude
-                          });
+                        });
                     },
                     (error) => {
-                      console.log(error.code, error.message);
+                    // See error code charts below.
+                    console.log('cvbhjkl', error.code, error.message);
                     },
                     { enableHighAccuracy: true, timeout: 15000, maximumAge: 10000 }
                 );
-                } else {
+            } else {
+                request(
+                    Platform.select({
+                    android: PERMISSIONS.ANDROID.ACCESS_FINE_LOCATION,
+                    ios: PERMISSIONS.IOS.LOCATION_WHEN_IN_USE
+                    })
+                    ).then(res => {
+                        if (res == "granted") {
+                        Geolocation.getCurrentPosition(
+                            (position) => {
+                            setDefaultOrigin({
+                                    latitude: position?.coords?.latitude,
+                                    longitude: position?.coords?.longitude
+                                });
+                            },
+                            (error) => {
+                            console.log(error.code, error.message);
+                            },
+                            { enableHighAccuracy: true, timeout: 15000, maximumAge: 10000 }
+                        );
+                        } else {
+                        }
+                    });
                 }
-              });
             } catch (error) {
               console.log("location set error:", error);
             }
@@ -121,7 +145,6 @@ const UpcomingBooking = forwardRef((props, ref) => {
             </View>
             <View>
                 <Text style={[commonStyles.text_xs,commonStyles.darkGreyTextColor, commonStyles.centerTextAlign, commonStyles.marginBottom5]}>
-
                     Paid
                 </Text>
                 <Text style={[commonStyles.text_xs_bold, commonStyles.blackTextColor, commonStyles.centerTextAlign]}>
@@ -131,7 +154,7 @@ const UpcomingBooking = forwardRef((props, ref) => {
         </View>
         <View style={commonStyles.divider} />
         <View style={[commonStyles.flexRow, commonStyles.justifyContentBetween, commonStyles.alignItemsCenter]}>
-            <TouchableOpacity >
+            <TouchableOpacity onPress={() => setTimeModal(true)}>
                 <Text style={[commonStyles.text_xs_thick, commonStyles.blueTextColor]}>
                     Modify
                 </Text>
@@ -148,6 +171,7 @@ const UpcomingBooking = forwardRef((props, ref) => {
         </View>
         </View>
         <QrCode isModal={isModal} setModal={setModal} data={JSON.stringify(qrCode)} />
+        <SelectTime isModal={isTimeModal} setModal={setTimeModal} isBooking type={props?.item?.place?.availability} data={props?.item} getBookingData={props?.getBookingData} />
     </>
   );
 })

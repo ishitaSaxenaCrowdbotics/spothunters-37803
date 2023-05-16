@@ -71,6 +71,7 @@ const BookingsList = (props) => {
                     style={{width: '78%'}}
                     value={searchText}
                     onChangeText={(value) => onSearch(value)}
+                    placeholder='Search Here...'
                     label='Search Here...'/>
                 <TouchableOpacity style={styles.settingButton}>
                     <Image source={require('../../assets/settingIcon.png')} />

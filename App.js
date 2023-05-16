@@ -22,6 +22,7 @@ import Home from "./src/screens/home";
 import ChangePassword from "./src/screens/changPassword";
 import EmailVerification from "./src/screens/emailVerification";
 import { DrawerHeader } from "./src/components/drawerHeader";
+// import { slice } from "./modules/social-login/auth";
 
 const Stack = createStackNavigator(); 
 
@@ -100,6 +101,7 @@ const getStore = globalState => {
   const reducer = combineReducers({
     // app: appReducer,
     // auth_requests: auth_requests,
+    // auth: slice.reducer,
     app: SpotHunterReducer,
     ...reducers,
     ...connectors
