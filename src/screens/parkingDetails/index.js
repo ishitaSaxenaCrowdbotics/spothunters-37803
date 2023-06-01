@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { View, Text, ScrollView, Image, SafeAreaView, FlatList, Dimensions } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { View, Text, ScrollView, Image, SafeAreaView, FlatList, Dimensions, Alert, ActivityIndicator, Modal } from 'react-native';
 import { CustomButton } from '../../components/customButton';
 import { colors, commonStyles } from '../../styles';
 import { Icon } from 'react-native-elements';
@@ -9,20 +9,49 @@ import { calculateTotalHours, convertToMeterToMiles } from '../../utils';
 import SelectTime from '../../components/selectTime';
 import { CreateAccountPopup } from '../../components/createAccountPopUp';
 import { LogoutPopup } from '../../components/logOutPopup';
-import { bookSpotRequest } from '../../utils/service';
+import { bookSpotRequest, updatePaymentStatusRequest } from '../../utils/service';
 import moment from 'moment';
 import { TouchableOpacity } from 'react-native-gesture-handler';
+import {
+    useApplePay,
+    useGooglePay,
+    useStripe,
+    presentGooglePay
+  } from "@stripe/stripe-react-native";
+import { fetchPaymentSheetParams, get_paymentIntent } from '../../../modules/payments/api';
+import { localOptions, styles } from '../../../modules/payments/options';
+import { StripeProvider } from "@stripe/stripe-react-native";
+import style from './styles';
+import { PaymentPopup } from '../../components/paymentPopup';
 
 const ParkingDetails = (props) => { 
 
+    const { initPaymentSheet, presentPaymentSheet } = useStripe();
     const dispatch = useDispatch()
     const [iscreateAccountModal, setCreateAccountModal] = useState(false)
     const [modalVisible, setModalVisible] = useState(false)
     const [tabSelected, setTabSelected] = useState(2)
+    const [loading, setLoading] = useState()
+    const [gPayinitialized, setGPayInitialized] = useState(false);
+    const [isPaymentModal, setIsPaymentModal] = useState(2)
     let parkingPlace = useSelector(state => state?.app?.parkingPlace)
     let userData = useSelector(state => state?.app?.userData)
     let filters = useSelector(state => state?.app?.filters)
     console.log('filters: ', filters)
+    const {
+        merchantName,
+        enableGooglePay,
+        enableApplePay,
+        merchantCountryCode,
+        stripeTestEnv,
+        merchantCurrency
+      } = localOptions;
+
+    const numofHours = calculateTotalHours(filters?.start, filters?.end) * filters?.day?.length
+    console.log('diff: ', numofHours)
+    const parkingFare = parkingPlace?.availability === 'Hourly' ? numofHours * parseFloat(parkingPlace?.price?.toFixed(2)) : parkingPlace?.price?.toFixed(2)
+    const commission = parkingFare * parseFloat(parkingPlace?.commission)?.toFixed(2) * .01
+    const total_price = parseFloat(commission) + parseFloat(parkingFare)
 
     const bookingData = () => {
         if (filters?.availability === 'Monthly'){
@@ -55,41 +84,195 @@ const ParkingDetails = (props) => {
         )
     }
 
-    const bookNow = async () => {
+    const updatePaymentStatus = async (id, paymentIntent) => {
+        // let paymentIntent = await get_paymentIntent();
+        // console.log('paymentIntent: ', paymentIntent)
+        const reqBody = {
+            payment: true,
+            payment_stipe_id: paymentIntent,
+            paid_amount: (parkingPlace?.is_payment_available && tabSelected === 1) ? commission?.toFixed(2) : total_price.toFixed(2)
+        }
+        console.log('reqBody: ', reqBody)
+        const resp = await dispatch(updatePaymentStatusRequest(reqBody, id))
+        console.log('resp: ', resp)
+        if(resp?.id){
+            setLoading(false)
+            props.navigation.navigate('Confirmation', {id, parkingPlaceName: parkingPlace?.name, placeAdd: parkingPlace?.address, paid: resp?.paid_amount * 100, inTime: filters?.start, outTime: filters?.end, availability: filters?.availability})
+        } else {
+            setLoading(false)
+        }
+    }
 
-        console.log('enddate: ', filters?.endDate)
+    const initializePaymentSheet = async () => {
+        const { paymentIntent, ephemeralKey, customer } =
+          await fetchPaymentSheetParams((parkingPlace?.is_payment_available && tabSelected === 1) ? commission?.toFixed(2) : total_price.toFixed(2));
+        const { error } = await initPaymentSheet({
+          customerId: customer,
+          customerEphemeralKeySecret: ephemeralKey,
+          paymentIntentClientSecret: paymentIntent,
+          merchantDisplayName: merchantName,
+          applePay: false,
+          googlePay: enableGooglePay,
+          merchantCountryCode: merchantCountryCode,
+          testEnv: stripeTestEnv // use test environment
+        });
+        __DEV__ && console.log(error);
+        if (!error) {
+        //   setLoading(true);
+        }
+        return paymentIntent
+    };
+    
+      // Pay Through Credit Card
+      const openPaymentSheet = async (id) => {
+        const paymentIntent = await initializePaymentSheet();
+        const { error } = await presentPaymentSheet({ clientSecret: localOptions.stripeSecretKey });
+    
+        if (error) {
+            setLoading(false)
+          Alert.alert(`Error code: ${error.code}`, error.message);
+        } else {
+            updatePaymentStatus(id, paymentIntent)
+        //   Alert.alert("Success", "Your order is confirmed!");
+
+        }
+    };
+
+    const bookNow = async () => {
+        setIsPaymentModal(false)
+        setLoading(true)
         const req = {
             "place": parkingPlace?.id,
-            end: filters?.availability === 'Monthly' ? moment(filters?.month).format("YYYY-MM-DDThh:mm:ss") + 'Z' : moment(filters?.endDate).format("YYYY-MM-DDThh:mm:ss") + 'Z',
-            start: filters?.availability === 'Monthly' ? moment(filters?.month).format("YYYY-MM-DDThh:mm:ss") + 'Z' : moment(filters?.startDate).format("YYYY-MM-DDThh:mm:ss") + 'Z',
+            end: filters?.availability === 'Monthly' ? moment(filters?.month).format("YYYY-MM-DDThh:mm:ss") + 'Z' : moment(filters?.end*1000).format("YYYY-MM-DDThh:mm:ss") + 'Z',
+            start: filters?.availability === 'Monthly' ? moment(filters?.month).format("YYYY-MM-DDThh:mm:ss") + 'Z' : moment(filters?.start*1000).format("YYYY-MM-DDThh:mm:ss") + 'Z',
             "fare": parkingPlace?.price?.toFixed(2),
+            "paid_amount": (parkingPlace?.is_payment_available && tabSelected === 1) ? commission?.toFixed(2) : total_price.toFixed(2),
             "days": filters?.day?.toString(),
             "payment": false,
             "payment_mode": "Cash"
         }
-
         console.log('req: ', req)
-
         const resp = await dispatch(bookSpotRequest(req))
         console.log('resp: ', resp)
         if(resp?.status){
             if(userData?.is_guest){
                 setModalVisible(false)
                 setCreateAccountModal(true)
+                setLoading(false)
             } else {
-                props.navigation.reset({routes:[{name: 'Confirmation'}]})
+                // setModalVisible(false)
+                console.log('stripe: ', resp?.data?.id)
+                openPaymentSheet(resp?.data?.id)
+                // props.navigation.navigate('Payments')
+                // props.navigation.reset({routes:[{name: 'Confirmation'}]})
             }
+        } else {
+            setLoading(false)
         }
     }
 
-    const numofHours = calculateTotalHours(filters?.start, filters?.end) * filters?.day.length
-    console.log('diff: ', numofHours)
-    const parkingFare = parkingPlace?.availability === 'Hourly' ? numofHours * parseFloat(parkingPlace?.price?.toFixed(2)) : parkingPlace?.price?.toFixed(2)
-    const commission = parkingFare * parseFloat(parkingPlace?.commission?.toFixed(2)) * .01
-    const total_price = parseFloat(commission?.toFixed(2)) + parseFloat(parkingFare?.toFixed(2))
+    if (enableGooglePay) {
+        // Google Pay related config
+        const { initGooglePay } = useGooglePay();
+    
+        useEffect(() => {
+          async function initialize() {
+            const { error } = await initGooglePay({
+              testEnv: stripeTestEnv,
+              merchantName: merchantName,
+              countryCode: merchantCountryCode,
+              billingAddressConfig: {
+                format: "FULL",
+                isPhoneNumberRequired: true,
+                isRequired: false
+              },
+              existingPaymentMethodRequired: false,
+              isEmailRequired: true
+            });
+    
+            if (error) {
+              Alert.alert(error.code, error.message);
+              return;
+            }
+            setGPayInitialized(true);
+          }
+          if (Platform.OS === "android") {
+            initialize();
+          }
+        }, [initGooglePay]);
+    }
+    
+    const payGoogle = async () => {
+        bookNow()
+        setIsPaymentModal(false)
+        const { paymentIntent } = await fetchPaymentSheetParams((parkingPlace?.is_payment_available && tabSelected === 1) ? commission?.toFixed(2) : total_price.toFixed(2))
+        const { error } = await presentGooglePay({
+            clientSecret: paymentIntent,
+            currencyCode: merchantCurrency
+        });
+
+        if (error) {
+            Alert.alert(error.code, error.message);
+            return;
+        }
+        Alert.alert("Success", "The SetupIntent was confirmed successfully.");
+    };
+
+      // Apple Pay related config
+    const { presentApplePay, confirmApplePayPayment, isApplePaySupported } =
+    useApplePay({
+        onShippingMethodSelected: (shippingMethod) => {
+        __DEV__ && console.log("shippingMethod", shippingMethod);
+        // Update cart summary based on selected shipping method.
+        },
+        onShippingContactSelected: (shippingContact) => {
+        __DEV__ && console.log("shippingContact", shippingContact);
+        // Make modifications to cart here e.g. adding tax.
+        // handler(cart);
+        }
+    });
+
+    const payApple = async () => {
+        bookNow()
+        setIsPaymentModal(false)
+        console.log('apple pay: ')
+    const { error, paymentMethod } = await presentApplePay({
+        cartItems: [{ label: merchantName, amount: '60' }],
+        country: merchantCountryCode,
+        currency: merchantCurrency,
+        requiredShippingAddressFields: ["emailAddress", "phoneNumber", "name"],
+        requiredBillingContactFields: ["phoneNumber", "name"],
+        jcbEnabled: true
+    });
+
+    console.log('paymentMethod: ', )
+
+    if (error) {
+        Alert.alert(error.code, error.message);
+    } else {
+        __DEV__ && console.log(JSON.stringify(paymentMethod, null, 2));
+        const { paymentIntent } = await fetchPaymentSheetParams((parkingPlace?.is_payment_available && tabSelected === 1) ? commission?.toFixed(2) : total_price.toFixed(2));
+
+        const { error: confirmApplePayError } = await confirmApplePayPayment(
+        paymentIntent
+        );
+
+        if (confirmApplePayError) {
+        Alert.alert(confirmApplePayError.code, confirmApplePayError.message);
+        } else {
+        Alert.alert("Success", "The payment was confirmed successfully!");
+        }
+    }
+    };
 
   return (
       <SafeAreaView style={{backgroundColor: '#FBFBFB', flex: 1}}>
+          <StripeProvider
+        publishableKey={localOptions.stripePublishKey}
+        merchantIdentifier={localOptions.merchantIdentifier}
+      >
+          <>
+          
         <ScrollView contentContainerStyle={{justifyContent: 'center'}}>
             <View style={{height: 170}} >
                 <FlatList 
@@ -141,7 +324,7 @@ const ParkingDetails = (props) => {
         <View style={{paddingHorizontal: 8, paddingVertical: 16, backgroundColor: 'white', flexDirection: 'row', justifyContent: 'space-between'}}>
             <View style={{flex: 0.5, alignItems: 'center', justifyContent: 'center'}}>
                 <Text style={[commonStyles.text_xs_bold, {textAlign: 'center'}]}>
-                   {`Parking Fare: $${parkingFare.toFixed(2)}`}
+                   {`Parking Fare: $${parkingFare}`}
                 </Text>
                 <Text style={[commonStyles.text_xs_bold, {textAlign: 'center'}]}>
                     {`Reservation Fee: $${commission?.toFixed(2)}`}
@@ -151,9 +334,16 @@ const ParkingDetails = (props) => {
                 </Text>
             </View>
             <View style={{flex: 0.5}}>
-                <CustomButton label={`Pay ${(parkingPlace?.is_payment_available && tabSelected === 1) ? `$${commission?.toFixed(2)}` : `$${total_price.toFixed(2)}`}`} isPrimaryButton onPress={() => setModalVisible(true)} />
+                {loading ? <ActivityIndicator color={colors.base} size={'large'}/>
+                    : 
+                    <>
+                        <CustomButton label={`Pay ${(parkingPlace?.is_payment_available && tabSelected === 1) ? `$${commission?.toFixed(2)}` : `$${total_price.toFixed(2)}`}`} isPrimaryButton onPress={() => setModalVisible(true)} />
+                    </>
+                }
             </View>
         </View>
+        </>
+        </StripeProvider>
         <CreateAccountPopup isModal={iscreateAccountModal} setModal={setCreateAccountModal} navigation={props.navigation}/>
         <LogoutPopup
             visible={modalVisible} 
@@ -161,8 +351,22 @@ const ParkingDetails = (props) => {
             subHeader='Are you sure you want to book?'
             primaryButton='Yes'
             navigation={props.navigation} 
-            onLogout={bookNow}
+            onLogout={() => {
+                setModalVisible(false)
+                setIsPaymentModal(true)
+            }}
             onClose={() => setModalVisible(false)} />
+        <PaymentPopup
+        visible={isPaymentModal} 
+        navigation={props.navigation}
+        bookNow={bookNow}
+        payGoogle={payGoogle}
+        gPayinitialized={gPayinitialized}
+        enableGooglePay={enableGooglePay}
+        onClose={() => setIsPaymentModal(false)}
+        isApplePaySupported={isApplePaySupported}
+        payApple={payApple}
+        enableApplePay={enableApplePay} />
     </SafeAreaView>
   );
 }

@@ -14,8 +14,8 @@ const Login = (props) => {
   const [isAccountCreate, setIsAccountCreate] = useState(props?.route?.params?.isSignup)
   const [toggleCheckBox, setToggleCheckBox] = useState(false)
   const [rememberMe, setRememberMe] = useState(false)
-  const [email, setEmail] = useState('jainlavika19+95@gmail.com')//test1@gmail.com jainlavika19+95@gmail.com mandeep.kumar+1@crowdbotics.com
-  const [password, setPassword] = useState('lavika19') //test lavika19 Admin123
+  const [email, setEmail] = useState(']')//test1@gmail.com jainlavika19+95@gmail.com mandeep.kumar+1@crowdbotics.com
+  const [password, setPassword] = useState('') //test lavika19 Admin123
   const [mobileNumber, setMobileNumber] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')// reNxsgmgx5
   const [isloading, setIsloading] = useState(false)
@@ -199,9 +199,9 @@ const Login = (props) => {
         <View style={commonStyles.marginTop30}>
         <SocialButtonsView
           loading={false}
-          onFacebookConnect={() => onFacebookConnect(dispatch, props.navigation)}
+          onFacebookConnect={() => onFacebookConnect(dispatch, props.navigation, socialAuths)}
           onGoogleConnect={() => onGoogleConnect(dispatch, props.navigation, socialAuths)}
-          onAppleConnect={() => onAppleConnect(dispatch, props.navigation)}
+          onAppleConnect={() => onAppleConnect(dispatch, props.navigation, socialAuths)}
         />
       </View>
         <Text style={styles.textStyle}>{isAccountCreate ? "Already have an account?" : "Don't have account?"}</Text>

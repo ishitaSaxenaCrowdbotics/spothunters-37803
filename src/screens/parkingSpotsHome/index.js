@@ -130,15 +130,17 @@ const ParkingSpotsHome = (props) => {
     }, [])
 
     const getParkingPlaces = async () => {
+        const nextDate = new Date(new Date().getTime() + 24 * 60 * 60 * 1000)
+        console.log('nextDate: ', nextDate)
         dispatch(filters({
-            end: toUnixTime(new Date().getFullYear(), new Date().getMonth()+1, new Date().getDate(), new Date().getHours(), new Date().getMinutes(), new Date().getSeconds()),
-            start: toUnixTime(new Date().getFullYear(), new Date().getMonth()+1, new Date().getDate(), new Date().getHours(), new Date().getMinutes(), new Date().getSeconds()),
+            end: toUnixTime(nextDate.getFullYear(), nextDate.getMonth()+1, nextDate.getDate(), nextDate.getHours(), nextDate.getMinutes(), nextDate.getSeconds()),
+            start: toUnixTime(nextDate.getFullYear(), nextDate.getMonth()+1, nextDate.getDate(), nextDate.getHours(), nextDate.getMinutes(), nextDate.getSeconds()),
             availability: 'Daily', 
           }))
         setLoading(true)
         const reqData = {
-            end: toUnixTime(new Date().getFullYear(), new Date().getMonth()+1, new Date().getDate(), new Date().getHours(), new Date().getMinutes(), new Date().getSeconds()),
-            start: toUnixTime(new Date().getFullYear(), new Date().getMonth()+1, new Date().getDate(), new Date().getHours(), new Date().getMinutes(), new Date().getSeconds()),
+            end: toUnixTime(nextDate.getFullYear(), nextDate.getMonth()+1, nextDate.getDate(), nextDate.getHours(), nextDate.getMinutes(), nextDate.getSeconds()),
+            start: toUnixTime(nextDate.getFullYear(), nextDate.getMonth()+1, nextDate.getDate(), nextDate.getHours(), nextDate.getMinutes(), nextDate.getSeconds()),
             availability: 'Daily'
           }
         const resp = await dispatch(parkingSearchListRequest(reqData)) 
@@ -259,7 +261,7 @@ const ParkingSpotsHome = (props) => {
         <>
         {loading ? <ActivityIndicator style={{marginTop: 50}} size="large" color={colors.base} /> : 
         <>
-        <Text style={{paddingHorizontal: 16,  marginTop: 10}}>{selectTime ? selectTime : `Daily: ${new Date().toLocaleDateString()}`}</Text>
+        <Text style={{paddingHorizontal: 16,  marginTop: 10}}>{selectTime ? selectTime : `Daily: ${new Date(new Date().getTime() + 24 * 60 * 60 * 1000).toLocaleDateString()}`}</Text>
         <View style={{ paddingHorizontal: 16, flexDirection: 'row', justifyContent: 'space-between', marginBottom: 8, marginTop: 5 }}>
             <Text style={[commonStyles.text_xs_thick, {textAlignVertical: 'center'}]}>
                 {parkingSearchList?.count} parking spots near you

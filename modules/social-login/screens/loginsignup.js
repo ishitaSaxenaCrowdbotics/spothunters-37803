@@ -33,7 +33,8 @@ import {
   appleLogin
 } from "../auth";
 import { unwrapResult } from "@reduxjs/toolkit";
-import { googleLoginRequest } from "../../../src/utils/service";
+import { googleLoginRequest, set_auth } from "../../../src/utils/service";
+import { setLoginData } from "../../../src/state/actions";
 
 // Custom Text Input
 export const TextInputField = (props) => (
@@ -115,7 +116,7 @@ export const SocialButtonsView = (props) => (
   </View>
 );
 
-export const onFacebookConnect = async (dispatch, navigation) => {
+export const onFacebookConnect = async (dispatch, navigation, socialAuths) => {
   try {
     const fbResult = await LoginManager.logInWithPermissions([
       "public_profile",
@@ -126,13 +127,27 @@ export const onFacebookConnect = async (dispatch, navigation) => {
       dispatch(facebookLogin({ access_token: data.accessToken }))
         .then(unwrapResult)
         .then((res) => {
-          if (res.key) navigation.navigate(HOME_SCREEN_NAME);
+          // if (res.key) navigation.navigate(HOME_SCREEN_NAME);
+          console.log('google response: ', res)
+          if(res?.token){
+            dispatch(setLoginData(res))
+            set_auth(Object.assign({}, res));
+            socialAuths && socialAuths()
+          }
         });
     }
   } catch (err) {
     console.log("Facebook Login Failed: ", JSON.stringify(err));
   }
 };
+
+export const googleLogOut = async () => {
+  const isSignedIn = await GoogleSignin.isSignedIn();
+  if(isSignedIn) {
+    await GoogleSignin.revokeAccess();
+    await GoogleSignin.signOut();
+  }
+}
 
 export const onGoogleConnect = async (dispatch, navigation, socialAuths) => {
   console.log('tokens: google data')
@@ -153,7 +168,12 @@ export const onGoogleConnect = async (dispatch, navigation, socialAuths) => {
     const resp1 = await dispatch(googleLoginRequest({ access_token: tokens.accessToken }))
     console.log('google response: ', resp1)
     if(resp1?.token){
+      dispatch(setLoginData(resp1))
+      set_auth(Object.assign({}, resp1));
       socialAuths && socialAuths()
+    } else {
+      await GoogleSignin.revokeAccess();
+      await GoogleSignin.signOut();
     }
     // dispatch(googleLogin({ access_token: tokens.accessToken }))
     //   .then(unwrapResult)
@@ -168,19 +188,26 @@ export const onGoogleConnect = async (dispatch, navigation, socialAuths) => {
   }
 };
 
-export const onAppleConnect = async (dispatch, navigation) => {
+export const onAppleConnect = async (dispatch, navigation, socialAuths) => {
   try {
     const signinFunction = Platform.select({
       ios: appleForiOS,
       android: appleForAndroid
     });
+    console.log('signinFunction: ', signinFunction)
     const result = await signinFunction();
+    console.log('signinFunction result: ', result)
     dispatch(
       appleLogin({ id_token: result.id_token, access_token: result.code })
     )
       .then(unwrapResult)
       .then((res) => {
-        if (res.key) navigation.navigate(HOME_SCREEN_NAME);
+        console.log('data res : ', res)
+        dispatch(setLoginData(resp1))
+        set_auth(Object.assign({}, res));
+        console.log('apple id: ', res)
+        socialAuths && socialAuths()
+        // if (res.key) navigation.navigate(HOME_SCREEN_NAME);
       });
   } catch (err) {
     console.log(JSON.stringify(err));

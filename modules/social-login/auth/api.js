@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const BASE_URL = "https://your-app-backend.botics.co"; // your app back-end url
+const BASE_URL = "https://parkauthority-37803.botics.co"; // your app back-end url
 
 const authAPI = axios.create({
   baseURL: BASE_URL,

@@ -45,10 +45,10 @@ const BookingsList = (props) => {
     }, [])
 
     const renderItemPrev = ({item}) => {
-        return(<PreviousBooking fullView item={item} />) 
+        return(<PreviousBooking fullView item={item} />)  
     }
     const renderItem = ({item}) => {
-        return(<UpcomingBooking navigation={props.navigation} fullView item={item}/>)
+        return(<UpcomingBooking navigation={props.navigation} fullView item={item}  getBookingData={getBookingData}/>)
     }
 
     const onSearch = async (value) => { 
@@ -81,7 +81,7 @@ const BookingsList = (props) => {
             {props?.route?.params?.upcoming ? 
                 <FlatList 
                     nestedScrollEnabled
-                    data={upcomingBookings?.results}
+                    data={upcomingBookings}
                     style={commonStyles.fullWidth}
                     showsVerticalScrollIndicator={true}
                     renderItem={renderItem}

@@ -1,9 +1,9 @@
 // Please, update the values below as instructed in the README.md file.
 export const GOOGLE_WEB_CLIENT_ID = "993169876801-92aink9vca20s5ver7bj9uapbmlkgia1.apps.googleusercontent.com";
-export const GOOGLE_IOS_CLIENT_ID = "YYYYYY.apps.googleusercontent.com";
-export const APPLE_SERVICE_ID = "com.crowdbotics.APP_NAME";
+export const GOOGLE_IOS_CLIENT_ID = "993169876801-4vbfjstkloq1h0t25k403a7ig200m8ml.apps.googleusercontent.com";
+export const APPLE_SERVICE_ID = "com.spotHunter.web";
 export const APPLE_REDIRECT_CALLBACK =
-  "https://your-app-here.com/accounts/apple/login/callback/";
+  "https://parkauthority-37803.botics.co/accounts/apple/login/callback/";
 
 // -----------------------------------------------------
 const messageMap = {

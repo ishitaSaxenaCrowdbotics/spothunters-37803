@@ -1,13 +1,12 @@
 import React, { useEffect, useState, useContext } from "react";
 import { Text, View, FlatList } from "react-native";
-import { OptionsContext } from "@options";
-// import { StripeProvider } from "@stripe/stripe-react-native";
-// import { CheckoutScreen } from "./checkout";
+import { StripeProvider } from "@stripe/stripe-react-native";
+import { CheckoutScreen } from "./checkout";
 import { fetchPaymentHistory } from "./api";
+import { localOptions, styles } from "./options";
 
 const Payments = () => {
-  const options = useContext(OptionsContext);
-  const { styles, localOptions } = options;
+  // const { styles, localOptions } = options;
   const [payments, setPayments] = useState([]);
   const [refresh, setRefresh] = useState(true);
   const getPayments = async () => {
@@ -42,12 +41,12 @@ const Payments = () => {
 
   return (
     <View>
-      {/* <StripeProvider
-        publishableKey={stripePublishKey}
-        merchantIdentifier={merchantIdentifier}
-      > */}
-        {/* <CheckoutScreen /> */}
-      {/* </StripeProvider> */}
+      <StripeProvider
+        publishableKey={localOptions.stripePublishKey}
+        merchantIdentifier={localOptions.merchantIdentifier}
+      >
+        <CheckoutScreen />
+      </StripeProvider>
       <View>
         <Text
           style={{ marginHorizontal: 15, marginTop: 15, paddingBottom: 10 }}

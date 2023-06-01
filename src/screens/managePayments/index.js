@@ -1,21 +1,21 @@
 import React, { useEffect, useState } from 'react';
-import { SafeAreaView, FlatList, View, Text, TouchableOpacity, Image, Modal, PermissionsAndroid } from 'react-native';
+import { SafeAreaView, FlatList, View, Text, TouchableOpacity, Image, Modal, PermissionsAndroid, Alert } from 'react-native';
 import ViewReport from '../../components/viewReport';
 import { colors, commonStyles } from '../../styles';
 import { styles } from './styles';
 import { Icon } from 'react-native-elements'
 import { CustomButton } from '../../components/customButton';
-import { downloadReportRequest, managePaymentRequest } from '../../utils/service';
+import { downloadReportRequest, get_auth, managePaymentRequest } from '../../utils/service';
 import { useDispatch, useSelector } from 'react-redux';
-import { formatTime } from '../../utils';
 import moment from 'moment';
 import FloatingTextInput from '../../components/floatingTextInput';
 import DatePicker from 'react-native-date-picker';
-// import RNFetchBlob from 'rn-fetch-blob'
+import RNFetchBlob from 'rn-fetch-blob'
 
 const ManagePayment = (props) => {
 
     let managePayment = useSelector(state => state?.app?.managePayment)
+    let rqData
     const dispatch = useDispatch()
     const [search, setSearch] = useState('')
     const [isStartDateOpen, setIsStartDateOpen] = useState(false)
@@ -34,7 +34,6 @@ const ManagePayment = (props) => {
 
     const onSearch = async (value, isFilter) => { 
         !isFilter && setSearch(value)
-        let rqData
         if(isFilter){
           setIsModal(false)
           rqData = {
@@ -52,45 +51,45 @@ const ManagePayment = (props) => {
         } else {
         }
     }
-
-    const getDownload = async () => {
-      await dispatch(downloadReportRequest()) 
-      // console.log('resp: ', resp)   
+    
+    const actualDownload = async (pk, id) => {
+      const { dirs } = RNFetchBlob.fs;
+            let user = await get_auth();
+      RNFetchBlob.config({
+          fileCache: true,
+          addAndroidDownloads: {
+          useDownloadManager: true,
+          notification: true,
+          mediaScannable: true,
+          title: `test.pdf`,
+          path: `${dirs.DownloadDir}/test.pdf`,
+          },
+      })
+        .fetch('GET', `${API_URL}/user/api/v1/manage-payment/generate-pdf-report/?search=${rqData?.search ? rqData?.search : ''}&start_date=${rqData?.start_date ? rqData?.start_date : ''}&end_date=${rqData?.end_date ? rqData?.end_date : ''}&pk=${id || ''}`, {
+           'Content-type': 'application/json',
+            accept: 'application/json',
+            Authorization: `Token ${user?.token}`
+        })
+        .then((res) => {
+        console.log('The file saved to ', res.path());
+        })
+        .catch((e) => {
+        console.log(e)
+        });
     }
     
-    // actualDownload = () => {
-    // const { dirs } = RNFetchBlob.fs;
-    // RNFetchBlob.config({
-    //     fileCache: true,
-    //     addAndroidDownloads: {
-    //     useDownloadManager: true,
-    //     notification: true,
-    //     mediaScannable: true,
-    //     title: `test.pdf`,
-    //     path: `${dirs.DownloadDir}/test.pdf`,
-    //     },
-    // })
-    //     .fetch('GET', 'http://www.africau.edu/images/default/sample.pdf', {})
-    //     .then((res) => {
-    //     console.log('The file saved to ', res.path());
-    //     })
-    //     .catch((e) => {
-    //     console.log(e)
-    //     });
-    // }
-    
-    // downloadFile = () => {
-    // try {
-    //     const granted = await PermissionsAndroid.request(PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE);
-    //     if (granted === PermissionsAndroid.RESULTS.GRANTED) {
-    //         this.actualDownload();
-    //     } else {
-    //         Alert.alert('Permission Denied!', 'You need to give storage permission to download the file');
-    //     }
-    //     } catch (err) {
-    //     console.warn(err);
-    //     } 
-    // }
+    const downloadFile = async (pk, id) => {
+    try {
+        const granted = await PermissionsAndroid.request(PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE);
+        if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+            actualDownload(pk, id);
+        } else {
+            Alert.alert('Permission Denied!', 'You need to give storage permission to download the file');
+        }
+        } catch (err) {
+        console.warn(err);
+        } 
+    }
 
     const renderItem = ({item}) => {
         return(
@@ -112,7 +111,7 @@ const ManagePayment = (props) => {
                             {moment(item?.created).format('YYYY-MM-DD')}
                         </Text>
                     </View>
-                    <TouchableOpacity style={[commonStyles.marginLeft15]}>
+                    <TouchableOpacity style={[commonStyles.marginLeft15]} onPress={() => downloadFile(true, item?.id)}>
                         <Icon name="download" type='antdesign' size={25} color={colors.base} />
                     </TouchableOpacity>
                 </View>
@@ -142,7 +141,7 @@ const ManagePayment = (props) => {
             keyExtractor={(item, index) => `${item.id}-${index}`}/>
         <View style={[commonStyles.paddingHorizontal16, commonStyles.paddingVertical16, commonStyles.whiteBackground, commonStyles.flexRow, commonStyles.justifyContentBetween]}>
             <Text style={[commonStyles.text_large, commonStyles.textAlignVerticalCenter]}>Download full report</Text>
-            <CustomButton label={'Download'} isPrimaryButton onPress={getDownload} style={{flex: 0.6}} />
+            <CustomButton label={'Download'} isPrimaryButton onPress={downloadFile} style={{flex: 0.6}} />
         </View>
         <Modal
             transparent

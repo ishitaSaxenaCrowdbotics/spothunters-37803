@@ -107,7 +107,7 @@ const UpcomingBooking = forwardRef((props, ref) => {
                     {props?.item?.place?.name}
                 </Text>
                 <Text style={[commonStyles.text_xs, commonStyles.darkGreyTextColor, commonStyles.marginTop8]}>
-                    {`Rental ID: ${props?.item?.id}`}
+                    {`Rental ID: ${props?.item?.id} (${props?.item?.place?.availability})`}
                 </Text>
                 <View style={[commonStyles.flexRow, commonStyles.marginTop8, commonStyles.alignItemsCenter]}>
                     {/* <Image source={require('../../assets/marker.png')} style={[commonStyles.marginRight8, commonStyles.size24]} /> */}
@@ -132,7 +132,10 @@ const UpcomingBooking = forwardRef((props, ref) => {
                     In time
                 </Text>
                 <Text style={[commonStyles.text_xs_bold, commonStyles.blackTextColor, commonStyles.centerTextAlign]}>
-                    {formatTime(props?.item?.start)}
+                    {props?.item?.start.split('T')[0]}
+                </Text>
+                <Text style={[commonStyles.text_xs_bold, commonStyles.blackTextColor, commonStyles.centerTextAlign]}>
+                    {props?.item?.start.split('T')[1].replace('Z', '')}
                 </Text>
             </View>
             <View>
@@ -140,7 +143,10 @@ const UpcomingBooking = forwardRef((props, ref) => {
                     Out time 
                 </Text>
                 <Text style={[commonStyles.text_xs_bold,commonStyles.blackTextColor, commonStyles.centerTextAlign]}>
-                    {formatTime(props?.item?.end)}
+                    {(props?.item?.place?.availability === 'Monthly' || props?.item?.place?.availability === 'Daily') ? 'None' : props?.item?.end.split('T')[0]}
+                </Text>
+                <Text style={[commonStyles.text_xs_bold, commonStyles.blackTextColor, commonStyles.centerTextAlign]}>
+                {(props?.item?.place?.availability === 'Monthly' || props?.item?.place?.availability === 'Daily') ? '' : props?.item?.end.split('T')[1].replace('Z', '')}
                 </Text>
             </View>
             <View>

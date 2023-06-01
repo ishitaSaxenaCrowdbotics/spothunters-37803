@@ -18,7 +18,7 @@ const SendFeedback = (props) => {
   const onSubmit = async () => {
     const resp = await dispatch(feedBackRequest({email: emailID, message: msg}))
     console.log('resp: ', resp)
-    if(resp.id){
+    if(resp.status){
       Alert.alert('feedback sent')
     }
   }

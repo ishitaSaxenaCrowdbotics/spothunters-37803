@@ -34,14 +34,14 @@ const Home = (props) => {
             setLoadingPrev(true)
         }
         const resp1 = await dispatch(previousBookingRequest())
-        if (resp1?.count > 0){
+        if (resp1?.length > 0){
             console.log('prev resp: ', resp1)
             setLoadingPrev(false)
         } else {
             setLoadingPrev(false)
         }
         const res2 = await dispatch(upcomingBookingRequest())
-        if (res2?.count > 0){
+        if (res2?.length > 0){
             setLoadingUp(false)
             console.log('upcoming resp1: ', res2)
         } else {

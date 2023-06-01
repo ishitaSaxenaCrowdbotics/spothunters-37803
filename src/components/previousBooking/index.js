@@ -99,7 +99,7 @@ const PreviousBooking = (props) => {
                     In time
                 </Text>
                 <Text style={[commonStyles.text_xs_bold, commonStyles.blackTextColor, commonStyles. centerTextAlign]}>
-                {formatTime(props?.item?.start)}
+                {formatTime(props?.item?.entry)}
                 </Text>
             </View>
             <View>
@@ -107,7 +107,7 @@ const PreviousBooking = (props) => {
                     Out time 
                 </Text>
                 <Text style={[commonStyles.text_xs_bold, commonStyles.blackTextColor, commonStyles. centerTextAlign]}>
-                {formatTime(props?.item?.end)}
+                {formatTime(props?.item?.exit)}
                 </Text>
             </View>
             <View>
@@ -115,7 +115,7 @@ const PreviousBooking = (props) => {
                     Total Time
                 </Text>
                 <Text style={[commonStyles.text_xs_bold, commonStyles.blackTextColor, commonStyles. centerTextAlign]}>
-                  {calcTotalTime(props?.item?.start, props?.item?.end)}
+                  {calcTotalTime(props?.item?.entry, props?.item?.exit)}
                 </Text>
             </View>
         </View>

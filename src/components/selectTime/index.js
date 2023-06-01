@@ -15,9 +15,10 @@ import moment from 'moment';
 
 const SelectTime = (props) => {
 
+  var date = new Date();
     const [isSelected, setSelected] = useState(props?.type || 'Hourly')
-    const [startDate, setStartDate] = useState(new Date())
-    const [endDate, setEndDate] = useState(new Date())
+    const [startDate, setStartDate] = useState(new Date(date.getFullYear(), date.getMonth(), date.getDate() + 1, 0,0,0))
+    const [endDate, setEndDate] = useState(new Date(date.getFullYear(), date.getMonth(), date.getDate() + 1, 0,0,0))
     const [month, setMonth] = useState(new Date(new Date().getFullYear(), new Date().getMonth() + 1))
     const [open, setOpen] = useState({isOpen: false, type: ''})
     const [isOpenMonthPicker, setIsOpenMonthPicker] = useState(false)
@@ -26,6 +27,9 @@ const SelectTime = (props) => {
     const dispatch = useDispatch()
     const monthNames = ["January", "February", "March", "April", "May", "June",
       "July", "August", "September", "October", "November", "December"];
+
+      var tomorrow = new Date(date.getFullYear(), date.getMonth(), date.getDate() + 1, 0,0,0);
+    console.log('date min: ', tomorrow)
 
     const renderItem = ({item, index}) => {
       return(
@@ -105,18 +109,18 @@ const SelectTime = (props) => {
     const onPresTab = type => {
       setSelected(type)
       if (type === 'Hourly'){
-        setStartDate(new Date())
-        setEndDate(new Date())
+        setStartDate(new Date(date.getFullYear(), date.getMonth(), date.getDate() + 1, 0,0,0))
+        setEndDate(new Date(date.getFullYear(), date.getMonth(), date.getDate() + 1, 0,0,0))
       } else if(type === 'Monthly'){
         setMonth(new Date(new Date().getFullYear(), new Date().getMonth() + 1))
       } else if(type === 'Weekly'){
-        setStartDate(new Date())
+        setStartDate(new Date(date.getFullYear(), date.getMonth(), date.getDate() + 1, 0,0,0))
         var newDate = new Date()
-        newDate.setDate(newDate.getDate() + 7)
+        newDate.setDate(newDate.getDate(date.getFullYear(), date.getMonth(), date.getDate() + 1, 0,0,0) + 7)
         setEndDate(newDate)
       } else if(type === 'Daily'){
-        setStartDate(new Date())
-        setEndDate(new Date())
+        setStartDate(new Date(date.getFullYear(), date.getMonth(), date.getDate() + 1, 0,0,0))
+        setEndDate(new Date(date.getFullYear(), date.getMonth(), date.getDate() + 1, 0,0,0))
       }
     }
 
@@ -201,7 +205,7 @@ const SelectTime = (props) => {
                 modal
                 is24hourSource="locale"
                 locale="en"
-                minimumDate={isSelected !== 'Hourly' ? new Date() : null}
+                minimumDate={tomorrow} 
                 open={open.isOpen}
                 mode={isSelected === 'Hourly' ? 'datetime' : 'date'}
                 date={(open.type === 'startDate' || open.type === 'Daily'|| open.type === 'Weekly') ? startDate : endDate}
@@ -216,10 +220,10 @@ const SelectTime = (props) => {
                   } else {
                     setEndDate(date)
                   }
-                  setOpen(false)
+                  // setOpen({isOpen: false, type: open.type})
                 }}
                 onCancel={() => {
-                setOpen(false)
+                // setOpen({isOpen: true, type: open.type})
                 }} />
               {isOpenMonthPicker && (
                 <MonthPicker

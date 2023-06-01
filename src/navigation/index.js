@@ -37,6 +37,8 @@ import { logoutRequest } from '../utils/service';
 import { removeAuthData } from '../utils';
 import { reset } from '../state/actions';
 import ManagePayment from '../screens/managePayments';
+import payments from '../../modules/payments';
+import { googleLogOut } from '../../modules/social-login/screens/loginsignup';
 
 function CustomDrawerContent(props) {
     const [modalVisible, setModalVisible] = useState(false)
@@ -55,6 +57,7 @@ function CustomDrawerContent(props) {
             setModalVisible(false)
             removeAuthData()
             dispatch(reset())
+            googleLogOut()
             props.navigation.reset({routes:[{name: 'Login'}]})
         }
     }
@@ -209,7 +212,7 @@ const Booking = props => {
         <BookNav.Screen name='Parking Details' component={ParkingDetails}/>
         <BookNav.Screen name='Payment' component={Payment}/>
         <BookNav.Screen name='Login' component={Login}/>
-        <BookNav.Screen name='Confirmation' component={BookingConfirmation}/>
+        <BookNav.Screen name='Confirmation' component={BookingConfirmation}/>        
       </BookNav.Navigator>
     </>
   );
@@ -243,7 +246,7 @@ const MainNav = props => {
         screenOptions={({ navigation, route }) => {
             return {
               headerStyle: { backgroundColor: '#FBFBFB' },
-              headerTitle: route.name === 'ParkingCompHome' || route.name === 'Home' ? `Hi, ${userData?.name}` : route.name,
+              headerTitle: route.name === 'ParkingCompHome' || route.name === 'Home' ? `Hi, ${userData?.name ? userData?.name: ''}` : route.name,
               headerLeft: () => <DrawerHeader navigation={navigation} />
             };
           }}>
@@ -258,6 +261,7 @@ const MainNav = props => {
         <Drawer.Screen name='BookListing' component={BookListing} options={{ headerShown: false }}/>
         <Drawer.Screen name='ViewReports' component={ViewReports}/>
         <Drawer.Screen name='Manage Payment' component={ManagePayment}/>
+        <Drawer.Screen name='Payments' component={payments.navigator}/>
         <Drawer.Screen
           name="booking"
           component={Booking}

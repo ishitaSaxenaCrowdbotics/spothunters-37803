@@ -17,7 +17,7 @@ export async function appleForAndroid() {
   // Configure the request
   appleAuthAndroid.configure({
     // The Service ID you registered with Apple
-    clientId: APPLE_SERVICE_ID,
+    clientId: 'com.spotHunter.web',
 
     // Return URL added to your Apple dev console. We intercept this redirect, but it must still match
     // the URL you provided to Apple. It can be an empty route on your backend as it's never called.

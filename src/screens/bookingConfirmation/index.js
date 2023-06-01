@@ -35,16 +35,16 @@ const BookingConfirmation = (props) => {
         </View>
         <View style={[ commonStyles. justifyContentBetween, commonStyles.marginTop8, commonStyles.paddingHorizontal30]}>
             <Text style={[commonStyles.text_large_thick, commonStyles.lightBlackTextColor]}>
-                NCP Car Park Manchester
+                {props?.route?.params?.parkingPlaceName}
             </Text>
             <Text style={[commonStyles.text_xs, commonStyles.darkGreyTextColor, commonStyles.marginTop8]}>
-                {`Rental ID: 123`}
+                {`Rental ID: ${props?.route?.params?.id}`}
             </Text>
             <View style={[commonStyles.flexRow, commonStyles.marginTop8, commonStyles.alignItemsCenter]}>
                 {/* <Image source={require('../../assets/marker.png')} style={[commonStyles.marginRight8, commonStyles.size24]} /> */}
                 <Icon name="location-sharp" type='ionicon' size={25} color={'black'} />
                 <Text style={[commonStyles.text_xs, commonStyles.darkGreyTextColor]}>
-                    Toronto, Canada
+                    {props?.route?.params?.placeAdd}
                 </Text>
             </View>
         </View>
@@ -54,7 +54,7 @@ const BookingConfirmation = (props) => {
                     In time
                 </Text>
                 <Text style={[commonStyles.text_xs_bold, commonStyles.blackTextColor, commonStyles.centerTextAlign]}>
-                    fghjkl
+                {new Date(props?.route?.params?.inTime*1000).toLocaleString()}
                 </Text>
             </View>
             <View>
@@ -62,7 +62,7 @@ const BookingConfirmation = (props) => {
                     Out time 
                 </Text>
                 <Text style={[commonStyles.text_xs_bold,commonStyles.blackTextColor, commonStyles.centerTextAlign]}>
-                    fghjkl
+                {props?.route?.params?.availability !== 'Hourly' ? 'None' : new Date(props?.route?.params?.outTime*1000).toLocaleString()}
                 </Text>
             </View>
             <View>
@@ -71,7 +71,7 @@ const BookingConfirmation = (props) => {
                     Paid
                 </Text>
                 <Text style={[commonStyles.text_xs_bold, commonStyles.blackTextColor, commonStyles.centerTextAlign]}>
-                    $45
+                    {`$${props?.route?.params?.paid}`}
                 </Text>
             </View>
         </View>
@@ -79,7 +79,7 @@ const BookingConfirmation = (props) => {
             {qr && <Image source={{ uri: `data:image/png;base64,${qr}` }} style={{height: 140, width: 140}} />}
         </View> */}
         <View style={[commonStyles.paddingHorizontal8, commonStyles.paddingVertical16, commonStyles.whiteBackground, {position: 'absolute', bottom: 0, right: 0, left: 0}]}>
-                <CustomButton label={'Book New Parking'} onPress={() => props.navigation.navigate('booking')} />
+                <CustomButton label={'Book New Parking'} onPress={() => props.navigation.reset({routes:[{name: 'ParkingSpotsHome'}]})} />
         </View>
     </SafeAreaView>
   );

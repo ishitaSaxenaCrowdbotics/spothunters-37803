@@ -491,7 +491,6 @@ export const bookSpotRequest = (data) => async (dispatch) => {
   });
   let json = await response.json();
   console.log('response: ', json)
-  // dispatch(parkingCompHome(json))
   return json
 }
 
@@ -533,27 +532,46 @@ export const managePaymentRequest = (reqData) => async (dispatch) => {
     return json
 }
 
- export const downloadReportRequest = (reqData) => async (dispatch) => {
-   const requestUrl = reqData ? ['GET', `${API_URL}/user/api/v1/manage-payment/generate-pdf-report/?search=${reqData?.search ? reqData?.search : ''}&start_date=${reqData?.start_date ? reqData?.start_date : ''}&end_date=${reqData?.end_date ? reqData?.end_date : ''}`] : ['GET', `${API_URL}/user/api/v1/manage-payment/generate-pdf-report/`]
-      // const requestUrl = ['GET', `${API_URL}/user/api/v1/manage-payment/`];
-     console.log('requestUrl: ', requestUrl)
-     let user = await get_auth();
-     let response = await fetch(requestUrl[1], {
-       method: requestUrl[0],
-       headers: {
-         'Content-type': 'application/json',
-         accept: 'application/json',
-         Authorization: `Token ${user?.token}`
-       },
-     });
-    let json = await response.json();
-    console.log('response: ', json)
-    const blob = new Blob([resp], { type: "application/pdf" })
-    const url = URL.createObjectURL(blob)
-    const a = document.createElement("a")
-    a.href = url
-    a.download = "example.pdf"
-    a.click()
-    URL.revokeObjectURL(url)
-        // return json
- }
+export const downloadReportRequest = (reqData) => async (dispatch) => {
+  const requestUrl = reqData ? ['GET', `${API_URL}/user/api/v1/manage-payment/generate-pdf-report/?search=${reqData?.search ? reqData?.search : ''}&start_date=${reqData?.start_date ? reqData?.start_date : ''}&end_date=${reqData?.end_date ? reqData?.end_date : ''}`] : ['GET', `${API_URL}/user/api/v1/manage-payment/generate-pdf-report/`]
+    // const requestUrl = ['GET', `${API_URL}/user/api/v1/manage-payment/`];
+    console.log('requestUrl: ', requestUrl)
+    let user = await get_auth();
+    let response = await fetch(requestUrl[1], {
+      method: requestUrl[0],
+      headers: {
+        'Content-type': 'application/json',
+        accept: 'application/json',
+        Authorization: `Token ${user?.token}`
+      },
+    });
+  let json = await response.json();
+  console.log('response: ', json)
+  // const blob = new Blob([resp], { type: "application/pdf" })
+  // const url = URL.createObjectURL(blob)
+  // const a = document.createElement("a")
+  // a.href = url
+  // a.download = "example.pdf"
+  // a.click()
+  // URL.revokeObjectURL(url)
+      // return json
+}
+
+export const updatePaymentStatusRequest = (data, id) => async (dispatch) => {
+  const requestUrl = ['PATCH', `${API_URL}/parking/api/v1/payment-status/${id}/`];
+  console.log('requestUrl: ', requestUrl)
+  let user = await get_auth();
+  let response = await fetch(requestUrl[1], {
+    method: requestUrl[0],
+    headers: {
+      'Content-type': 'application/json',
+      accept: 'application/json',
+      Authorization: `Token ${user?.token}`
+    },
+    body: JSON.stringify(data)
+  });
+  let json = await response.json();
+  console.log('response: ', json)
+  // dispatch(parkingCompHome(json))
+  return json
+}

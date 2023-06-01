@@ -1,6 +1,6 @@
 import { StyleSheet } from "react-native";
 
-const styles = StyleSheet.create({
+export const styles = StyleSheet.create({
   hr: {
     marginTop: 20,
     marginBottom: 20,
@@ -63,7 +63,7 @@ const styles = StyleSheet.create({
 });
 
 export const localOptions = {
-  stripeSecretKey: "sk_test_xxxxxxxxxxx",
+  stripeSecretKey: "sk_test_51N8OMlFdHTQtW0piycecLmtsyGbiB1O17MaJGT7XzFv56wJGK6cT747qx2XQDteZxgPdqsVvREE56f5AWXGzRjBE00OKYL1dxp",
   merchantName: "Example Inc.",
   enableGooglePay: true,
   enableApplePay: true,
@@ -71,7 +71,7 @@ export const localOptions = {
   merchantCountryCode: "US",
   merchantCurrency: "USD",
   stripeTestEnv: true,
-  stripePublishKey: "pk_test_xxxxxxxxxx"
+  stripePublishKey: "pk_test_51N8OMlFdHTQtW0piO3f6beyjQy8pR3FQltBK5pAIts4sK3namjf9Bv2aVZ2AKdx5FeSER5BLvIh3oT3LBnndxV4k00120xHlb7"
 };
 
 export default {
